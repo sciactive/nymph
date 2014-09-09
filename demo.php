@@ -10,14 +10,22 @@ $require('NymphConfig', array(), function(){
 
 $nymph = $require('Nymph');
 
-$newEntity = new Entity();
-$newEntity->test = 'This is the test data!';
-$newEntity->uniqueID = $nymph->newUID('entity_test');
-$newEntity->private = 'This variable is confidential.';
+require 'Employee.php';
+
+$newEntity = new Employee();
+$newEntity->name = 'John Doe';
+$newEntity->title = 'Senior Person';
+$newEntity->salary = 5000000;
 $newEntity->save();
 
-$entity = $nymph->getEntity($newEntity->guid);
-$entity->privateData = array('private');
+$newEntity2 = new Employee();
+$newEntity2->name = 'Jane Doe';
+$newEntity2->title = 'Seniorer Person';
+$newEntity2->salary = 8000000;
+$newEntity2->subordinates[] = $newEntity;
+$newEntity2->save();
+
+$entity = $nymph->getEntity(array('class' => Employee), array('&', 'guid' => $newEntity2->guid));
 
 ?>
 <!DOCTYPE html>
@@ -35,5 +43,6 @@ $entity->privateData = array('private');
 		<pre><script>
 			document.write(JSON.parse(<?php echo json_encode((int) $entity->guid); ?>));
 		</script></pre>
+		<pre><?php var_dump($newEntity2); ?></pre>
 	</body>
 </html>

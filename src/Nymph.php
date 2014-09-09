@@ -18,6 +18,7 @@
  * @param RequirePHP $require The RequirePHP variable.
  */
 function setupNymph($require) {
+	$GLOBALS['NymphRequire'] = &$require;
 	$require('Nymph', array('NymphConfig'), function($NymphConfig){
 		require(dirname(__FILE__).DIRECTORY_SEPARATOR.'Interfaces.php');
 		require(dirname(__FILE__).DIRECTORY_SEPARATOR.'Exceptions.php');
@@ -28,6 +29,12 @@ function setupNymph($require) {
 
 		$Nymph = new $class($NymphConfig);
 		return $Nymph;
+	});
+	$require('NymphREST', array('Nymph'), function(){
+		require(dirname(__FILE__).DIRECTORY_SEPARATOR.'NymphREST.php');
+
+		$NymphREST = new NymphREST();
+		return $NymphREST;
 	});
 }
 

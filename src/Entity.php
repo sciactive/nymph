@@ -88,8 +88,8 @@ class Entity implements EntityInterface {
 	 */
 	public function __construct($id = 0) {
 		if ($id > 0) {
-			global $require;
-			$entity = $require('Nymph')->getEntity(array('class' => get_class($this)), array('&', 'guid' => $id, 'tag' => $this->tags));
+			global $NymphRequire;
+			$entity = $NymphRequire('Nymph')->getEntity(array('class' => get_class($this)), array('&', 'guid' => $id, 'tag' => $this->tags));
 			if (isset($entity)) {
 				$this->guid = $entity->guid;
 				$this->tags = $entity->tags;
@@ -288,6 +288,8 @@ class Entity implements EntityInterface {
 		$tag_array = func_get_args();
 		if ((array) $tag_array[0] === $tag_array[0])
 			$tag_array = $tag_array[0];
+		if (empty($tag_array))
+			return;
 		foreach ($tag_array as $tag) {
 			$this->tags[] = $tag;
 		}
@@ -330,10 +332,10 @@ class Entity implements EntityInterface {
 	}
 
 	public function delete() {
-		global $require;
+		global $NymphRequire;
 		if ($this->isASleepingReference)
 			$this->referenceWake();
-		return $require('Nymph')->deleteEntity($this);
+		return $NymphRequire('Nymph')->deleteEntity($this);
 	}
 
 	/**
@@ -467,6 +469,14 @@ class Entity implements EntityInterface {
 
 	public function jsonSerialize() {
 		$object = (object) array();
+		if ($this->isASleepingReference) {
+			$object->guid = $this->sleepingReference[1];
+			$object->isASleepingReference = true;
+			$object->sleepingReference = $this->sleepingReference;
+			$object->etype = $this->etype();
+			$object->class = $this->sleepingReference[2];
+			return $object;
+		}
 		$object->guid = $this->guid;
 		$object->cdate = $this->p_cdate;
 		$object->mdate = $this->p_mdate;
@@ -574,8 +584,8 @@ class Entity implements EntityInterface {
 	private function referenceWake() {
 		if (!$this->isASleepingReference)
 			return true;
-		global $require;
-		$entity = $require('Nymph')->getEntity(array('class' => $this->sleepingReference[2], 'skip_ac' => (bool) $this->_nUseSkipAC), array('&', 'guid' => $this->sleepingReference[1]));
+		global $NymphRequire;
+		$entity = $NymphRequire('Nymph')->getEntity(array('class' => $this->sleepingReference[2], 'skip_ac' => (bool) $this->_nUseSkipAC), array('&', 'guid' => $this->sleepingReference[1]));
 		if (!isset($entity))
 			return false;
 		$this->isASleepingReference = false;
@@ -591,8 +601,8 @@ class Entity implements EntityInterface {
 			$this->referenceWake();
 		if (!isset($this->guid))
 			return false;
-		global $require;
-		$refresh = $require('Nymph')->getEntity(array('class' => get_class($this)), array('&', 'guid' => $this->guid));
+		global $NymphRequire;
+		$refresh = $NymphRequire('Nymph')->getEntity(array('class' => get_class($this)), array('&', 'guid' => $this->guid));
 		if (!isset($refresh))
 			return 0;
 		$this->tags = $refresh->tags;
@@ -617,10 +627,10 @@ class Entity implements EntityInterface {
 	}
 
 	public function save() {
-		global $require;
+		global $NymphRequire;
 		if ($this->isASleepingReference)
 			$this->referenceWake();
-		return $require('Nymph')->saveEntity($this);
+		return $NymphRequire('Nymph')->saveEntity($this);
 	}
 
 	public function toReference() {

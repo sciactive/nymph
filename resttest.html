@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Nymph REST Test</title>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+		<script>
+			$(function(){
+				$("button").click(function(){
+					eval($("textarea").val());
+				});
+				$("pre").click(function(){
+					$("textarea").val($(this).html());
+				})
+			});
+		</script>
+	</head>
+	<body>
+		<div style="width: 49%; float: left;">
+			<textarea rows="20" style="width: 95%;"></textarea>
+			<br>Click an AJAX call below and <button>Go</button>
+		</div>
+		<div style="width: 49%; height: 300px; float: left; overflow: auto;" id="result">result here</div>
+		<br style="clear: both;">
+		<h4>Get a new UID</h4>
+		<pre>$.ajax({
+	method: 'PUT',
+	url: 'rest.php',
+	type: 'html',
+	data: {'action': 'uid', 'data': 'employee'},
+	success: function(data) {
+		$("#result").html(data);
+	},
+	error: function(status){
+		$("#result").html(status);
+	}
+});</pre>
+		<h4>Create two entities</h4>
+		<pre>$.ajax({
+	method: 'PUT',
+	url: 'rest.php',
+	type: 'html',
+	data: {'action': 'entities', 'data': '[{"guid":null,"tags":[],"data":{"name":"Jane Doe","current":true,"salary":8000000,"start_date":1410293207,"subordinates":[],"title":"Seniorer Person"},"class":"Employee"},{"guid":null,"tags":["boss","bigcheese"],"data":{"name":"Steve Guy","current":true,"salary":8000000,"start_date":1410293207,"subordinates":[],"title":"Executive Person"},"class":"Employee"}]'},
+	success: function(data) {
+		$("#result").html(data);
+	},
+	error: function(status){
+		$("#result").html(status);
+	}
+});</pre>
+		<h4>Create an entity</h4>
+		<pre>$.ajax({
+	method: 'PUT',
+	url: 'rest.php',
+	type: 'html',
+	data: {'action': 'entity', 'data': '{"guid":null,"tags":[],"data":{"name":"Jane Doe","current":true,"salary":8000000,"start_date":1410293207,"subordinates":[],"title":"Seniorer Person"},"class":"Employee"}'},
+	success: function(data) {
+		$("#result").html(data);
+	},
+	error: function(status){
+		$("#result").html(status);
+	}
+});</pre>
+		<h4>Get an entity</h4>
+		<pre>$.ajax({
+	method: 'GET',
+	url: 'rest.php',
+	type: 'html',
+	data: {'action': 'getEntity', 'data': '[{"class":"Employee"},{"type":"&amp;","strict":["name","Jane Doe"]}]'},
+	success: function(data) {
+		$("#result").html(data);
+	},
+	error: function(status){
+		$("#result").html(status);
+	}
+});</pre>
+		<h4>Get entities</h4>
+		<pre>$.ajax({
+	method: 'GET',
+	url: 'rest.php',
+	type: 'html',
+	data: {'action': 'getEntities', 'data': '[{"class":"Employee","limit":4},{"type":"&amp;","strict":["name","Jane Doe"]}]'},
+	success: function(data) {
+		$("#result").html(data);
+	},
+	error: function(status){
+		$("#result").html(status);
+	}
+});</pre>
+		<h4>Get UID value</h4>
+		<pre>$.ajax({
+	method: 'GET',
+	url: 'rest.php',
+	type: 'html',
+	data: {'action': 'getUID', 'data': 'employee'},
+	success: function(data) {
+		$("#result").html(data);
+	},
+	error: function(status){
+		$("#result").html(status);
+	}
+});</pre>
+	</body>
+</html>
