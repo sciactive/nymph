@@ -5,6 +5,20 @@
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+		<script type="text/javascript">
+			(function(){
+				var s = document.createElement("script"); s.setAttribute("src", "https://www.promisejs.org/polyfills/promise-5.0.0.min.js");
+				(typeof Promise !== "undefined" && typeof Promise.all === "function") || document.getElementsByTagName('head')[0].appendChild(s);
+			})();
+		</script>
+		<script>
+			NymphOptions = {
+				restURL: 'rest.php'
+			};
+		</script>
+		<script src="src/Nymph.js"></script>
+		<script src="src/Entity.js"></script>
+		<script src="Employee.js"></script>
 		<script>
 			$(function(){
 				$("button").click(function(){
@@ -24,17 +38,16 @@
 		<div style="width: 49%; height: 300px; float: left; overflow: auto;" id="result">result here</div>
 		<br style="clear: both;">
 		<h4>Get a new UID</h4>
-		<pre>$.ajax({
-	method: 'PUT',
-	url: 'rest.php',
-	type: 'html',
-	data: {'action': 'uid', 'data': 'employee'},
-	success: function(data) {
-		$("#result").html(data);
-	},
-	error: function(status){
-		$("#result").html(status);
-	}
+		<pre>Nymph.newUID('employee').then(function(data){
+	$("#result").html(data);
+}, function(jqXHR, status){
+	$("#result").html(status);
+});</pre>
+		<h4>Get UID value</h4>
+		<pre>Nymph.getUID('employee').then(function(data){
+	$("#result").html(data);
+}, function(jqXHR, status){
+	$("#result").html(status);
 });</pre>
 		<h4>Create two entities</h4>
 		<pre>$.ajax({
@@ -63,43 +76,16 @@
 	}
 });</pre>
 		<h4>Get an entity</h4>
-		<pre>$.ajax({
-	method: 'GET',
-	url: 'rest.php',
-	type: 'html',
-	data: {'action': 'getEntity', 'data': '[{"class":"Employee"},{"type":"&amp;","strict":["name","Jane Doe"]}]'},
-	success: function(data) {
-		$("#result").html(data);
-	},
-	error: function(status){
-		$("#result").html(status);
-	}
+		<pre>Nymph.getEntity({"class":"Employee"}, {"type":"&amp;","strict":["name","Jane Doe"]}).then(function(data){
+	$("#result").html(JSON.stringify(data));
+}, function(jqXHR, status){
+	$("#result").html(status);
 });</pre>
 		<h4>Get entities</h4>
-		<pre>$.ajax({
-	method: 'GET',
-	url: 'rest.php',
-	type: 'html',
-	data: {'action': 'getEntities', 'data': '[{"class":"Employee","limit":4},{"type":"&amp;","strict":["name","Jane Doe"]}]'},
-	success: function(data) {
-		$("#result").html(data);
-	},
-	error: function(status){
-		$("#result").html(status);
-	}
-});</pre>
-		<h4>Get UID value</h4>
-		<pre>$.ajax({
-	method: 'GET',
-	url: 'rest.php',
-	type: 'html',
-	data: {'action': 'getUID', 'data': 'employee'},
-	success: function(data) {
-		$("#result").html(data);
-	},
-	error: function(status){
-		$("#result").html(status);
-	}
+		<pre>Nymph.getEntities({"class":"Employee","limit":4},{"type":"&amp;","strict":["name","Jane Doe"]}).then(function(data){
+	$("#result").html(JSON.stringify(data));
+}, function(jqXHR, status){
+	$("#result").html(status);
 });</pre>
 	</body>
 </html>
