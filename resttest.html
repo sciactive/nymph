@@ -25,7 +25,7 @@
 					eval($("textarea").val());
 				});
 				$("pre").click(function(){
-					$("textarea").val($(this).html());
+					$("textarea").val($(this).text());
 				})
 			});
 		</script>
@@ -95,7 +95,7 @@
 });</pre>
 		<h4>Delete an entity</h4>
 		<pre>Nymph.getEntity({"class":"Employee"}, {"type":"&amp;","strict":["name","Jane Doe"]}).then(function(data){
-	$("#result").html(JSON.stringify(data)+'<br>');
+	$("#result").html(JSON.stringify(data)+'&lt;br&gt;');
 	Nymph.deleteEntity(data).then(function(data){
 		$("#result").append(JSON.stringify(data));
 	}, function(errObj){
@@ -106,7 +106,7 @@
 });</pre>
 		<h4>Delete entities</h4>
 		<pre>Nymph.getEntities({"class":"Employee","limit":2},{"type":"&amp;","strict":["name","Jane Doe"]}).then(function(data){
-	$("#result").html(JSON.stringify(data)+'<br>');
+	$("#result").html(JSON.stringify(data)+'&lt;br&gt;');
 	Nymph.deleteEntities(data).then(function(data){
 		$("#result").append(JSON.stringify(data));
 	}, function(errObj){
