@@ -106,6 +106,7 @@ class NymphREST {
 				}
 				$entity = new $newEnt['class'];
 				$entity->addTag($newEnt['tags']);
+				$entity->jsonUnserializeData($newEnt['data']);
 				foreach ($newEnt['data'] as $name => $value) {
 					$entity->$name = $value;
 				}
@@ -135,6 +136,67 @@ class NymphREST {
 			echo $result;
 		}
 		header("HTTP/1.1 201 Created", true, 201);
+		return true;
+	}
+
+	protected function POST($action = '', $data = '') {
+		if (!in_array($action, array('entity', 'entities'))) {
+			return $this->httpError(400, "Bad Request");
+		}
+		$ents = json_decode($data, true);
+		if ($action === 'entity')
+			$ents = array($ents);
+		$saved = array();
+		$invalidData = false;
+		$notfound = false;
+		foreach ($ents as $newEnt) {
+			if (!class_exists($newEnt['class']) || !is_numeric($newEnt['guid']) || (int)$newEnt['guid'] <= 0) {
+				$invalidData = true;
+				continue;
+			}
+			$entity = $this->nymph->getEntity(
+					array('class' => $newEnt['class']),
+					array('&',
+						'guid' => (int)$newEnt['guid']
+					)
+				);
+			if ($entity === null) {
+				$notfound = true;
+				continue;
+			}
+			if (!$entity) {
+				$invalidData = true;
+				continue;
+			}
+			$entity->removeTag($entity->getTags());
+			$entity->addTag($newEnt['tags']);
+			$entity->jsonUnserializeData($newEnt['data']);
+			$privateData = array();
+			foreach ($entity->privateData as $var) {
+				$privateData[$var] = $entity->$var;
+			}
+			$entity->putData(array_merge($privateData, $newEnt['data']));
+			try {
+				if ($entity->save()) {
+					$saved[] = $entity;
+				}
+			} catch (EntityInvalidDataException $e) {
+				$invalidData = true;
+			}
+		}
+		if (empty($saved)) {
+			if ($invalidData)
+				return $this->httpError(400, "Bad Request");
+			elseif ($notfound)
+				return $this->httpError(404, "Not Found");
+			else
+				return $this->httpError(500, "Internal Server Error");
+		}
+		if ($action === 'entity')
+			echo json_encode($saved[0]);
+		else
+			echo json_encode($saved);
+		header("HTTP/1.1 200 OK", true, 200);
 		return true;
 	}
 

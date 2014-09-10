@@ -76,6 +76,14 @@ class Entity implements EntityInterface {
 	 */
 	public $privateData = array();
 	/**
+	 * The entries listed here correspond to variables that should be converted
+	 * to standard objects instead of arrays when unserializing from JSON.
+	 *
+	 * @var array
+	 * @access public
+	 */
+	public $objectData = array('ac');
+	/**
 	 * Whether to use "skip_ac" when accessing entity references.
 	 *
 	 * @var bool
@@ -414,6 +422,10 @@ class Entity implements EntityInterface {
 		return $this->sdata;
 	}
 
+	public function getTags() {
+		return $this->tags;
+	}
+
 	public function hasTag() {
 		if ($this->isASleepingReference)
 			$this->referenceWake();
@@ -508,6 +520,14 @@ class Entity implements EntityInterface {
 		}
 		$object->class = get_class($this);
 		return $object;
+	}
+
+	public function jsonUnserializeData(&$data) {
+		foreach ($this->objectData as $var) {
+			if (isset($data[$var]) && (array) $data[$var] === $data) {
+				$data[$var] = (object) $data[$var];
+			}
+		}
 	}
 
 	public function putData($data, $sdata = array()) {

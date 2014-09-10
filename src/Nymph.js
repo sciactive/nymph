@@ -83,7 +83,44 @@ license LGPL
 			});
 		},
 
+		saveEntity: function(entity){
+			var that = this;
+			return new Promise(function(resolve, reject){
+				$.ajax({
+					type: entity.guid == null ? 'PUT' : 'POST',
+					url: that.restURL,
+					dataType: 'json',
+					data: {'action': 'entity', 'data': JSON.stringify(entity)},
+					success: function(data) {
+						if (typeof data.guid !== "undefined" && data.guid > 0) {
+							resolve(entity.init(data));
+						} else {
+							reject({textStatus: "Server error"});
+						}
+					},
+					error: function(jqXHR, textStatus, errorThrown){
+						reject({jqXHR: jqXHR, textStatus: textStatus, errorThrown: errorThrown});
+					}
+				});
+			});
+		},
+
 		getEntity: function(){
+			var that = this, args = arguments;
+			return new Promise(function(resolve, reject){
+				that.getEntityData.apply(that, args).then(function(data){
+					if (data != null) {
+						resolve(that.initEntity(data));
+					} else {
+						resolve(null);
+					}
+				}, function(errObj){
+					reject(errObj);
+				});
+			});
+		},
+
+		getEntityData: function(){
 			var that = this,
 				args = arguments;
 			return new Promise(function(resolve, reject){
@@ -94,13 +131,7 @@ license LGPL
 					data: {'action': 'entity', 'data': JSON.stringify(args)},
 					success: function(data) {
 						if (typeof data.guid !== "undefined" && data.guid > 0) {
-							var entity;
-							if (typeof data.class === "string" && typeof window[data.class] !== "undefined" && typeof window[data.class].prototype.init === "function") {
-								entity = new window[data.class]();
-							} else {
-								entity = new Entity();
-							}
-							resolve(entity.init(data));
+							resolve(data);
 						} else {
 							resolve(null);
 						}
@@ -122,13 +153,23 @@ license LGPL
 					dataType: 'json',
 					data: {'action': 'entities', 'data': JSON.stringify(args)},
 					success: function(data) {
-						resolve(data);
+						resolve($.map(data, that.initEntity));
 					},
 					error: function(jqXHR, textStatus, errorThrown){
 						reject({jqXHR: jqXHR, textStatus: textStatus, errorThrown: errorThrown});
 					}
 				});
 			});
+		},
+
+		initEntity: function(entityJSON){
+			var entity;
+			if (typeof entityJSON.class === "string" && typeof window[entityJSON.class] !== "undefined" && typeof window[entityJSON.class].prototype.init === "function") {
+				entity = new window[entityJSON.class]();
+			} else {
+				entity = new Entity();
+			}
+			return entity.init(entityJSON);
 		},
 
 		deleteEntity: function(entity, plural){

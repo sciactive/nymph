@@ -51,9 +51,6 @@ class Employee extends Entity {
 		if (empty($this->title)) {
 			$exc->addField('title');
 		}
-		if (!is_int($this->salary)) {
-			$exc->addField('salary');
-		}
 		if (empty($this->start_date)) {
 			$exc->addField('start_date');
 		}

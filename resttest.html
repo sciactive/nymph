@@ -26,7 +26,14 @@
 				});
 				$("pre").click(function(){
 					$("textarea").val($(this).text());
-				})
+				});
+				$("h4").each(function(){
+					var that = $(this), option = $("<option>"+$(this).text()+"</option>");
+					$("select").append(option).change(function(){
+						if ($(this).find("option:selected").is(option))
+							that.next("pre").click();
+					});
+				});
 			});
 		</script>
 	</head>
@@ -37,6 +44,9 @@
 		</div>
 		<div style="width: 49%; height: 300px; float: left; overflow: auto;" id="result">result here</div>
 		<br style="clear: both;">
+		<select>
+			<option>-</option>
+		</select>
 		<h4>Get a new UID</h4>
 		<pre>Nymph.newUID('employee').then(function(data){
 	$("#result").html(data);
@@ -56,30 +66,127 @@
 	$("#result").html(errObj.textStatus);
 });</pre>
 		<h4>Create two entities</h4>
-		<pre>$.ajax({
-	method: 'PUT',
-	url: 'rest.php',
-	type: 'html',
-	data: {'action': 'entities', 'data': '[{"guid":null,"tags":[],"data":{"name":"Jane Doe","current":true,"salary":8000000,"start_date":1410293207,"subordinates":[],"title":"Seniorer Person"},"class":"Employee"},{"guid":null,"tags":["boss","bigcheese"],"data":{"name":"Steve Guy","current":true,"salary":8000000,"start_date":1410293207,"subordinates":[],"title":"Executive Person"},"class":"Employee"}]'},
-	success: function(data) {
-		$("#result").html(data);
-	},
-	error: function(status){
+		<pre>var entity = new Employee();
+entity.set({
+	"name": "Jane Doe",
+	"current": true,
+	"salary": 8000000,
+	"start_date": (new Date().getTime()) / 1000,
+	"subordinates": [],
+	"title": "Seniorer Person"
+});
+entity.save().then(function(data){
+	var entity = new Employee();
+	entity.addTag("boss","bigcheese");
+	entity.set({
+		"name": "Steve Guy",
+		"current": true,
+		"salary": 8000000,
+		"start_date": (new Date().getTime()) / 1000,
+		"subordinates": [data],
+		"title": "Executive Person"
+	});
+	entity.save().then(function(data){
+		$("#result").html(JSON.stringify(data));
+	}, function(errObj){
 		$("#result").html(errObj.textStatus);
-	}
+	});
+}, function(errObj){
+	$("#result").html(errObj.textStatus);
 });</pre>
 		<h4>Create an entity</h4>
-		<pre>$.ajax({
-	method: 'PUT',
-	url: 'rest.php',
-	type: 'html',
-	data: {'action': 'entity', 'data': '{"guid":null,"tags":[],"data":{"name":"Jane Doe","current":true,"salary":8000000,"start_date":1410293207,"subordinates":[],"title":"Seniorer Person"},"class":"Employee"}'},
-	success: function(data) {
-		$("#result").html(data);
-	},
-	error: function(status){
+		<pre>var entity = new Employee();
+entity.set("name", "Jane Doe");
+entity.set({
+	"current": true,
+	"salary": 8000000,
+	"start_date": (new Date().getTime()) / 1000,
+	"subordinates": [],
+	"title": "Seniorer Person"
+});
+console.log(entity.get("name"));
+console.log(entity.get(["name", "current", "salary", "start_date", "subordinates", "title"]));
+entity.save().then(function(data){
+	$("#result").html(JSON.stringify(data));
+}, function(errObj){
+	$("#result").html(errObj.textStatus);
+});</pre>
+		<h4>Add, check, and remove tags</h4>
+		<pre>$("#result").html("");
+var entity = new Entity;
+entity.addTag('test');
+console.log(entity.tags);
+if (entity.hasTag('test')) {
+	$("#result").append("pass&lt;br&gt;");
+} else {
+	$("#result").append("fail&lt;br&gt;");
+}
+entity.addTag('test', 'test2');
+console.log(entity.tags);
+if (entity.hasTag('test', 'test2')) {
+	$("#result").append("pass&lt;br&gt;");
+} else {
+	$("#result").append("fail&lt;br&gt;");
+}
+entity.addTag(['test', 'test3', 'test4', 'test5', 'test6']);
+console.log(entity.tags);
+if (entity.hasTag(['test', 'test3', 'test4', 'test5', 'test6'])) {
+	$("#result").append("pass&lt;br&gt;");
+} else {
+	$("#result").append("fail&lt;br&gt;");
+}
+entity.removeTag('test2');
+console.log(entity.tags);
+if (!entity.hasTag('test2')) {
+	$("#result").append("pass&lt;br&gt;");
+} else {
+	$("#result").append("fail&lt;br&gt;");
+}
+entity.removeTag('test3', 'test4');
+console.log(entity.tags);
+if (!entity.hasTag('test3', 'test4')) {
+	$("#result").append("pass&lt;br&gt;");
+} else {
+	$("#result").append("fail&lt;br&gt;");
+}
+entity.removeTag(['test5', 'test6']);
+console.log(entity.tags);
+if (!entity.hasTag(['test5', 'test6'])) {
+	$("#result").append("pass&lt;br&gt;");
+} else {
+	$("#result").append("fail&lt;br&gt;");
+}
+if (!(entity.tags&lt;["test"]||entity.tags&gt;["test"])) {
+	$("#result").append("pass&lt;br&gt;");
+} else {
+	$("#result").append("fail&lt;br&gt;");
+}
+</pre>
+		<h4>Wake a sleeping reference</h4>
+		<pre>Nymph.getEntity({"class":"Employee"}, {"type":"&amp;","strict":["name","Jane Doe"]}).then(function(data){
+	var entity = new Employee();
+	entity.referenceSleep(['nymph_entity_reference', data.guid, 'Employee']);
+	entity.ready(function(entity){
+		$("#result").html(JSON.stringify(data));
+	}, function(errObj){
 		$("#result").html(errObj.textStatus);
-	}
+	});
+}, function(errObj){
+	$("#result").html(errObj.textStatus);
+});</pre>
+		<h4>Change an entity</h4>
+		<pre>Nymph.getEntity({"class":"Employee"}, {"type":"&amp;","gt":["salary",1]}).then(function(data){
+	$("#result").html(JSON.stringify(data)+'&lt;br&gt;&lt;br&gt;');
+	delete data.data.salary;
+	data.set("current", false);
+	data.set("end_date", (new Date().getTime()) / 1000);
+	data.save().then(function(data){
+		$("#result").append(JSON.stringify(data));
+	}, function(errObj){
+		$("#result").append(errObj.textStatus);
+	});
+}, function(errObj){
+	$("#result").html(errObj.textStatus);
 });</pre>
 		<h4>Get an entity</h4>
 		<pre>Nymph.getEntity({"class":"Employee"}, {"type":"&amp;","strict":["name","Jane Doe"]}).then(function(data){
@@ -95,8 +202,8 @@
 });</pre>
 		<h4>Delete an entity</h4>
 		<pre>Nymph.getEntity({"class":"Employee"}, {"type":"&amp;","strict":["name","Jane Doe"]}).then(function(data){
-	$("#result").html(JSON.stringify(data)+'&lt;br&gt;');
-	Nymph.deleteEntity(data).then(function(data){
+	$("#result").html(JSON.stringify(data)+'&lt;br&gt;&lt;br&gt;');
+	data.delete().then(function(data){
 		$("#result").append(JSON.stringify(data));
 	}, function(errObj){
 		$("#result").html(errObj.textStatus);
@@ -106,7 +213,7 @@
 });</pre>
 		<h4>Delete entities</h4>
 		<pre>Nymph.getEntities({"class":"Employee","limit":2},{"type":"&amp;","strict":["name","Jane Doe"]}).then(function(data){
-	$("#result").html(JSON.stringify(data)+'&lt;br&gt;');
+	$("#result").html(JSON.stringify(data)+'&lt;br&gt;&lt;br&gt;');
 	Nymph.deleteEntities(data).then(function(data){
 		$("#result").append(JSON.stringify(data));
 	}, function(errObj){

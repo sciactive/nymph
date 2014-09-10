@@ -563,6 +563,9 @@ class NymphDriverMySQL extends NymphDriver {
 									if ((object) $cur_entity === $cur_entity) {
 										$pass = ((strpos($sdata[$cur_value[0]], "a:3:{i:0;s:22:\"nymph_entity_reference\";i:1;i:{$cur_entity->guid};") !== false) xor ($type_is_not xor $clause_not));
 										if (!($type_is_or xor $pass)) break;
+									} elseif ((array) $cur_entity === $cur_entity) {
+										$pass = ((strpos($sdata[$cur_value[0]], "a:3:{i:0;s:22:\"nymph_entity_reference\";i:1;i:{$cur_entity['guid']};") !== false) xor ($type_is_not xor $clause_not));
+										if (!($type_is_or xor $pass)) break;
 									} else {
 										$pass = ((strpos($sdata[$cur_value[0]], "a:3:{i:0;s:22:\"nymph_entity_reference\";i:1;i:{$cur_entity};") !== false) xor ($type_is_not xor $clause_not));
 										if (!($type_is_or xor $pass)) break;
@@ -570,6 +573,8 @@ class NymphDriverMySQL extends NymphDriver {
 								}
 							} elseif ((object) $cur_value[1] === $cur_value[1]) {
 								$pass = ((strpos($sdata[$cur_value[0]], "a:3:{i:0;s:22:\"nymph_entity_reference\";i:1;i:{$cur_value[1]->guid};") !== false) xor ($type_is_not xor $clause_not));
+							} elseif ((array) $cur_value[1] === $cur_value[1]) {
+								$pass = ((strpos($sdata[$cur_value[0]], "a:3:{i:0;s:22:\"nymph_entity_reference\";i:1;i:{$cur_value[1]['guid']};") !== false) xor ($type_is_not xor $clause_not));
 							} else {
 								$pass = ((strpos($sdata[$cur_value[0]], "a:3:{i:0;s:22:\"nymph_entity_reference\";i:1;i:{$cur_value[1]};") !== false) xor ($type_is_not xor $clause_not));
 							}
