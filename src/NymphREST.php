@@ -46,6 +46,49 @@ class NymphREST {
 		return $this->httpError(405, "Method Not Allowed");
 	}
 
+	protected function DELETE($action = '', $data = '') {
+		if (!in_array($action, array('entity', 'entities', 'uid'))) {
+			return $this->httpError(400, "Bad Request");
+		}
+		if (in_array($action, array('entity', 'entities'))) {
+			$ents = json_decode($data, true);
+			if ($action === 'entity')
+				$ents = array($ents);
+			$deleted = array();
+			$failures = false;
+			foreach ($ents as $delEnt) {
+				$guid = (int) $delEnt['guid'];
+				$etype = $delEnt['etype'];
+				try {
+					if ($this->nymph->deleteEntityByID($guid, $etype)) {
+						$deleted[] = $guid;
+					} else {
+						$failures = true;
+					}
+				} catch (Exception $e) {
+					$failures = true;
+				}
+			}
+			if (empty($deleted)) {
+				if ($failures)
+					return $this->httpError(400, "Bad Request");
+				else
+					return $this->httpError(500, "Internal Server Error");
+			}
+			if ($action === 'entity')
+				echo json_encode($deleted[0]);
+			else
+				echo json_encode($deleted);
+			header("HTTP/1.1 200 OK", true, 200);
+		} else {
+			if (!$this->nymph->deleteUID("$data")) {
+				return $this->httpError(500, "Internal Server Error");
+			}
+			header("HTTP/1.1 204 No Content", true, 204);
+		}
+		return true;
+	}
+
 	protected function PUT($action = '', $data = '') {
 		if (!in_array($action, array('entity', 'entities', 'uid'))) {
 			return $this->httpError(400, "Bad Request");
@@ -57,8 +100,10 @@ class NymphREST {
 			$created = array();
 			$invalidData = false;
 			foreach ($ents as $newEnt) {
-				if (!class_exists($newEnt['class']))
+				if (!class_exists($newEnt['class'])) {
+					$invalidData = true;
 					continue;
+				}
 				$entity = new $newEnt['class'];
 				$entity->addTag($newEnt['tags']);
 				foreach ($newEnt['data'] as $name => $value) {
@@ -94,13 +139,19 @@ class NymphREST {
 	}
 
 	protected function GET($action = '', $data = '') {
-		if (!in_array($action, array('getEntity', 'getEntities', 'getUID'))) {
+		if (!in_array($action, array('entity', 'entities', 'uid'))) {
 			return $this->httpError(400, "Bad Request");
 		}
-		if (in_array($action, array('getEntity', 'getEntities'))) {
+		$actionMap = array(
+			'entity' => 'getEntity',
+			'entities' => 'getEntities',
+			'uid' => 'getUID'
+		);
+		$method = $actionMap[$action];
+		if (in_array($action, array('entity', 'entities'))) {
 			$args = json_decode($data, true);
 			if (is_int($args)) {
-				$result = $this->nymph->$action($args);
+				$result = $this->nymph->$method($args);
 			} else {
 				$count = count($args);
 				if ($count > 1) {
@@ -114,7 +165,7 @@ class NymphREST {
 						$args[$i] = $newArg;
 					}
 				}
-				$result = call_user_func_array(array($this->nymph, $action), $args);
+				$result = call_user_func_array(array($this->nymph, $method), $args);
 			}
 			if (empty($result)) {
 				return $this->httpError(404, "Not Found");
@@ -122,7 +173,7 @@ class NymphREST {
 			echo json_encode($result);
 			return true;
 		} else {
-			$result = $this->nymph->$action("$data");
+			$result = $this->nymph->$method("$data");
 			if (empty($result)) {
 				return $this->httpError(500, "Internal Server Error");
 			}

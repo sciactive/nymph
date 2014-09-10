@@ -4,7 +4,7 @@
 		<title>Nymph REST Test</title>
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+		<script src="lib/jquery-1.7.2.min.js"></script>
 		<script type="text/javascript">
 			(function(){
 				var s = document.createElement("script"); s.setAttribute("src", "https://www.promisejs.org/polyfills/promise-5.0.0.min.js");
@@ -40,14 +40,20 @@
 		<h4>Get a new UID</h4>
 		<pre>Nymph.newUID('employee').then(function(data){
 	$("#result").html(data);
-}, function(jqXHR, status){
-	$("#result").html(status);
+}, function(errObj){
+	$("#result").html(errObj.textStatus);
 });</pre>
 		<h4>Get UID value</h4>
 		<pre>Nymph.getUID('employee').then(function(data){
 	$("#result").html(data);
-}, function(jqXHR, status){
-	$("#result").html(status);
+}, function(errObj){
+	$("#result").html(errObj.textStatus);
+});</pre>
+		<h4>Delete UID</h4>
+		<pre>Nymph.deleteUID('employee').then(function(data){
+	$("#result").html(data);
+}, function(errObj){
+	$("#result").html(errObj.textStatus);
 });</pre>
 		<h4>Create two entities</h4>
 		<pre>$.ajax({
@@ -59,7 +65,7 @@
 		$("#result").html(data);
 	},
 	error: function(status){
-		$("#result").html(status);
+		$("#result").html(errObj.textStatus);
 	}
 });</pre>
 		<h4>Create an entity</h4>
@@ -72,20 +78,42 @@
 		$("#result").html(data);
 	},
 	error: function(status){
-		$("#result").html(status);
+		$("#result").html(errObj.textStatus);
 	}
 });</pre>
 		<h4>Get an entity</h4>
 		<pre>Nymph.getEntity({"class":"Employee"}, {"type":"&amp;","strict":["name","Jane Doe"]}).then(function(data){
 	$("#result").html(JSON.stringify(data));
-}, function(jqXHR, status){
-	$("#result").html(status);
+}, function(errObj){
+	$("#result").html(errObj.textStatus);
 });</pre>
 		<h4>Get entities</h4>
 		<pre>Nymph.getEntities({"class":"Employee","limit":4},{"type":"&amp;","strict":["name","Jane Doe"]}).then(function(data){
 	$("#result").html(JSON.stringify(data));
-}, function(jqXHR, status){
-	$("#result").html(status);
+}, function(errObj){
+	$("#result").html(errObj.textStatus);
+});</pre>
+		<h4>Delete an entity</h4>
+		<pre>Nymph.getEntity({"class":"Employee"}, {"type":"&amp;","strict":["name","Jane Doe"]}).then(function(data){
+	$("#result").html(JSON.stringify(data)+'<br>');
+	Nymph.deleteEntity(data).then(function(data){
+		$("#result").append(JSON.stringify(data));
+	}, function(errObj){
+		$("#result").html(errObj.textStatus);
+	});
+}, function(errObj){
+	$("#result").html(errObj.textStatus);
+});</pre>
+		<h4>Delete entities</h4>
+		<pre>Nymph.getEntities({"class":"Employee","limit":2},{"type":"&amp;","strict":["name","Jane Doe"]}).then(function(data){
+	$("#result").html(JSON.stringify(data)+'<br>');
+	Nymph.deleteEntities(data).then(function(data){
+		$("#result").append(JSON.stringify(data));
+	}, function(errObj){
+		$("#result").html(errObj.textStatus);
+	});
+}, function(errObj){
+	$("#result").html(errObj.textStatus);
 });</pre>
 	</body>
 </html>
