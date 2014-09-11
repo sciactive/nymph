@@ -1,0 +1,11 @@
+label.list-group-item {
+	font-weight: normal;
+	cursor: pointer;
+}
+span.done-true {
+	text-decoration: line-through;
+	color: grey;
+}
+label.done-true {
+	text-align: right;
+}

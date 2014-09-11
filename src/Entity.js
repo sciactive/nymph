@@ -81,6 +81,14 @@ license LGPL
 
 
 	Entity = function(id){
+		this.guid = null;
+		this.cdate = null;
+		this.mdate = null;
+		this.tags = [];
+		this.info = {};
+		this.data = {};
+		this.isASleepingReference = false;
+		this.sleepingReference = false;
 		if (typeof id !== "undefined" && !isNaN(id)) {
 			Nymph.getEntity({"class":this.class},{"type":"&","guid":id}).then(function(data){
 				this.init(data);
@@ -98,15 +106,7 @@ license LGPL
 
 		// === Class Variables ===
 
-		guid: null,
-		cdate: null,
-		mdate: null,
-		tags: [],
 		etype: "entity",
-		info: {},
-		data: {},
-		isASleepingReference: false,
-		sleepingReference: false,
 
 		// === Events ===
 

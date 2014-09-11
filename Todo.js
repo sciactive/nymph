@@ -3,25 +3,25 @@
 (function (factory) {
     if (typeof define === 'function' && define.amd) {
         // AMD. Register as a module.
-        define('NymphEmployee', ['jquery', 'NymphEntity'], factory);
+        define('NymphTodo', ['jquery', 'NymphEntity'], factory);
     } else {
         // Browser globals
         factory(jQuery, Entity);
     }
 }(function($, Entity){
-	Employee = function(id){
+	Todo = function(id){
 		this.constructor.call(this, id);
-		this.addTag('employee');
+		this.addTag('todo');
 	};
-	Employee.prototype = new Entity();
+	Todo.prototype = new Entity();
 
-	$.extend(Employee.prototype, {
+	$.extend(Todo.prototype, {
 		// === The Name of the Class ===
-		class: 'Employee',
+		class: 'Todo',
 
 		// === Class Variables ===
-		etype: "employee"
+		etype: "todo"
 	});
 
-	return Employee;
+	return Todo;
 }));

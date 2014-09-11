@@ -1,0 +1,62 @@
+<!doctype html>
+<html ng-app="todoApp">
+	<head>
+		<title>Nymph Angular Todo App</title>
+		<script src="lib/jquery-1.7.2.min.js"></script>
+		<script type="text/javascript">
+			(function(){
+				var s = document.createElement("script"); s.setAttribute("src", "https://www.promisejs.org/polyfills/promise-5.0.0.min.js");
+				(typeof Promise !== "undefined" && typeof Promise.all === "function") || document.getElementsByTagName('head')[0].appendChild(s);
+			})();
+		</script>
+		<script>
+			NymphOptions = {
+				restURL: 'rest.php'
+			};
+		</script>
+		<script src="src/Nymph.js"></script>
+		<script src="src/Entity.js"></script>
+		<script src="Todo.js"></script>
+
+		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.0-rc.1/angular.min.js"></script>
+		<script src="todoApp.js"></script>
+		<link rel="stylesheet" href="todo.css">
+		<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+	</head>
+	<body>
+		<div class="container" ng-controller="TodoController">
+			<div class="row">
+				<div class="col-lg-8">
+					<div class="page-header">
+						<h2>Todo</h2>
+					</div>
+					<div class="row">
+						<div class="col-sm-8">
+							<div class="list-group" style="clear: both;">
+								<label class="list-group-item list-group-item-{{todo.data.done ? 'success' : 'warning'}}" ng-repeat="todo in todos">
+								  <input type="checkbox" ng-model="todo.data.done" ng-change="todo.save().then(null, function(errObj){alert('Error: '+errObj.textStatus);})">
+								  <span class="done-{{todo.data.done}}">{{todo.data.name}}</span>
+								</label>
+							</div>
+						</div>
+						<div class="col-sm-4" style="text-align: center;">
+							<small class="alert alert-info" style="display: block;">{{remaining()}} of {{todos.length}} remaining [ <a href="" ng-click="archive()">archive</a> ]</small>
+						</div>
+					</div>
+
+
+					<form ng-submit="addTodo()">
+						<div class="row">
+							<div class="col-xs-10">
+								<input class="form-control" type="text" ng-model="todoText" placeholder="add new todo here">
+							</div>
+							<div class="col-xs-2" style="text-align: right;">
+								<input class="btn btn-default" type="submit" value="add">
+							</div>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>
