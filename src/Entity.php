@@ -481,14 +481,8 @@ class Entity implements EntityInterface {
 
 	public function jsonSerialize() {
 		$object = (object) array();
-		if ($this->isASleepingReference) {
-			$object->guid = $this->sleepingReference[1];
-			$object->isASleepingReference = true;
-			$object->sleepingReference = $this->sleepingReference;
-			$object->etype = $this->etype();
-			$object->class = $this->sleepingReference[2];
-			return $object;
-		}
+		if ($this->isASleepingReference)
+			return $this->sleepingReference;
 		$object->guid = $this->guid;
 		$object->cdate = $this->p_cdate;
 		$object->mdate = $this->p_mdate;
