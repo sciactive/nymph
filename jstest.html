@@ -72,14 +72,14 @@ second.data.thing = 'this';
 	$("#result").html(errObj.textStatus);
 });</pre>
 		<h4>Get a new UID</h4>
-		<pre>Nymph.newUID('employee').then(function(data){
-	$("#result").html(data);
+		<pre>Nymph.newUID('employee').then(function(uidValue){
+	$("#result").html(uidValue);
 }, function(errObj){
 	$("#result").html(errObj.textStatus);
 });</pre>
 		<h4>Get UID value</h4>
-		<pre>Nymph.getUID('employee').then(function(data){
-	$("#result").html(data);
+		<pre>Nymph.getUID('employee').then(function(uidValue){
+	$("#result").html(uidValue);
 }, function(errObj){
 	$("#result").html(errObj.textStatus);
 });</pre>
@@ -99,7 +99,7 @@ entity.set({
 	"subordinates": [],
 	"title": "Seniorer Person"
 });
-entity.save().then(function(data){
+entity.save().then(function(jane){
 	var entity = new Employee();
 	entity.addTag("boss","bigcheese");
 	entity.set({
@@ -107,11 +107,11 @@ entity.save().then(function(data){
 		"current": true,
 		"salary": 8000000,
 		"start_date": (new Date().getTime()) / 1000,
-		"subordinates": [data],
+		"subordinates": [jane],
 		"title": "Executive Person"
 	});
-	entity.save().then(function(data){
-		$("#result").html(JSON.stringify(data));
+	entity.save().then(function(steve){
+		$("#result").html(JSON.stringify(steve));
 	}, function(errObj){
 		$("#result").html(errObj.textStatus);
 	});
@@ -130,8 +130,8 @@ entity.set({
 });
 console.log(entity.get("name"));
 console.log(entity.get(["name", "current", "salary", "start_date", "subordinates", "title"]));
-entity.save().then(function(data){
-	$("#result").html(JSON.stringify(data));
+entity.save().then(function(jane){
+	$("#result").html(JSON.stringify(jane));
 }, function(errObj){
 	$("#result").html(errObj.textStatus);
 });</pre>
@@ -187,11 +187,11 @@ if (!(entity.tags&lt;["test"]||entity.tags&gt;["test"])) {
 }
 </pre>
 		<h4>Wake a sleeping reference</h4>
-		<pre>Nymph.getEntity({"class":"Employee"}, {"type":"&amp;","strict":["name","Jane Doe"]}).then(function(data){
+		<pre>Nymph.getEntity({"class":"Employee"}, {"type":"&amp;","strict":["name","Jane Doe"]}).then(function(jane){
 	var entity = new Employee();
-	entity.referenceSleep(['nymph_entity_reference', data.guid, 'Employee']);
+	entity.referenceSleep(['nymph_entity_reference', jane.guid, 'Employee']);
 	entity.ready(function(entity){
-		$("#result").html(JSON.stringify(data));
+		$("#result").html(JSON.stringify(entity));
 	}, function(errObj){
 		$("#result").html(errObj.textStatus);
 	});
@@ -199,13 +199,13 @@ if (!(entity.tags&lt;["test"]||entity.tags&gt;["test"])) {
 	$("#result").html(errObj.textStatus);
 });</pre>
 		<h4>Change an entity</h4>
-		<pre>Nymph.getEntity({"class":"Employee"}, {"type":"&amp;","gt":["salary",1]}).then(function(data){
-	$("#result").html(JSON.stringify(data)+'&lt;br&gt;&lt;br&gt;');
-	delete data.data.salary;
-	data.set("current", false);
-	data.set("end_date", (new Date().getTime()) / 1000);
-	data.save().then(function(data){
-		$("#result").append(JSON.stringify(data));
+		<pre>Nymph.getEntity({"class":"Employee"}, {"type":"&amp;","gt":["salary",1]}).then(function(employee){
+	$("#result").html(JSON.stringify(employee)+'&lt;br&gt;&lt;br&gt;');
+	delete employee.data.salary;
+	employee.set("current", false);
+	employee.set("end_date", (new Date().getTime()) / 1000);
+	employee.save().then(function(employee){
+		$("#result").append(JSON.stringify(employee));
 	}, function(errObj){
 		$("#result").append(errObj.textStatus);
 	});
@@ -213,22 +213,22 @@ if (!(entity.tags&lt;["test"]||entity.tags&gt;["test"])) {
 	$("#result").html(errObj.textStatus);
 });</pre>
 		<h4>Get an entity</h4>
-		<pre>Nymph.getEntity({"class":"Employee"}, {"type":"&amp;","strict":["name","Jane Doe"]}).then(function(data){
-	$("#result").html(JSON.stringify(data));
+		<pre>Nymph.getEntity({"class":"Employee"}, {"type":"&amp;","strict":["name","Jane Doe"]}).then(function(jane){
+	$("#result").html(JSON.stringify(jane));
 }, function(errObj){
 	$("#result").html(errObj.textStatus);
 });</pre>
 		<h4>Get entities</h4>
-		<pre>Nymph.getEntities({"class":"Employee","limit":4},{"type":"&amp;","strict":["name","Jane Doe"]}).then(function(data){
-	$("#result").html(JSON.stringify(data));
+		<pre>Nymph.getEntities({"class":"Employee","limit":4},{"type":"&amp;","tag":["employee"]}).then(function(entities){
+	$("#result").html(JSON.stringify(entities));
 }, function(errObj){
 	$("#result").html(errObj.textStatus);
 });</pre>
 		<h4>Delete an entity</h4>
-		<pre>Nymph.getEntity({"class":"Employee"}, {"type":"&amp;","strict":["name","Jane Doe"]}).then(function(data){
-	$("#result").html(JSON.stringify(data)+'&lt;br&gt;&lt;br&gt;');
-	data.delete().then(function(data){
-		$("#result").append(JSON.stringify(data));
+		<pre>Nymph.getEntity({"class":"Employee"}, {"type":"&amp;","strict":["name","Jane Doe"]}).then(function(jane){
+	$("#result").html(JSON.stringify(jane)+'&lt;br&gt;&lt;br&gt;');
+	jane.delete().then(function(deleted){
+		$("#result").append(JSON.stringify(deleted));
 	}, function(errObj){
 		$("#result").html(errObj.textStatus);
 	});
@@ -236,10 +236,10 @@ if (!(entity.tags&lt;["test"]||entity.tags&gt;["test"])) {
 	$("#result").html(errObj.textStatus);
 });</pre>
 		<h4>Delete entities</h4>
-		<pre>Nymph.getEntities({"class":"Employee","limit":2},{"type":"&amp;","strict":["name","Jane Doe"]}).then(function(data){
-	$("#result").html(JSON.stringify(data)+'&lt;br&gt;&lt;br&gt;');
-	Nymph.deleteEntities(data).then(function(data){
-		$("#result").append(JSON.stringify(data));
+		<pre>Nymph.getEntities({"class":"Employee","limit":2},{"type":"&amp;","strict":["name","Jane Doe"]}).then(function(janes){
+	$("#result").html(JSON.stringify(janes)+'&lt;br&gt;&lt;br&gt;');
+	Nymph.deleteEntities(janes).then(function(deleted){
+		$("#result").append(JSON.stringify(deleted));
 	}, function(errObj){
 		$("#result").html(errObj.textStatus);
 	});
