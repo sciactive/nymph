@@ -43,12 +43,4 @@ angular.module('todoApp', []).controller('TodoController', ['$scope', function($
 			}
 		});
 	};
-
-	$scope.save = function() {
-		angular.forEach($scope.todos, function(todo) {
-			todo.save().then(null, function(errObj){
-				alert("Error: "+errObj.textStatus);
-			});
-		});
-	};
 }]);

@@ -13,7 +13,8 @@ license LGPL
         factory(jQuery, Nymph);
     }
 }(function($, Nymph){
-	var arrayUnique = function(array){
+	var sleepErr = "This entity is in a sleeping reference state. You must use .ready().then() to wake it.",
+	arrayUnique = function(array){
 		var a = array.concat();
 		for(var i=0; i<a.length; ++i) {
 			for(var j=i+1; j<a.length; ++j) {
@@ -77,6 +78,19 @@ license LGPL
 		}
 		// Not an array, just return it.
 		return item;
+	}, sortObj = function(obj) { // adapted from http://am.aurlien.net/post/1221493460/sorting-javascript-objects
+		var temp_array = [];
+		for (var key in obj) {
+			if (obj.hasOwnProperty(key)) {
+				temp_array.push(key);
+			}
+		}
+		temp_array.sort();
+		var temp_obj = {};
+		for (var i=0; i<temp_array.length; i++) {
+		  temp_obj[temp_array[i]] = obj[temp_array[i]];
+		}
+		return temp_obj;
 	};
 
 
@@ -136,6 +150,8 @@ license LGPL
 
 		// Tag methods.
 		addTag: function(){
+			if (this.isASleepingReference)
+				throw new EntityIsSleepingReferenceError(sleepErr);
 			var tags;
 			if ($.isArray(arguments[0])) {
 				tags = arguments[0];
@@ -145,6 +161,8 @@ license LGPL
 			this.tags = onlyStrings(arrayUnique(this.tags.concat(tags)));
 		},
 		hasTag: function(){
+			if (this.isASleepingReference)
+				throw new EntityIsSleepingReferenceError(sleepErr);
 			var tagArray = arguments;
 			if ($.isArray(arguments[0]))
 				tagArray = tagArray[0];
@@ -155,6 +173,8 @@ license LGPL
 			return true;
 		},
 		removeTag: function(){
+			if (this.isASleepingReference)
+				throw new EntityIsSleepingReferenceError(sleepErr);
 			var tagArray = arguments, newTags = [];
 			if ($.isArray(arguments[0]))
 				tagArray = tagArray[0];
@@ -168,6 +188,8 @@ license LGPL
 
 		// Property getter and setter. You can also just access Entity.data directly.
 		get: function(name){
+			if (this.isASleepingReference)
+				throw new EntityIsSleepingReferenceError(sleepErr);
 			if ($.isArray(arguments[0])) {
 				var result = {};
 				for (var k in name) {
@@ -179,6 +201,8 @@ license LGPL
 			}
 		},
 		set: function(name, value){
+			if (this.isASleepingReference)
+				throw new EntityIsSleepingReferenceError(sleepErr);
 			if (typeof name === "object") {
 				for (var k in name) {
 					this.data[k] = name[k];
@@ -189,14 +213,82 @@ license LGPL
 		},
 
 		save: function(){
+			if (this.isASleepingReference)
+				throw new EntityIsSleepingReferenceError(sleepErr);
 			return Nymph.saveEntity(this);
 		},
 
 		delete: function(){
+			if (this.isASleepingReference)
+				throw new EntityIsSleepingReferenceError(sleepErr);
 			return Nymph.deleteEntity(this);
 		},
 
+		is: function(object){
+			if (this.isASleepingReference)
+				throw new EntityIsSleepingReferenceError(sleepErr);
+			if (!(object instanceof Entity))
+				return false;
+			if ((this.guid && this.guid > 0) || (object.guid && object.guid > 0)) {
+				return this.guid == object.guid;
+			} else if (typeof object.toJSON !== 'function') {
+				return false;
+			} else {
+				var obData = sortObj(object.toJSON());
+				obData.tags.sort();
+				obData.data = sortObj(obData.data);
+				var myData = sortObj(this.toJSON());
+				myData.tags.sort();
+				myData.data = sortObj(myData.data);
+				return JSON.stringify(obData) == JSON.stringify(myData);
+			}
+		},
+		equals: function(object){
+			if (this.isASleepingReference)
+				throw new EntityIsSleepingReferenceError(sleepErr);
+			if (!(object instanceof Entity))
+				return false;
+			if ((this.guid && this.guid > 0) || (object.guid && object.guid > 0)) {
+				if (this.guid != object.guid)
+					return false;
+			}
+			if (object.class != this.class)
+				return false;
+			//return eq(this, object, [], []);
+			var obData = sortObj(object.toJSON());
+			obData.tags.sort();
+			obData.data = sortObj(obData.data);
+			var myData = sortObj(this.toJSON());
+			myData.tags.sort();
+			myData.data = sortObj(myData.data);
+			return JSON.stringify(obData) == JSON.stringify(myData);
+		},
+		inArray: function(array, strict){
+			if (this.isASleepingReference)
+				throw new EntityIsSleepingReferenceError(sleepErr);
+			if (!$.isArray(array))
+				return false;
+			for (var k in array) {
+				if (strict ? this.equals(array[k]) : this.is(array[k]))
+					return true;
+			}
+			return false;
+		},
+		arraySearch: function(array, strict){
+			if (this.isASleepingReference)
+				throw new EntityIsSleepingReferenceError(sleepErr);
+			if (!$.isArray(array))
+				return false;
+			for (var k in array) {
+				if (strict ? this.equals(array[k]) : this.is(array[k]))
+					return k;
+			}
+			return false;
+		},
+
 		toJSON: function(){
+			if (this.isASleepingReference)
+				throw new EntityIsSleepingReferenceError(sleepErr);
 			var obj = {};
 			obj.guid = this.guid;
 			obj.cdate = this.cdate;
@@ -245,6 +337,13 @@ license LGPL
 			});
 		}
 	});
+
+	EntityIsSleepingReferenceError = function(message){
+		this.name = 'EntityIsSleepingReferenceError';
+		this.message = message;
+		this.stack = (new Error()).stack;
+	};
+	EntityIsSleepingReferenceError.prototype = new Error;
 
 	return Entity;
 }));

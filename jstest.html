@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>Nymph REST Test</title>
+		<title>Nymph JS Test</title>
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<script src="lib/jquery-1.7.2.min.js"></script>
@@ -40,13 +40,37 @@
 	<body>
 		<div style="width: 49%; float: left;">
 			<textarea rows="20" style="width: 95%;"></textarea>
-			<br>Click an AJAX call below and <button>Go</button>
+			<br>Click a code test below and <button>Go</button>
 		</div>
 		<div style="width: 49%; height: 300px; float: left; overflow: auto;" id="result">result here</div>
 		<br style="clear: both;">
 		<select>
 			<option>-</option>
 		</select>
+		<h4>Check two entities are equal</h4>
+		<pre>Nymph.getEntity({"class":"Employee"}, {"type":"&amp;","strict":["name","Jane Doe"]}).then(function(first){
+	Nymph.getEntity({"class":"Employee"}, {"type":"&amp;","guid":first.guid}).then(function(second){
+first.data.thing = 'this';
+first.data.other = 'this';
+second.data.other = 'this';
+second.data.thing = 'this';
+		$("#result").html(JSON.stringify(first.equals(second)));
+	}, function(errObj){
+		$("#result").html(errObj.textStatus);
+	});
+}, function(errObj){
+	$("#result").html(errObj.textStatus);
+});</pre>
+		<h4>Check two objects are the same entity</h4>
+		<pre>Nymph.getEntity({"class":"Employee"}, {"type":"&amp;","strict":["name","Jane Doe"]}).then(function(first){
+	Nymph.getEntity({"class":"Employee"}, {"type":"&amp;","guid":first.guid}).then(function(second){
+		$("#result").html(JSON.stringify(first.is(second)));
+	}, function(errObj){
+		$("#result").html(errObj.textStatus);
+	});
+}, function(errObj){
+	$("#result").html(errObj.textStatus);
+});</pre>
 		<h4>Get a new UID</h4>
 		<pre>Nymph.newUID('employee').then(function(data){
 	$("#result").html(data);

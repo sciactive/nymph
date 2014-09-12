@@ -21,6 +21,7 @@ class Employee extends Entity {
 		$this->current = true;
 		$this->start_date = time();
 		$this->subordinates = array();
+		$this->addTag('employee');
 		parent::__construct($id);
 		if (!IS_MANAGER) {
 			$this->privateData[] = 'salary';
