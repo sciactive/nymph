@@ -10,8 +10,8 @@ $require('NymphConfig', array(), function(){
 
 $NymphREST = $require('NymphREST');
 
-require 'Employee.php';
-require 'Todo.php';
+require 'examples/Employee.php';
+require 'examples/Todo.php';
 
 if (in_array($_SERVER['REQUEST_METHOD'], array('PUT', 'DELETE'))) {
 	parse_str(file_get_contents("php://input"), $args);

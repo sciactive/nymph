@@ -62,11 +62,16 @@ license LGPL
 		if ($.isArray(item)) {
 			// Check if it's a reference.
 			if (item[0] === 'nymph_entity_reference') {
+				var entity;
 				if (typeof item[2] === "string" && typeof window[item[2]] !== "undefined" && typeof window[item[2]].prototype.referenceSleep === "function") {
-					var entity = new window[item[2]]();
-					entity.referenceSleep(item);
-					return entity;
+					entity = new window[item[2]]();
+				} else if (typeof require !== 'undefined' && require('Nymph'+item[2]).prototype.init === "function") {
+					entity = new require('Nymph'+item[2])();
+				} else {
+					throw new NymphClassNotAvailableError(item[2]+" class cannot be found.")
 				}
+				entity.referenceSleep(item);
+				return entity;
 			} else {
 				// Recurse into lower arrays.
 				return $.map(item, getSleepingReference);
@@ -344,6 +349,13 @@ license LGPL
 		this.stack = (new Error()).stack;
 	};
 	EntityIsSleepingReferenceError.prototype = new Error;
+
+	NymphClassNotAvailableError = function(message){
+		this.name = 'NymphClassNotAvailableError';
+		this.message = message;
+		this.stack = (new Error()).stack;
+	};
+	NymphClassNotAvailableError.prototype = new Error;
 
 	return Entity;
 }));

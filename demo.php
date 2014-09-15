@@ -10,7 +10,7 @@ $require('NymphConfig', array(), function(){
 
 $nymph = $require('Nymph');
 
-require 'Employee.php';
+require 'examples/Employee.php';
 
 $newEntity = new Employee();
 $newEntity->name = 'John Doe';

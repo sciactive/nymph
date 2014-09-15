@@ -166,8 +166,10 @@ license LGPL
 			var entity;
 			if (typeof entityJSON.class === "string" && typeof window[entityJSON.class] !== "undefined" && typeof window[entityJSON.class].prototype.init === "function") {
 				entity = new window[entityJSON.class]();
+			} else if (typeof require !== 'undefined' && require('Nymph'+entityJSON.class).prototype.init === "function") {
+				entity = new require('Nymph'+entityJSON.class)();
 			} else {
-				entity = new Entity();
+				throw new NymphClassNotAvailableError(entityJSON.class+" class cannot be found.")
 			}
 			return entity.init(entityJSON);
 		},
@@ -194,6 +196,13 @@ license LGPL
 			return this.deleteEntity(entities, true);
 		}
 	};
+
+	NymphClassNotAvailableError = function(message){
+		this.name = 'NymphClassNotAvailableError';
+		this.message = message;
+		this.stack = (new Error()).stack;
+	};
+	NymphClassNotAvailableError.prototype = new Error;
 
 	return Nymph.init(NymphOptions);
 }));
