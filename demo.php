@@ -8,9 +8,9 @@ $require('NymphConfig', array(), function(){
 	return include 'conf/config.php';
 });
 
-$nymph = $require('Nymph');
-
-require 'examples/Employee.php';
+$require(array('Nymph'), function(){
+	require 'examples/Employee.php';
+});
 
 $newEntity = new Employee();
 $newEntity->name = 'John Doe';
@@ -25,7 +25,7 @@ $newEntity2->salary = 8000000;
 $newEntity2->subordinates[] = $newEntity;
 $newEntity2->save();
 
-$entity = $nymph->getEntity(array('class' => Employee), array('&', 'guid' => $newEntity2->guid));
+$entity = $require('Nymph')->getEntity(array('class' => Employee), array('&', 'guid' => $newEntity2->guid));
 
 ?>
 <!DOCTYPE html>
@@ -36,7 +36,7 @@ $entity = $nymph->getEntity(array('class' => Employee), array('&', 'guid' => $ne
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	</head>
 	<body>
-		<div>Right now, it's just a test. Here's the result:</div>
+		<div>Check out the code to see what's going on. Here's the result:</div>
 		<pre><?php echo json_encode($entity); ?></pre>
 		<pre><?php var_dump($entity); ?></pre>
 		<pre><?php echo json_encode((int) $entity->guid); ?></pre>

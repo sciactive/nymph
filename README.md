@@ -45,25 +45,31 @@ If your RequirePHP container is named `$require`, Nymph will automatically load 
 setupNymph($your_container);
 ```
 
-Next, include any custom Entity classes you've created. In this example, we'll include the ones from the code examples.
+Next, include any custom Entity classes you've created. In this example, we'll include the ones from the code examples. This must be done after loading Nymph for the first time.
 
 ```php
+$nymph = $require('Nymph');
 require 'examples/Employee.php';
 require 'examples/Todo.php';
+
+// or
+
+$require(array('Nymph'), function(){
+	require 'examples/Employee.php';
+	require 'examples/Todo.php';
+});
 ```
 
 Now, you can begin using Nymph.
 
 ```php
-$nymph = $require('Nymph');
-
 $newEntity = new Employee();
 $newEntity->name = 'John Doe';
 $newEntity->title = 'Senior Person';
 $newEntity->salary = 5000000;
 $newEntity->save();
 
-$entity = $nymph->getEntity(array('class' => Employee), array('&', 'tag' => array('employee')));
+$entity = $require('Nymph')->getEntity(array('class' => Employee), array('&', 'tag' => array('employee')));
 ```
 
 Or, you can setup a REST endpoint, using the NymphREST module.
