@@ -484,8 +484,8 @@ class Entity implements EntityInterface {
 		if ($this->isASleepingReference)
 			return $this->sleepingReference;
 		$object->guid = $this->guid;
-		$object->cdate = $this->p_cdate;
-		$object->mdate = $this->p_mdate;
+		$object->cdate = $this->cdate;
+		$object->mdate = $this->mdate;
 		$object->tags = $this->tags;
 		$object->etype = $this->etype();
 		$object->info = array(
@@ -505,11 +505,11 @@ class Entity implements EntityInterface {
 			$object->info['image'] = $this->info('image');
 		$object->data = array();
 		foreach ($this->data as $key => $val) {
-			if ($key !== 'p_cdate' && $key !== 'p_mdate' && !in_array($key, $this->privateData))
+			if ($key !== 'cdate' && $key !== 'mdate' && !in_array($key, $this->privateData))
 				$object->data[$key] = $val;
 		}
 		foreach ($this->sdata as $key => $val) {
-			if ($key !== 'p_cdate' && $key !== 'p_mdate' && !in_array($key, $this->privateData))
+			if ($key !== 'cdate' && $key !== 'mdate' && !in_array($key, $this->privateData))
 				$object->data[$key] = $this->$key;
 		}
 		$object->class = get_class($this);

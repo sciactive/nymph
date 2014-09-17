@@ -100,7 +100,7 @@ interface NymphDriverInterface {
 	 * - reverse - (bool) If true, entities will be retrieved from newest to
 	 *   oldest. Therefore, offset will be from the newest entity.
 	 * - sort - (string) How to sort the entities. Accepts "guid", "cdate", and
-	 *   "mdate". Defaults to "guid".
+	 *   "mdate". Defaults to "cdate".
 	 * - skip_ac - (bool) If true, the user manager will not filter returned
 	 *   entities according to access controls.
 	 *
@@ -292,10 +292,10 @@ interface NymphDriverInterface {
 	/**
 	 * Save an entity to the database.
 	 *
-	 * If the entity has never been saved (has no GUID), a variable "p_cdate"
+	 * If the entity has never been saved (has no GUID), a variable "cdate"
 	 * is set on it with the current Unix timestamp using microtime(true).
 	 *
-	 * The variable "p_mdate" is set to the current Unix timestamp using
+	 * The variable "mdate" is set to the current Unix timestamp using
 	 * microtime(true).
 	 *
 	 * @param mixed &$entity The entity.

@@ -21,6 +21,12 @@ angular.module('todoApp', []).controller('TodoController', ['$scope', function($
 		});
 	};
 
+	$scope.save = function(todo) {
+		todo.save().then(null, function(errObj){
+			alert('Error: '+errObj.textStatus);
+		});
+	};
+
 	$scope.remaining = function() {
 		var count = 0;
 		angular.forEach($scope.todos, function(todo) {

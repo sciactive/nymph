@@ -34,7 +34,7 @@
 						<div class="col-sm-8">
 							<div class="list-group" style="clear: both;">
 								<label class="list-group-item list-group-item-{{todo.data.done ? 'success' : 'warning'}}" ng-repeat="todo in todos">
-								  <input type="checkbox" ng-model="todo.data.done" ng-change="todo.save().then(null, function(errObj){alert('Error: '+errObj.textStatus);})">
+								  <input type="checkbox" ng-model="todo.data.done" ng-change="save(todo)">
 								  <span class="done-{{todo.data.done}}">{{todo.data.name}}</span>
 								</label>
 							</div>

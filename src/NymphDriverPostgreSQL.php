@@ -336,11 +336,11 @@ class NymphDriverPostgreSQL extends NymphDriver {
 		while ($row) {
 			$guid = (int) $row['guid'];
 			$tags = explode(',', substr($row['tags'], 1, -1));
-			$p_cdate = (float) $row['cdate'];
-			$p_mdate = (float) $row['mdate'];
+			$cdate = (float) $row['cdate'];
+			$mdate = (float) $row['mdate'];
 			fwrite($fhandle, "{{$guid}}[".implode(',', $tags)."]\n");
-			fwrite($fhandle, "\tp_cdate=".json_encode(serialize($p_cdate))."\n");
-			fwrite($fhandle, "\tp_mdate=".json_encode(serialize($p_mdate))."\n");
+			fwrite($fhandle, "\tcdate=".json_encode(serialize($cdate))."\n");
+			fwrite($fhandle, "\tmdate=".json_encode(serialize($mdate))."\n");
 			if (isset($row['dname'])) {
 				// This do will keep going and adding the data until the
 				// next entity is reached. $row will end on the next entity.
@@ -400,11 +400,11 @@ class NymphDriverPostgreSQL extends NymphDriver {
 		while ($row) {
 			$guid = (int) $row['guid'];
 			$tags = explode(',', substr($row['tags'], 1, -1));
-			$p_cdate = (float) $row['cdate'];
-			$p_mdate = (float) $row['mdate'];
+			$cdate = (float) $row['cdate'];
+			$mdate = (float) $row['mdate'];
 			echo "{{$guid}}[".implode(',', $tags)."]\n";
-			echo "\tp_cdate=".json_encode(serialize($p_cdate))."\n";
-			echo "\tp_mdate=".json_encode(serialize($p_mdate))."\n";
+			echo "\tcdate=".json_encode(serialize($cdate))."\n";
+			echo "\tmdate=".json_encode(serialize($mdate))."\n";
 			if (isset($row['dname'])) {
 				// This do will keep going and adding the data until the
 				// next entity is reached. $row will end on the next entity.
@@ -450,7 +450,7 @@ class NymphDriverPostgreSQL extends NymphDriver {
 				$etype = '';
 			}
 		}
-		$sort = isset($options['sort']) ? $options['sort'] : 'guid';
+		$sort = isset($options['sort']) ? $options['sort'] : 'cdate';
 		$count = $ocount = 0;
 
 		// Check if the requested entity is cached.
@@ -552,12 +552,12 @@ class NymphDriverPostgreSQL extends NymphDriver {
 							break;
 						case 'strict':
 						case '!strict':
-							if ($cur_value[0] == 'p_cdate') {
+							if ($cur_value[0] == 'cdate') {
 								if ( $cur_query )
 									$cur_query .= $type_is_or ? ' OR ' : ' AND ';
 								$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'e."cdate"='.((float) $cur_value[1]);
 								break;
-							} elseif ($cur_value[0] == 'p_mdate') {
+							} elseif ($cur_value[0] == 'mdate') {
 								if ( $cur_query )
 									$cur_query .= $type_is_or ? ' OR ' : ' AND ';
 								$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'e."mdate"='.((float) $cur_value[1]);
@@ -575,12 +575,12 @@ class NymphDriverPostgreSQL extends NymphDriver {
 						case 'match':
 						case '!match':
 							if ($this->usePLPerl) {
-								if ($cur_value[0] == 'p_cdate') {
+								if ($cur_value[0] == 'cdate') {
 									if ( $cur_query )
 										$cur_query .= $type_is_or ? ' OR ' : ' AND ';
 									$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'e."cdate"='.((float) $cur_value[1]);
 									break;
-								} elseif ($cur_value[0] == 'p_mdate') {
+								} elseif ($cur_value[0] == 'mdate') {
 									if ( $cur_query )
 										$cur_query .= $type_is_or ? ' OR ' : ' AND ';
 									$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'e."mdate"='.((float) $cur_value[1]);
@@ -606,12 +606,12 @@ class NymphDriverPostgreSQL extends NymphDriver {
 							break;
 						case 'data':
 						case '!data':
-							if ($cur_value[0] == 'p_cdate') {
+							if ($cur_value[0] == 'cdate') {
 								if ( $cur_query )
 									$cur_query .= $type_is_or ? ' OR ' : ' AND ';
 								$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'e."cdate"='.((float) $cur_value[1]);
 								break;
-							} elseif ($cur_value[0] == 'p_mdate') {
+							} elseif ($cur_value[0] == 'mdate') {
 								if ( $cur_query )
 									$cur_query .= $type_is_or ? ' OR ' : ' AND ';
 								$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'e."mdate"='.((float) $cur_value[1]);
@@ -644,12 +644,12 @@ class NymphDriverPostgreSQL extends NymphDriver {
 							}
 						case 'gt':
 						case '!gt':
-							if ($cur_value[0] == 'p_cdate') {
+							if ($cur_value[0] == 'cdate') {
 								if ( $cur_query )
 									$cur_query .= $type_is_or ? ' OR ' : ' AND ';
 								$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'e."cdate">'.((float) $cur_value[1]);
 								break;
-							} elseif ($cur_value[0] == 'p_mdate') {
+							} elseif ($cur_value[0] == 'mdate') {
 								if ( $cur_query )
 									$cur_query .= $type_is_or ? ' OR ' : ' AND ';
 								$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'e."mdate">'.((float) $cur_value[1]);
@@ -657,12 +657,12 @@ class NymphDriverPostgreSQL extends NymphDriver {
 							}
 						case 'gte':
 						case '!gte':
-							if ($cur_value[0] == 'p_cdate') {
+							if ($cur_value[0] == 'cdate') {
 								if ( $cur_query )
 									$cur_query .= $type_is_or ? ' OR ' : ' AND ';
 								$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'e."cdate">='.((float) $cur_value[1]);
 								break;
-							} elseif ($cur_value[0] == 'p_mdate') {
+							} elseif ($cur_value[0] == 'mdate') {
 								if ( $cur_query )
 									$cur_query .= $type_is_or ? ' OR ' : ' AND ';
 								$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'e."mdate">='.((float) $cur_value[1]);
@@ -670,12 +670,12 @@ class NymphDriverPostgreSQL extends NymphDriver {
 							}
 						case 'lt':
 						case '!lt':
-							if ($cur_value[0] == 'p_cdate') {
+							if ($cur_value[0] == 'cdate') {
 								if ( $cur_query )
 									$cur_query .= $type_is_or ? ' OR ' : ' AND ';
 								$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'e."cdate"<'.((float) $cur_value[1]);
 								break;
-							} elseif ($cur_value[0] == 'p_mdate') {
+							} elseif ($cur_value[0] == 'mdate') {
 								if ( $cur_query )
 									$cur_query .= $type_is_or ? ' OR ' : ' AND ';
 								$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'e."mdate"<'.((float) $cur_value[1]);
@@ -683,12 +683,12 @@ class NymphDriverPostgreSQL extends NymphDriver {
 							}
 						case 'lte':
 						case '!lte':
-							if ($cur_value[0] == 'p_cdate') {
+							if ($cur_value[0] == 'cdate') {
 								if ( $cur_query )
 									$cur_query .= $type_is_or ? ' OR ' : ' AND ';
 								$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'e."cdate"<='.((float) $cur_value[1]);
 								break;
-							} elseif ($cur_value[0] == 'p_mdate') {
+							} elseif ($cur_value[0] == 'mdate') {
 								if ( $cur_query )
 									$cur_query .= $type_is_or ? ' OR ' : ' AND ';
 								$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'e."mdate"<='.((float) $cur_value[1]);
@@ -718,15 +718,13 @@ class NymphDriverPostgreSQL extends NymphDriver {
 
 		switch ($sort) {
 			case 'cdate':
-				// This should ensure that two entities with the same cdate get
-				// sorted correctly.
-				$sort = 'e."cdate"+(e."guid"*0.000000000001)';
+			default:
+				$sort = 'e."cdate"';
 				break;
 			case 'mdate':
-				$sort = 'e."mdate"+(e."guid"*0.000000000001)';
+				$sort = 'e."mdate"';
 				break;
 			case 'guid':
-			default:
 				$sort = 'e."guid"';
 				break;
 		}
@@ -769,7 +767,7 @@ class NymphDriverPostgreSQL extends NymphDriver {
 		while ($row) {
 			$guid = (int) $row[0];
 			$tags = $row[1];
-			$data = array('p_cdate' => (float) $row[2], 'p_mdate' => (float) $row[3]);
+			$data = array('cdate' => (float) $row[2], 'mdate' => (float) $row[3]);
 			// Serialized data.
 			$sdata = array();
 			if (isset($row[4])) {
@@ -880,7 +878,7 @@ class NymphDriverPostgreSQL extends NymphDriver {
 					$entity = $this->pull_cache($guid, $class);
 				else
 					$entity = null;
-				if (!isset($entity) || $data['p_mdate'] > $entity->p_mdate) {
+				if (!isset($entity) || $data['mdate'] > $entity->mdate) {
 					$entity = call_user_func(array($class, 'factory'));
 					$entity->guid = $guid;
 					$entity->tags = explode(',', substr($tags, 1, -1));
@@ -943,8 +941,8 @@ class NymphDriverPostgreSQL extends NymphDriver {
 						$guid,
 						pg_escape_string($this->link, '{'.$tags.'}'),
 						pg_escape_string($this->link, '{'.implode(',', array_keys($data)).'}'),
-						unserialize($data['p_cdate']),
-						unserialize($data['p_mdate']));
+						unserialize($data['cdate']),
+						unserialize($data['mdate']));
 					if ( !(pg_query($this->link, $query)) ) {
 						throw new NymphQueryFailedException('Query failed: ' . pg_last_error(), 0, null, $query);
 					}
@@ -954,7 +952,7 @@ class NymphDriverPostgreSQL extends NymphDriver {
 					if ( !(pg_query($this->link, $query)) ) {
 						throw new NymphQueryFailedException('Query failed: ' . pg_last_error(), 0, null, $query);
 					}
-					unset($data['p_cdate'], $data['p_mdate']);
+					unset($data['cdate'], $data['mdate']);
 					if ($data) {
 						$query = '';
 						foreach ($data as $name => $value) {
@@ -1014,8 +1012,8 @@ class NymphDriverPostgreSQL extends NymphDriver {
 				$guid,
 				pg_escape_string($this->link, '{'.$tags.'}'),
 				pg_escape_string($this->link, '{'.implode(',', array_keys($data)).'}'),
-				unserialize($data['p_cdate']),
-				unserialize($data['p_mdate']));
+				unserialize($data['cdate']),
+				unserialize($data['mdate']));
 			if ( !(pg_query($this->link, $query)) ) {
 				throw new NymphQueryFailedException('Query failed: ' . pg_last_error(), 0, null, $query);
 			}
@@ -1027,7 +1025,7 @@ class NymphDriverPostgreSQL extends NymphDriver {
 			}
 			if ($data) {
 				$query = '';
-				unset($data['p_cdate'], $data['p_mdate']);
+				unset($data['cdate'], $data['mdate']);
 				foreach ($data as $name => $value) {
 					preg_match_all('/a:3:\{i:0;s:22:"nymph_entity_reference";i:1;i:(\d+);/', $value, $references, PREG_PATTERN_ORDER);
 					$uvalue = unserialize($value);
@@ -1110,9 +1108,9 @@ class NymphDriverPostgreSQL extends NymphDriver {
 	public function saveEntity(&$entity) {
 		// Save the created date.
 		if ( !isset($entity->guid) )
-			$entity->p_cdate = microtime(true);
+			$entity->cdate = microtime(true);
 		// Save the modified date.
-		$entity->p_mdate = microtime(true);
+		$entity->mdate = microtime(true);
 		$data = $entity->getData();
 		$sdata = $entity->getSData();
 		$varlist = array_merge(array_keys($data), array_keys($sdata));
@@ -1146,8 +1144,8 @@ class NymphDriverPostgreSQL extends NymphDriver {
 				$new_id,
 				pg_escape_string($this->link, '{'.implode(',', array_diff($entity->tags, array(''))).'}'),
 				pg_escape_string($this->link, '{'.implode(',', $varlist).'}'),
-				(float) $data['p_cdate'],
-				(float) $data['p_mdate']);
+				(float) $data['cdate'],
+				(float) $data['mdate']);
 			if ( !(@pg_send_query($this->link, $query)) ) {
 				throw new NymphQueryFailedException('Query failed: ' . pg_last_error(), 0, null, $query);
 			}
@@ -1166,7 +1164,7 @@ class NymphDriverPostgreSQL extends NymphDriver {
 					throw new NymphQueryFailedException('Query failed: ' . pg_last_error(), 0, null, $query);
 				}
 			}
-			unset($data['p_cdate'], $data['p_mdate']);
+			unset($data['cdate'], $data['mdate']);
 			$values = array();
 			foreach ($data as $name => $value) {
 				$svalue = serialize($value);
@@ -1230,8 +1228,8 @@ class NymphDriverPostgreSQL extends NymphDriver {
 				$etype,
 				pg_escape_string($this->link, '{'.implode(',', array_diff($entity->tags, array(''))).'}'),
 				pg_escape_string($this->link, '{'.implode(',', $varlist).'}'),
-				(float) $data['p_cdate'],
-				(float) $data['p_mdate'],
+				(float) $data['cdate'],
+				(float) $data['mdate'],
 				(int) $entity->guid);
 			if ( !(pg_query($this->link, $query)) ) {
 				throw new NymphQueryFailedException('Query failed: ' . pg_last_error(), 0, null, $query);
@@ -1243,7 +1241,7 @@ class NymphDriverPostgreSQL extends NymphDriver {
 			if ( !(pg_query($this->link, $query)) ) {
 				throw new NymphQueryFailedException('Query failed: ' . pg_last_error(), 0, null, $query);
 			}
-			unset($data['p_cdate'], $data['p_mdate']);
+			unset($data['cdate'], $data['mdate']);
 			$values = array();
 			foreach ($data as $name => $value) {
 				$svalue = serialize($value);

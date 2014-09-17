@@ -176,6 +176,8 @@ class NymphREST {
 				$privateData[$var] = $entity->$var;
 			}
 			$entity->putData(array_merge($privateData, $newEnt['data']));
+			$entity->cdate = $newEnt['cdate'];
+			$entity->mdate = $newEnt['mdate'];
 			try {
 				if ($entity->save()) {
 					$saved[] = $entity;

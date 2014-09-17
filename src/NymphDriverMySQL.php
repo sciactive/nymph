@@ -203,11 +203,11 @@ class NymphDriverMySQL extends NymphDriver {
 		while ($row) {
 			$guid = (int) $row['guid'];
 			$tags = $row['tags'] === ',,' ? array() : explode(',', trim($row['tags'], ','));
-			$p_cdate = (float) $row['cdate'];
-			$p_mdate = (float) $row['mdate'];
+			$cdate = (float) $row['cdate'];
+			$mdate = (float) $row['mdate'];
 			fwrite($fhandle, "{{$guid}}[".implode(',', $tags)."]\n");
-			fwrite($fhandle, "\tp_cdate=".json_encode(serialize($p_cdate))."\n");
-			fwrite($fhandle, "\tp_mdate=".json_encode(serialize($p_mdate))."\n");
+			fwrite($fhandle, "\tcdate=".json_encode(serialize($cdate))."\n");
+			fwrite($fhandle, "\tmdate=".json_encode(serialize($mdate))."\n");
 			if (isset($row['dname'])) {
 				// This do will keep going and adding the data until the
 				// next entity is reached. $row will end on the next entity.
@@ -267,11 +267,11 @@ class NymphDriverMySQL extends NymphDriver {
 		while ($row) {
 			$guid = (int) $row['guid'];
 			$tags = $row['tags'] === ',,' ? array() : explode(',', trim($row['tags'], ','));
-			$p_cdate = (float) $row['cdate'];
-			$p_mdate = (float) $row['mdate'];
+			$cdate = (float) $row['cdate'];
+			$mdate = (float) $row['mdate'];
 			echo "{{$guid}}[".implode(',', $tags)."]\n";
-			echo "\tp_cdate=".json_encode(serialize($p_cdate))."\n";
-			echo "\tp_mdate=".json_encode(serialize($p_mdate))."\n";
+			echo "\tcdate=".json_encode(serialize($cdate))."\n";
+			echo "\tmdate=".json_encode(serialize($mdate))."\n";
 			if (isset($row['dname'])) {
 				// This do will keep going and adding the data until the
 				// next entity is reached. $row will end on the next entity.
@@ -317,7 +317,7 @@ class NymphDriverMySQL extends NymphDriver {
 				$etype = '';
 			}
 		}
-		$sort = isset($options['sort']) ? $options['sort'] : 'guid';
+		$sort = isset($options['sort']) ? $options['sort'] : 'cdate';
 		$count = $ocount = 0;
 
 		// Check if the requested entity is cached.
@@ -389,12 +389,12 @@ class NymphDriverMySQL extends NymphDriver {
 						case '!data':
 						case 'strict':
 						case '!strict':
-							if ($cur_value[0] == 'p_cdate') {
+							if ($cur_value[0] == 'cdate') {
 								if ( $cur_query )
 									$cur_query .= $type_is_or ? ' OR ' : ' AND ';
 								$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'e.`cdate`='.((float) $cur_value[1]);
 								break;
-							} elseif ($cur_value[0] == 'p_mdate') {
+							} elseif ($cur_value[0] == 'mdate') {
 								if ( $cur_query )
 									$cur_query .= $type_is_or ? ' OR ' : ' AND ';
 								$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'e.`mdate`='.((float) $cur_value[1]);
@@ -402,12 +402,12 @@ class NymphDriverMySQL extends NymphDriver {
 							}
 						case 'gt':
 						case '!gt':
-							if ($cur_value[0] == 'p_cdate') {
+							if ($cur_value[0] == 'cdate') {
 								if ( $cur_query )
 									$cur_query .= $type_is_or ? ' OR ' : ' AND ';
 								$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'e.`cdate`>'.((float) $cur_value[1]);
 								break;
-							} elseif ($cur_value[0] == 'p_mdate') {
+							} elseif ($cur_value[0] == 'mdate') {
 								if ( $cur_query )
 									$cur_query .= $type_is_or ? ' OR ' : ' AND ';
 								$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'e.`mdate`>'.((float) $cur_value[1]);
@@ -415,12 +415,12 @@ class NymphDriverMySQL extends NymphDriver {
 							}
 						case 'gte':
 						case '!gte':
-							if ($cur_value[0] == 'p_cdate') {
+							if ($cur_value[0] == 'cdate') {
 								if ( $cur_query )
 									$cur_query .= $type_is_or ? ' OR ' : ' AND ';
 								$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'e.`cdate`>='.((float) $cur_value[1]);
 								break;
-							} elseif ($cur_value[0] == 'p_mdate') {
+							} elseif ($cur_value[0] == 'mdate') {
 								if ( $cur_query )
 									$cur_query .= $type_is_or ? ' OR ' : ' AND ';
 								$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'e.`mdate`>='.((float) $cur_value[1]);
@@ -428,12 +428,12 @@ class NymphDriverMySQL extends NymphDriver {
 							}
 						case 'lt':
 						case '!lt':
-							if ($cur_value[0] == 'p_cdate') {
+							if ($cur_value[0] == 'cdate') {
 								if ( $cur_query )
 									$cur_query .= $type_is_or ? ' OR ' : ' AND ';
 								$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'e.`cdate`<'.((float) $cur_value[1]);
 								break;
-							} elseif ($cur_value[0] == 'p_mdate') {
+							} elseif ($cur_value[0] == 'mdate') {
 								if ( $cur_query )
 									$cur_query .= $type_is_or ? ' OR ' : ' AND ';
 								$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'e.`mdate`<'.((float) $cur_value[1]);
@@ -441,12 +441,12 @@ class NymphDriverMySQL extends NymphDriver {
 							}
 						case 'lte':
 						case '!lte':
-							if ($cur_value[0] == 'p_cdate') {
+							if ($cur_value[0] == 'cdate') {
 								if ( $cur_query )
 									$cur_query .= $type_is_or ? ' OR ' : ' AND ';
 								$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'e.`cdate`<='.((float) $cur_value[1]);
 								break;
-							} elseif ($cur_value[0] == 'p_mdate') {
+							} elseif ($cur_value[0] == 'mdate') {
 								if ( $cur_query )
 									$cur_query .= $type_is_or ? ' OR ' : ' AND ';
 								$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'e.`mdate`<='.((float) $cur_value[1]);
@@ -480,15 +480,13 @@ class NymphDriverMySQL extends NymphDriver {
 
 		switch ($sort) {
 			case 'cdate':
-				// This should ensure that two entities with the same cdate get
-				// sorted correctly.
-				$sort = 'e.`cdate`+(e.`guid`*0.000000000001)';
+			default:
+				$sort = 'e.`cdate`';
 				break;
 			case 'mdate':
-				$sort = 'e.`mdate`+(e.`guid`*0.000000000001)';
+				$sort = 'e.`mdate`';
 				break;
 			case 'guid':
-			default:
 				$sort = 'e.`guid`';
 				break;
 		}
@@ -525,7 +523,7 @@ class NymphDriverMySQL extends NymphDriver {
 		while ($row) {
 			$guid = (int) $row[0];
 			$tags = $row[1];
-			$data = array('p_cdate' => (float) $row[2], 'p_mdate' => (float) $row[3]);
+			$data = array('cdate' => (float) $row[2], 'mdate' => (float) $row[3]);
 			// Serialized data.
 			$sdata = array();
 			if (isset($row[4])) {
@@ -656,7 +654,7 @@ class NymphDriverMySQL extends NymphDriver {
 					$entity = $this->pull_cache($guid, $class);
 				else
 					$entity = null;
-				if (!isset($entity) || $data['p_mdate'] > $entity->p_mdate) {
+				if (!isset($entity) || $data['mdate'] > $entity->mdate) {
 					$entity = call_user_func(array($class, 'factory'));
 					$entity->guid = $guid;
 					if ($tags !== ',,')
@@ -715,8 +713,8 @@ class NymphDriverMySQL extends NymphDriver {
 						$guid,
 						mysql_real_escape_string(','.$tags.',', $this->link),
 						mysql_real_escape_string(','.implode(',', array_keys($data)).',', $this->link),
-						unserialize($data['p_cdate']),
-						unserialize($data['p_mdate']));
+						unserialize($data['cdate']),
+						unserialize($data['mdate']));
 					if ( !(mysql_query($query, $this->link)) ) {
 						throw new NymphQueryFailedException('Query failed: ' . mysql_errno() . ': ' . mysql_error(), 0, null, $query);
 					}
@@ -726,7 +724,7 @@ class NymphDriverMySQL extends NymphDriver {
 					if ( !(mysql_query($query, $this->link)) ) {
 						throw new NymphQueryFailedException('Query failed: ' . mysql_errno() . ': ' . mysql_error(), 0, null, $query);
 					}
-					unset($data['p_cdate'], $data['p_mdate']);
+					unset($data['cdate'], $data['mdate']);
 					if ($data) {
 						$query = "INSERT INTO `{$this->config->MySQL->prefix['value']}data` (`guid`, `name`, `value`) VALUES ";
 						foreach ($data as $name => $value) {
@@ -773,8 +771,8 @@ class NymphDriverMySQL extends NymphDriver {
 				$guid,
 				mysql_real_escape_string(','.$tags.',', $this->link),
 				mysql_real_escape_string(','.implode(',', array_keys($data)).',', $this->link),
-				unserialize($data['p_cdate']),
-				unserialize($data['p_mdate']));
+				unserialize($data['cdate']),
+				unserialize($data['mdate']));
 			if ( !(mysql_query($query, $this->link)) ) {
 				throw new NymphQueryFailedException('Query failed: ' . mysql_errno() . ': ' . mysql_error(), 0, null, $query);
 			}
@@ -786,7 +784,7 @@ class NymphDriverMySQL extends NymphDriver {
 			}
 			if ($data) {
 				$query = "INSERT INTO `{$this->config->MySQL->prefix['value']}data` (`guid`, `name`, `value`) VALUES ";
-				unset($data['p_cdate'], $data['p_mdate']);
+				unset($data['cdate'], $data['mdate']);
 				foreach ($data as $name => $value) {
 					$query .= sprintf("(%u, '%s', '%s'),",
 						$guid,
@@ -862,9 +860,9 @@ class NymphDriverMySQL extends NymphDriver {
 	public function saveEntity(&$entity) {
 		// Save the created date.
 		if ( !isset($entity->guid) )
-			$entity->p_cdate = microtime(true);
+			$entity->cdate = microtime(true);
 		// Save the modified date.
-		$entity->p_mdate = microtime(true);
+		$entity->mdate = microtime(true);
 		$data = $entity->getData();
 		$sdata = $entity->getSData();
 		$varlist = array_merge(array_keys($data), array_keys($sdata));
@@ -901,8 +899,8 @@ class NymphDriverMySQL extends NymphDriver {
 				$entity->guid,
 				mysql_real_escape_string(','.implode(',', array_diff($entity->tags, array(''))).',', $this->link),
 				mysql_real_escape_string(','.implode(',', $varlist).',', $this->link),
-				(float) $data['p_cdate'],
-				(float) $data['p_mdate']);
+				(float) $data['cdate'],
+				(float) $data['mdate']);
 			if ( !(mysql_query($query, $this->link))  ) {
 				// If the tables don't exist yet, create them.
 				if (mysql_errno() == 1146 && $this->createTables()) {
@@ -915,7 +913,7 @@ class NymphDriverMySQL extends NymphDriver {
 					throw new NymphQueryFailedException('Query failed: ' . mysql_errno() . ': ' . mysql_error(), 0, null, $query);
 				}
 			}
-			unset($data['p_cdate'], $data['p_mdate']);
+			unset($data['cdate'], $data['mdate']);
 			$values = array();
 			foreach ($data as $name => $value) {
 				$values[] = sprintf('(%u, \'%s\', \'%s\')',
@@ -940,13 +938,12 @@ class NymphDriverMySQL extends NymphDriver {
 			// Removed any cached versions of this entity.
 			if ($this->config->cache['value'])
 				$this->cleanCache($entity->guid);
-			$query = sprintf("UPDATE `%sentities%s` SET `tags`='%s', `varlist`='%s', `cdate`=%F, `mdate`=%F WHERE `guid`='%u';",
+			$query = sprintf("UPDATE `%sentities%s` SET `tags`='%s', `varlist`='%s', `mdate`=%F WHERE `guid`='%u';",
 				$this->config->MySQL->prefix['value'],
 				$etype,
 				mysql_real_escape_string(','.implode(',', array_diff($entity->tags, array(''))).',', $this->link),
 				mysql_real_escape_string(','.implode(',', $varlist).',', $this->link),
-				(float) $data['p_cdate'],
-				(float) $data['p_mdate'],
+				(float) $data['mdate'],
 				(int) $entity->guid);
 			if ( !(mysql_query($query, $this->link)) ) {
 				throw new NymphQueryFailedException('Query failed: ' . mysql_errno() . ': ' . mysql_error(), 0, null, $query);
@@ -958,7 +955,7 @@ class NymphDriverMySQL extends NymphDriver {
 			if ( !(mysql_query($query, $this->link)) ) {
 				throw new NymphQueryFailedException('Query failed: ' . mysql_errno() . ': ' . mysql_error(), 0, null, $query);
 			}
-			unset($data['p_cdate'], $data['p_mdate']);
+			unset($data['cdate'], $data['mdate']);
 			$values = array();
 			foreach ($data as $name => $value) {
 				$values[] = sprintf('(%u, \'%s\', \'%s\')',
