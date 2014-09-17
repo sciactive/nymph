@@ -7,12 +7,12 @@ license LGPL
 (function (factory) {
     if (typeof define === 'function' && define.amd) {
         // AMD. Register as a module.
-        define('NymphEntity', ['jquery', 'Nymph'], factory);
+        define('NymphEntity', ['jquery', 'Nymph', 'Promise'], factory);
     } else {
         // Browser globals
-        factory(jQuery, Nymph);
+        factory(jQuery, Nymph, Promise);
     }
-}(function($, Nymph){
+}(function($, Nymph, Promise){
 	var sleepErr = "This entity is in a sleeping reference state. You must use .ready().then() to wake it.",
 	arrayUnique = function(array){
 		var a = array.concat();

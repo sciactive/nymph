@@ -1,10 +1,8 @@
-Nymph
-=====
+# <img alt="logo" src="https://raw.githubusercontent.com/sciactive/2be-extras/master/logo/product-icon-40-bw.png" align="top" /> Nymph
 
-An object relational mapper with PHP and JavaScript interfaces.
+Nymph is an open source object relational mapper for PHP and JavaScript. The goal of Nymph is to be easy to set up, easy to learn, and suitable for not only prototyping, but production projects. Nymph automatically creates tables the first time a new class is instantiated. Nymph entities are accessed just like any other object, in both PHP and JavaScript. There is a built in REST server, which makes building JavaScript applications with Nymph trivial. Nymph is based on the ORM in the Pines framework, which has been rigorously tested in real world, high demand web applications.
 
-Understanding Nymph
--------------------
+## Understanding Nymph
 
 Nymph takes the objects that hold your data and translates them to relational data to be stored in a SQL database. Nymph has two parts, in both JavaScript and PHP:
 
@@ -17,70 +15,20 @@ Nymph takes the objects that hold your data and translates them to relational da
 
 Both of these things exist in PHP and JavaScript, and interacting with them in either environment is very similar. The main difference being that in JavaScript, since data can't be retrieved immediately without halting execution until the server responds, Nymph will return JavaScript promise objects instead of actual data. Promise objects let you cleanly handle situations where Nymph fails to retrieve the requested data from the server.
 
-Nymph in JavaScript handles any database interaction by using a NymphREST endpoint. You can build your own endpoint very easily, by following the instructions in the Getting Started section.
+Nymph in JavaScript handles any database interaction by using a NymphREST endpoint. You can build your own endpoint very easily, by following the instructions in the [Setup Guide](https://github.com/sciactive/nymph/wiki/SetupGuide).
 
-Getting Started
----------------
+## Setting up a Nymph Application
 
-First, you need [RequirePHP](https://github.com/sciactive/requirephp). Include the require.php file, and instantiate your container.
+For a step by step guide to setting up Nymph on your own server, visit the [Setup Guide](https://github.com/sciactive/nymph/wiki/SetupGuide).
 
-```php
-require("require.php");
-$require = new RequirePHP();
-```
+## Technical Documentation
 
-Next, include Nymph, and set up your configuration module.
+The technical documentation on this wiki is accessible through the [Technical Documentation Index](https://github.com/sciactive/nymph/wiki/Docs).
 
-```php
-require 'src/Nymph.php';
-$require('NymphConfig', array(), function(){
-	// The conf/config.php file is where you will put all of your own configuration.
-	return include 'conf/config.php';
-});
-```
+## Contacting the Developers
 
-If your RequirePHP container is named `$require`, Nymph will automatically load itself as the module "Nymph". If your container has another name, you must setup Nymph yourself.
+There are several ways to contact the Nymph developers with your questions, concerns, comments, bug reports, or feature requests.
 
-```php
-setupNymph($your_container);
-```
-
-Next, include any custom Entity classes you've created. In this example, we'll include the ones from the code examples. This must be done after loading Nymph for the first time.
-
-```php
-$nymph = $require('Nymph');
-require 'examples/Employee.php';
-require 'examples/Todo.php';
-
-// or
-
-$require(array('Nymph'), function(){
-	require 'examples/Employee.php';
-	require 'examples/Todo.php';
-});
-```
-
-Now, you can begin using Nymph.
-
-```php
-$newEntity = new Employee();
-$newEntity->name = 'John Doe';
-$newEntity->title = 'Senior Person';
-$newEntity->salary = 5000000;
-$newEntity->save();
-
-$entity = $require('Nymph')->getEntity(array('class' => Employee), array('&', 'tag' => array('employee')));
-```
-
-Or, you can setup a REST endpoint, using the NymphREST module.
-
-```php
-$NymphREST = $require('NymphREST');
-
-if (in_array($_SERVER['REQUEST_METHOD'], array('PUT', 'DELETE'))) {
-	parse_str(file_get_contents("php://input"), $args);
-	$NymphREST->run($_SERVER['REQUEST_METHOD'], $args['action'], $args['data']);
-} else {
-	$NymphREST->run($_SERVER['REQUEST_METHOD'], $_REQUEST['action'], $_REQUEST['data']);
-}
-```
+- Nymph is part of [2be on Twitter](http://twitter.com/2be_io).
+- Bug reports, questions, and feature requests can be filed at the [issues page](https://github.com/sciactive/nymph/issues).
+- You can directly [email Hunter Perrin](mailto:hunter@sciactive.com), the creator of Nymph. Note that your message may be accidentally caught by the spam filter.
