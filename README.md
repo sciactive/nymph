@@ -19,11 +19,11 @@ Nymph in JavaScript handles any database interaction by using a NymphREST endpoi
 
 ## Setting up a Nymph Application
 
-For a step by step guide to setting up Nymph on your own server, visit the [Setup Guide](https://github.com/sciactive/nymph/wiki/SetupGuide).
+For a step by step guide to setting up Nymph on your own server, visit the [Setup Guide](https://github.com/sciactive/nymph/wiki/Setup-Guide).
 
 ## Technical Documentation
 
-The technical documentation on this wiki is accessible through the [Technical Documentation Index](https://github.com/sciactive/nymph/wiki/Docs).
+The technical documentation on this wiki is accessible through the [Technical Documentation Index](https://github.com/sciactive/nymph/wiki/Technical-Documentation).
 
 ## Contacting the Developers
 
