@@ -487,7 +487,6 @@ class Entity implements EntityInterface {
 		$object->cdate = $this->cdate;
 		$object->mdate = $this->mdate;
 		$object->tags = $this->tags;
-		$object->etype = $this->etype();
 		$object->info = array(
 			'name' => $this->info('name'),
 			'type' => $this->info('type'),

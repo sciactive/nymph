@@ -148,10 +148,10 @@ class NymphDriver implements NymphDriverInterface {
 		return $entities[0];
 	}
 
-	public function hsort(&$array, $property = null, $parent_property = null, $case_sensitive = false, $reverse = false) {
+	public function hsort(&$array, $property = null, $parentProperty = null, $caseSensitive = false, $reverse = false) {
 		// First sort by the requested property.
-		$this->sort($array, $property, $case_sensitive, $reverse);
-		if (!isset($parent_property))
+		$this->sort($array, $property, $caseSensitive, $reverse);
+		if (!isset($parentProperty))
 			return;
 		// Now sort by children.
 		$new_array = array();
@@ -162,7 +162,7 @@ class NymphDriver implements NymphDriverInterface {
 			$changed = false;
 			foreach ($array as $key => &$cur_entity) {
 				// Must break after adding one, so any following children don't go in the wrong order.
-				if (!isset($cur_entity->$parent_property) || !$cur_entity->$parent_property->inArray(array_merge($new_array, $array))) {
+				if (!isset($cur_entity->$parentProperty) || !$cur_entity->$parentProperty->inArray(array_merge($new_array, $array))) {
 					// If they have no parent (or their parent isn't in the array), they go on the end.
 					$new_array[] = $cur_entity;
 					unset($array[$key]);
@@ -170,17 +170,17 @@ class NymphDriver implements NymphDriverInterface {
 					break;
 				} else {
 					// Else find the parent.
-					$pkey = $cur_entity->$parent_property->arraySearch($new_array);
+					$pkey = $cur_entity->$parentProperty->arraySearch($new_array);
 					if ($pkey !== false) {
 						// And insert after the parent.
 						// This makes entities go to the end of the child list.
-						$cur_ancestor = $cur_entity->$parent_property;
+						$cur_ancestor = $cur_entity->$parentProperty;
 						while (isset($cur_ancestor)) {
 							$child_counter[$cur_ancestor->guid]++;
-							$cur_ancestor = $cur_ancestor->$parent_property;
+							$cur_ancestor = $cur_ancestor->$parentProperty;
 						}
 						// Where to place the entity.
-						$new_key = $pkey + $child_counter[$cur_entity->$parent_property->guid];
+						$new_key = $pkey + $child_counter[$cur_entity->$parentProperty->guid];
 						if (isset($new_array[$new_key])) {
 							// If it already exists, we have to splice it in.
 							array_splice($new_array, $new_key, 0, array($cur_entity));
@@ -206,12 +206,12 @@ class NymphDriver implements NymphDriverInterface {
 		$array = $new_array;
 	}
 
-	public function psort(&$array, $property = null, $parent_property = null, $case_sensitive = false, $reverse = false) {
+	public function psort(&$array, $property = null, $parentProperty = null, $caseSensitive = false, $reverse = false) {
 		// Sort by the requested property.
 		if (isset($property)) {
 			$this->sortProperty = $property;
-			$this->sortParent = $parent_property;
-			$this->sortCaseSensitive = $case_sensitive;
+			$this->sortParent = $parentProperty;
+			$this->sortCaseSensitive = $caseSensitive;
 			@usort($array, array($this, 'sortProperty'));
 		}
 		if ($reverse)
@@ -273,12 +273,12 @@ class NymphDriver implements NymphDriverInterface {
 		$this->entityCache[$entity->guid][$class]->clearCache();
 	}
 
-	public function sort(&$array, $property = null, $case_sensitive = false, $reverse = false) {
+	public function sort(&$array, $property = null, $caseSensitive = false, $reverse = false) {
 		// Sort by the requested property.
 		if (isset($property)) {
 			$this->sortProperty = $property;
 			$this->sortParent = null;
-			$this->sortCaseSensitive = $case_sensitive;
+			$this->sortCaseSensitive = $caseSensitive;
 			@usort($array, array($this, 'sortProperty'));
 		}
 		if ($reverse)

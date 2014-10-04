@@ -4,7 +4,7 @@
 		<title>Nymph JS Test</title>
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<script src="lib/jquery-1.7.2.min.js"></script>
+		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
 		<script type="text/javascript">
 			(function(){
 				var s = document.createElement("script"); s.setAttribute("src", "https://www.promisejs.org/polyfills/promise-5.0.0.min.js");
@@ -16,9 +16,9 @@
 				restURL: 'rest.php'
 			};
 		</script>
-		<script src="src/Nymph.js"></script>
-		<script src="src/Entity.js"></script>
-		<script src="examples/Employee.js"></script>
+		<script src="../src/Nymph.js"></script>
+		<script src="../src/Entity.js"></script>
+		<script src="classes/Employee.js"></script>
 		<script>
 			$(function(){
 				$("button").click(function(){
@@ -39,21 +39,46 @@
 	</head>
 	<body>
 		<div style="width: 49%; float: left;">
-			<textarea rows="20" style="width: 95%;"></textarea>
-			<br>Click a code test below and <button>Go</button>
+			<textarea rows="20" style="width: 95%; font-family: monospace;"></textarea>
+			<br>Choose a snippet below and <button>Go</button>
 		</div>
 		<div style="width: 49%; height: 300px; float: left; overflow: auto;" id="result">result here</div>
 		<br style="clear: both;">
 		<select>
 			<option>-</option>
 		</select>
+		<h4>Refresh an entity</h4>
+		<pre>var promise1 = Nymph.getEntity({"class":"Employee"}, {"type":"&amp;","strict":["name","Jane Doe"]}),
+    promise2 = Nymph.getEntity({"class":"Employee"}, {"type":"&amp;","strict":["name","Jane Doe"]});
+
+Promise.all([promise1, promise2]).then(function(entities){
+	entities[0].data.name = "Janet Doe";
+	entities[0].save().then(function(){
+		if (entities[1].data.name == "Janet Doe") {
+			$("#result").html("fail - refreshed without asking");
+			return;
+		}
+		entities[1].refresh().then(function(entity){
+			if (entity.data.name == "Janet Doe")
+				$("#result").html("pass");
+			else
+				$("#result").html("fail");
+		}, function(errObj){
+			$("#result").html(errObj.textStatus);
+		});
+	}, function(errObj){
+		$("#result").html(errObj.textStatus);
+	});
+}, function(errObj){
+	$("#result").html(errObj.textStatus);
+});</pre>
 		<h4>Check two entities are equal</h4>
 		<pre>Nymph.getEntity({"class":"Employee"}, {"type":"&amp;","strict":["name","Jane Doe"]}).then(function(first){
 	Nymph.getEntity({"class":"Employee"}, {"type":"&amp;","guid":first.guid}).then(function(second){
-first.data.thing = 'this';
-first.data.other = 'this';
-second.data.other = 'this';
-second.data.thing = 'this';
+		first.data.thing = 'this';
+		first.data.other = 'this';
+		second.data.other = 'this';
+		second.data.thing = 'this';
 		$("#result").html(JSON.stringify(first.equals(second)));
 	}, function(errObj){
 		$("#result").html(errObj.textStatus);

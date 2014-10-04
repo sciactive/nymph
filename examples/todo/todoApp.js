@@ -1,7 +1,9 @@
 angular.module('todoApp', []).controller('TodoController', ['$scope', function($scope) {
 	$scope.todos = [];
+	$scope.sort = 'name';
 	Nymph.getEntities({"class": 'Todo'}, {"type": '&', "tag": 'todo', "!tag": 'archived'}).then(function(todos){
 		if (todos && todos.length) {
+			Nymph.sort(todos, $scope.sort);
 			$scope.todos = todos;
 			$scope.$apply();
 		}
@@ -15,10 +17,16 @@ angular.module('todoApp', []).controller('TodoController', ['$scope', function($
 		todo.save().then(function(todo){
 			$scope.todos.push(todo);
 			$scope.todoText = '';
+			$scope.todos = Nymph.sort($scope.todos, $scope.sort);
 			$scope.$apply();
 		}, function(errObj){
 			alert("Error: "+errObj.textStatus);
 		});
+	};
+
+	$scope.sortTodos = function() {
+		$scope.todos = Nymph.sort($scope.todos, $scope.sort);
+		$scope.$apply();
 	};
 
 	$scope.save = function(todo) {

@@ -108,12 +108,11 @@ license LGPL
 		this.data = {};
 		this.isASleepingReference = false;
 		this.sleepingReference = false;
-		if (typeof id !== "undefined" && !isNaN(id)) {
-			Nymph.getEntity({"class":this.class},{"type":"&","guid":id}).then(function(data){
-				this.init(data);
-			}, function(jqXHR, status){
-				throw new Error();
-			});
+		if (typeof id !== "undefined" && !isNaN(Number(id))) {
+			this.guid = Number(id);
+			this.isASleepingReference = true;
+			this.sleepingReference = ['nymph_entity_reference', this.guid, this.class];
+			this.ready();
 		}
 	};
 	$.extend(Entity.prototype, {
@@ -126,6 +125,7 @@ license LGPL
 		// === Class Variables ===
 
 		etype: "entity",
+		readyPromise: null,
 
 		// === Events ===
 
@@ -141,7 +141,6 @@ license LGPL
 			this.cdate = jsonEntity.cdate;
 			this.mdate = jsonEntity.mdate;
 			this.tags = jsonEntity.tags;
-			this.etype = jsonEntity.etype;
 			this.info = jsonEntity.info;
 			this.data = jsonEntity.data;
 			for (var k in this.data) {
@@ -291,6 +290,19 @@ license LGPL
 			return false;
 		},
 
+		refresh: function(){
+			if (this.isASleepingReference)
+				return this.ready();
+			var that = this;
+			return new Promise(function(resolve, reject){
+				Nymph.getEntityData({"class":that.class},{"type":"&","guid":that.guid}).then(function(data){
+					resolve(that.init(data));
+				}, function(errObj){
+					reject(errObj);
+				});
+			});
+		},
+
 		toJSON: function(){
 			if (this.isASleepingReference)
 				throw new EntityIsSleepingReferenceError(sleepErr);
@@ -299,7 +311,6 @@ license LGPL
 			obj.cdate = this.cdate;
 			obj.mdate = this.mdate;
 			obj.tags = $.merge([], this.tags);
-			obj.etype = this.etype;
 			obj.data = {};
 			for (var k in this.data) {
 				obj.data[k] = getDataReference(this.data[k]);
@@ -323,23 +334,39 @@ license LGPL
 
 		ready: function(success, error){
 			var that = this;
-			return new Promise(function(resolve, reject){
+			this.readyPromise = new Promise(function(resolve, reject){
 				if (!that.isASleepingReference) {
+					that.readyPromise = null;
 					resolve(that);
 					if (typeof success === "function")
 						success(that);
 				} else {
-					Nymph.getEntityData({"class":that.sleepingReference[2]}, {"type":"&","guid":that.sleepingReference[1]}).then(function(data){
-						resolve(that.init(data));
-						if (typeof success === "function")
-							success(that);
-					}, function(errObj){
-						reject(errObj);
-						if (typeof error === "function")
-							error(that);
-					});
+					if (that.readyPromise) {
+						that.readyPromise.then(function(){
+							resolve(that);
+							if (typeof success === "function")
+								success(that);
+						}, function(errObj){
+							reject(errObj);
+							if (typeof error === "function")
+								error(that);
+						});
+					} else {
+						Nymph.getEntityData({"class":that.sleepingReference[2]}, {"type":"&","guid":that.sleepingReference[1]}).then(function(data){
+							that.readyPromise = null;
+							resolve(that.init(data));
+							if (typeof success === "function")
+								success(that);
+						}, function(errObj){
+							that.readyPromise = null;
+							reject(errObj);
+							if (typeof error === "function")
+								error(that);
+						});
+					}
 				}
 			});
+			return this.readyPromise;
 		}
 	});
 

@@ -1,15 +1,15 @@
 <?php
 
-require 'lib/require.php';
+require '../lib/require.php';
 $require = new RequirePHP();
 
-require 'src/Nymph.php';
+require '../src/Nymph.php';
 $require('NymphConfig', array(), function(){
-	return include 'conf/config.php';
+	return include 'config.php';
 });
 
 $require(array('Nymph'), function(){
-	require 'examples/Employee.php';
+	require 'classes/Employee.php';
 });
 
 $newEntity = new Employee();
@@ -31,7 +31,7 @@ $entity = $require('Nymph')->getEntity(array('class' => Employee), array('&', 'g
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>Nymph Demo</title>
+		<title>Nymph Quick Test</title>
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	</head>
