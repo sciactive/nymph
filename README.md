@@ -2,6 +2,10 @@
 
 Nymph is an open source object relational mapper for PHP and JavaScript. The goal of Nymph is to be easy to set up, easy to learn, and suitable for not only prototyping, but production projects. Nymph automatically creates tables the first time a new class is instantiated. Nymph entities are accessed just like any other object, in both PHP and JavaScript. There is a built in REST server, which makes building JavaScript applications with Nymph trivial. Nymph is based on the ORM in the Pines framework, which has been rigorously tested in real world, high demand web applications.
 
+## History
+
+Nymph started in 2009, as part of the Pines PHP framework. After years of only residing in that project, in August 2014, it was ripped out and made into its own project. To make it more useful, the JavaScript half was written. Now Nymph is a mature, well tested product.
+
 ## Understanding Nymph
 
 Nymph takes the objects that hold your data and translates them to relational data to be stored in a SQL database. Nymph has two parts, in both JavaScript and PHP:
