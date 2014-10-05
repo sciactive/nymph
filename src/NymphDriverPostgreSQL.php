@@ -103,13 +103,13 @@ class NymphDriverPostgreSQL extends NymphDriver {
 	 * @param string $etype The entity type to create a table for. If this is blank, the default tables are created.
 	 */
 	private function createTables($etype = null) {
-		if ( !(@pg_query($this->link, 'BEGIN;')) ) {
-			throw new NymphQueryFailedException('Query failed: ' . pg_last_error(), 0, null, 'BEGIN;');
+		if ( !(@pg_query($this->link, 'ROLLBACK; BEGIN;')) ) {
+			throw new NymphQueryFailedException('Query failed: ' . pg_last_error(), 0, null, 'ROLLBACK; BEGIN;');
 		}
 		if (isset($etype)) {
 			$etype =  '_'.pg_escape_string($this->link, $etype);
 			// Create the entity table.
-			$query .= sprintf(" CREATE TABLE IF NOT EXISTS \"%sentities%s\" ( guid bigint NOT NULL, tags text[], varlist text[], cdate numeric(18,6) NOT NULL, mdate numeric(18,6) NOT NULL, PRIMARY KEY (guid) ) WITH ( OIDS=FALSE ); ALTER TABLE \"%sentities%s\" OWNER TO \"%s\";",
+			$query = sprintf(" CREATE TABLE IF NOT EXISTS \"%sentities%s\" ( guid bigint NOT NULL, tags text[], varlist text[], cdate numeric(18,6) NOT NULL, mdate numeric(18,6) NOT NULL, PRIMARY KEY (guid) ) WITH ( OIDS=FALSE ); ALTER TABLE \"%sentities%s\" OWNER TO \"%s\";",
 				$this->config->PostgreSQL->prefix['value'],
 				$etype,
 				$this->config->PostgreSQL->prefix['value'],
@@ -255,6 +255,7 @@ class NymphDriverPostgreSQL extends NymphDriver {
 		if ( !(@pg_query($this->link, 'COMMIT;')) ) {
 			throw new NymphQueryFailedException('Query failed: ' . pg_last_error(), 0, null, 'COMMIT;');
 		}
+		return true;
 	}
 
 	public function deleteEntityByID($guid, $etype = null) {
@@ -322,36 +323,53 @@ class NymphDriverPostgreSQL extends NymphDriver {
 			$row = pg_fetch_assoc($result);
 		}
 
-		fwrite($fhandle, "#\n");
+		fwrite($fhandle, "\n#\n");
 		fwrite($fhandle, "# Entities\n");
 		fwrite($fhandle, "#\n\n");
 
-		// Export entities.
-		$query = sprintf("SELECT e.*, d.\"name\" AS \"dname\", d.\"value\" AS \"dvalue\" FROM \"%sentities\" e LEFT JOIN \"%sdata\" d ON e.\"guid\"=d.\"guid\" ORDER BY e.\"guid\";",
-			$this->config->PostgreSQL->prefix['value'],
-			$this->config->PostgreSQL->prefix['value']);
+		// Get the etypes.
+		$query = sprintf("SELECT relname FROM pg_stat_user_tables ORDER BY relname;");
 		if ( !($result = pg_query($this->link, $query)) ) {
 			throw new NymphQueryFailedException('Query failed: ' . pg_last_error(), 0, null, $query);
 		}
-		$row = pg_fetch_assoc($result);
+		$etypes = array();
+		$row = pg_fetch_array($result);
 		while ($row) {
-			$guid = (int) $row['guid'];
-			$tags = explode(',', substr($row['tags'], 1, -1));
-			$cdate = (float) $row['cdate'];
-			$mdate = (float) $row['mdate'];
-			fwrite($fhandle, "{{$guid}}[".implode(',', $tags)."]\n");
-			fwrite($fhandle, "\tcdate=".json_encode(serialize($cdate))."\n");
-			fwrite($fhandle, "\tmdate=".json_encode(serialize($mdate))."\n");
-			if (isset($row['dname'])) {
-				// This do will keep going and adding the data until the
-				// next entity is reached. $row will end on the next entity.
-				do {
-					fwrite($fhandle, "\t{$row['dname']}=".json_encode($row['dvalue'])."\n");
+			if (strpos($row[0], $this->config->PostgreSQL->prefix['value'].'entities_') === 0)
+				$etypes[] = substr($row[0], strlen($this->config->PostgreSQL->prefix['value'].'entities_'));
+			$row = pg_fetch_array($result);
+		}
+
+		foreach ($etypes as $etype) {
+			// Export entities.
+			$query = sprintf("SELECT e.*, d.\"name\" AS \"dname\", d.\"value\" AS \"dvalue\" FROM \"%sentities_%s\" e LEFT JOIN \"%sdata_%s\" d ON e.\"guid\"=d.\"guid\" ORDER BY e.\"guid\";",
+				$this->config->PostgreSQL->prefix['value'],
+				$etype,
+				$this->config->PostgreSQL->prefix['value'],
+				$etype);
+			if ( !($result = pg_query($this->link, $query)) ) {
+				throw new NymphQueryFailedException('Query failed: ' . pg_last_error(), 0, null, $query);
+			}
+			$row = pg_fetch_assoc($result);
+			while ($row) {
+				$guid = (int) $row['guid'];
+				$tags = explode(',', substr($row['tags'], 1, -1));
+				$cdate = (float) $row['cdate'];
+				$mdate = (float) $row['mdate'];
+				fwrite($fhandle, "{{$guid}}<{$etype}>[".implode(',', $tags)."]\n");
+				fwrite($fhandle, "\tcdate=".json_encode(serialize($cdate))."\n");
+				fwrite($fhandle, "\tmdate=".json_encode(serialize($mdate))."\n");
+				if (isset($row['dname'])) {
+					// This do will keep going and adding the data until the
+					// next entity is reached. $row will end on the next entity.
+					do {
+						fwrite($fhandle, "\t{$row['dname']}=".json_encode($row['dvalue'])."\n");
+						$row = pg_fetch_assoc($result);
+					} while ((int) $row['guid'] === $guid);
+				} else {
+					// Make sure that $row is incremented :)
 					$row = pg_fetch_assoc($result);
-				} while ((int) $row['guid'] === $guid);
-			} else {
-				// Make sure that $row is incremented :)
-				$row = pg_fetch_assoc($result);
+				}
 			}
 		}
 		return fclose($fhandle);
@@ -387,36 +405,53 @@ class NymphDriverPostgreSQL extends NymphDriver {
 			$row = pg_fetch_assoc($result);
 		}
 
-		echo "#\n";
+		echo "\n#\n";
 		echo "# Entities\n";
 		echo "#\n\n";
 
-		// Export entities.
-		$query = sprintf("SELECT e.*, d.\"name\" AS \"dname\", d.\"value\" AS \"dvalue\" FROM \"%sentities\" e LEFT JOIN \"%sdata\" d ON e.\"guid\"=d.\"guid\" ORDER BY e.\"guid\";",
-			$this->config->PostgreSQL->prefix['value'],
-			$this->config->PostgreSQL->prefix['value']);
+		// Get the etypes.
+		$query = sprintf("SELECT relname FROM pg_stat_user_tables ORDER BY relname;");
 		if ( !($result = pg_query($this->link, $query)) ) {
 			throw new NymphQueryFailedException('Query failed: ' . pg_last_error(), 0, null, $query);
 		}
-		$row = pg_fetch_assoc($result);
+		$etypes = array();
+		$row = pg_fetch_array($result);
 		while ($row) {
-			$guid = (int) $row['guid'];
-			$tags = explode(',', substr($row['tags'], 1, -1));
-			$cdate = (float) $row['cdate'];
-			$mdate = (float) $row['mdate'];
-			echo "{{$guid}}[".implode(',', $tags)."]\n";
-			echo "\tcdate=".json_encode(serialize($cdate))."\n";
-			echo "\tmdate=".json_encode(serialize($mdate))."\n";
-			if (isset($row['dname'])) {
-				// This do will keep going and adding the data until the
-				// next entity is reached. $row will end on the next entity.
-				do {
-					echo "\t{$row['dname']}=".json_encode(($row['dvalue'][0] === '~' ? stripcslashes(substr($row['dvalue'], 1)) : $row['dvalue']))."\n";
+			if (strpos($row[0], $this->config->PostgreSQL->prefix['value'].'entities_') === 0)
+				$etypes[] = substr($row[0], strlen($this->config->PostgreSQL->prefix['value'].'entities_'));
+			$row = pg_fetch_array($result);
+		}
+
+		foreach ($etypes as $etype) {
+			// Export entities.
+			$query = sprintf("SELECT e.*, d.\"name\" AS \"dname\", d.\"value\" AS \"dvalue\" FROM \"%sentities_%s\" e LEFT JOIN \"%sdata_%s\" d ON e.\"guid\"=d.\"guid\" ORDER BY e.\"guid\";",
+				$this->config->PostgreSQL->prefix['value'],
+				$etype,
+				$this->config->PostgreSQL->prefix['value'],
+				$etype);
+			if ( !($result = pg_query($this->link, $query)) ) {
+				throw new NymphQueryFailedException('Query failed: ' . pg_last_error(), 0, null, $query);
+			}
+			$row = pg_fetch_assoc($result);
+			while ($row) {
+				$guid = (int) $row['guid'];
+				$tags = explode(',', substr($row['tags'], 1, -1));
+				$cdate = (float) $row['cdate'];
+				$mdate = (float) $row['mdate'];
+				echo "{{$guid}}<{$etype}>[".implode(',', $tags)."]\n";
+				echo "\tcdate=".json_encode(serialize($cdate))."\n";
+				echo "\tmdate=".json_encode(serialize($mdate))."\n";
+				if (isset($row['dname'])) {
+					// This do will keep going and adding the data until the
+					// next entity is reached. $row will end on the next entity.
+					do {
+						echo "\t{$row['dname']}=".json_encode(($row['dvalue'][0] === '~' ? stripcslashes(substr($row['dvalue'], 1)) : $row['dvalue']))."\n";
+						$row = pg_fetch_assoc($result);
+					} while ((int) $row['guid'] === $guid);
+				} else {
+					// Make sure that $row is incremented :)
 					$row = pg_fetch_assoc($result);
-				} while ((int) $row['guid'] === $guid);
-			} else {
-				// Make sure that $row is incremented :)
-				$row = pg_fetch_assoc($result);
+				}
 			}
 		}
 		return true;
@@ -916,7 +951,6 @@ class NymphDriverPostgreSQL extends NymphDriver {
 	}
 
 	public function import($filename) {
-		$filename = clean_filename((string) $filename);
 		if (!$fhandle = fopen($filename, 'r'))
 			throw new NymphInvalidParametersException('Provided filename is unreadable.');
 		$line = '';
@@ -933,13 +967,41 @@ class NymphDriverPostgreSQL extends NymphDriver {
 				continue;
 			}
 			$matches = array();
-			if (preg_match('/^\s*{(\d+)}\[([\w,]+)\]\s*$/S', $line, $matches)) {
+			if (preg_match('/^\s*{(\d+)}<([\w-_]+)>\[([\w,]+)\]\s*$/S', $line, $matches)) {
 				// Save the current entity.
 				if ($guid) {
-					$query = sprintf("DELETE FROM \"%sentities\" WHERE \"guid\"=%u; INSERT INTO \"%sentities\" (\"guid\", \"tags\", \"varlist\", \"cdate\", \"mdate\") VALUES (%u, '%s', '%s', %F, %F);",
+					$query = sprintf("DELETE FROM \"%sguids\" WHERE \"guid\"=%u; INSERT INTO \"%sguids\" (\"guid\") VALUES (%u);",
 						$this->config->PostgreSQL->prefix['value'],
 						$guid,
 						$this->config->PostgreSQL->prefix['value'],
+						$guid);
+					if ( !(@pg_send_query($this->link, $query)) ) {
+						throw new NymphQueryFailedException('Query failed: ' . pg_last_error(), 0, null, $query);
+					}
+					if ( !($result = @pg_get_result($this->link)) ) {
+						throw new NymphQueryFailedException('Query failed: ' . pg_last_error(), 0, null, $query);
+					}
+					if ($error = pg_result_error_field($result, PGSQL_DIAG_SQLSTATE)) {
+						// If the tables don't exist yet, create them.
+						if ($error == '42P01' && $this->createTables()) {
+							if (isset($etype_dirty))
+								$this->createTables($etype_dirty);
+							if ( !($result = @pg_query($this->link, $query)) ) {
+								throw new NymphQueryFailedException('Query failed: ' . pg_last_error(), 0, null, $query);
+							}
+							if ( !($result = @pg_query($this->link, 'BEGIN;')) ) {
+								throw new NymphQueryFailedException('Query failed: ' . pg_last_error(), 0, null, 'BEGIN;');
+							}
+						} else {
+							throw new NymphQueryFailedException('Query failed: ' . pg_last_error(), 0, null, $query);
+						}
+					}
+					$query = sprintf("DELETE FROM \"%sentities_%s\" WHERE \"guid\"=%u; INSERT INTO \"%sentities_%s\" (\"guid\", \"tags\", \"varlist\", \"cdate\", \"mdate\") VALUES (%u, '%s', '%s', %F, %F);",
+						$this->config->PostgreSQL->prefix['value'],
+						$etype,
+						$guid,
+						$this->config->PostgreSQL->prefix['value'],
+						$etype,
 						$guid,
 						pg_escape_string($this->link, '{'.$tags.'}'),
 						pg_escape_string($this->link, '{'.implode(',', array_keys($data)).'}'),
@@ -948,8 +1010,9 @@ class NymphDriverPostgreSQL extends NymphDriver {
 					if ( !(pg_query($this->link, $query)) ) {
 						throw new NymphQueryFailedException('Query failed: ' . pg_last_error(), 0, null, $query);
 					}
-					$query = sprintf("DELETE FROM \"%sdata\" WHERE \"guid\"=%u;",
+					$query = sprintf("DELETE FROM \"%sdata_%s\" WHERE \"guid\"=%u;",
 						$this->config->PostgreSQL->prefix['value'],
+						$etype,
 						$guid);
 					if ( !(pg_query($this->link, $query)) ) {
 						throw new NymphQueryFailedException('Query failed: ' . pg_last_error(), 0, null, $query);
@@ -960,7 +1023,7 @@ class NymphDriverPostgreSQL extends NymphDriver {
 						foreach ($data as $name => $value) {
 							preg_match_all('/a:3:\{i:0;s:22:"nymph_entity_reference";i:1;i:(\d+);/', $value, $references, PREG_PATTERN_ORDER);
 							$uvalue = unserialize($value);
-							$query .= "INSERT INTO \"{$this->config->PostgreSQL->prefix['value']}data\" (\"guid\", \"name\", \"value\", \"references\", \"compare_true\", \"compare_one\", \"compare_zero\", \"compare_negone\", \"compare_emptyarray\", \"compare_string\") VALUES ";
+							$query .= "INSERT INTO \"{$this->config->PostgreSQL->prefix['value']}data_{$etype}\" (\"guid\", \"name\", \"value\", \"references\", \"compare_true\", \"compare_one\", \"compare_zero\", \"compare_negone\", \"compare_emptyarray\", \"compare_string\") VALUES ";
 							$query .= sprintf("(%u, '%s', '%s', '%s', %s, %s, %s, %s, %s, %s); ",
 								$guid,
 								pg_escape_string($this->link, $name),
@@ -984,7 +1047,8 @@ class NymphDriverPostgreSQL extends NymphDriver {
 				}
 				// Record the new entity's info.
 				$guid = (int) $matches[1];
-				$tags = $matches[2];
+				$etype = $matches[2];
+				$tags = $matches[3];
 			} elseif (preg_match('/^\s*([\w,]+)\s*=\s*(\S.*\S)\s*$/S', $line, $matches)) {
 				// Add the variable to the new entity.
 				if ($guid)
@@ -1007,10 +1071,38 @@ class NymphDriverPostgreSQL extends NymphDriver {
 		}
 		// Save the last entity.
 		if ($guid) {
-			$query = sprintf("DELETE FROM \"%sentities\" WHERE \"guid\"=%u; INSERT INTO \"%sentities\" (\"guid\", \"tags\", \"varlist\", \"cdate\", \"mdate\") VALUES (%u, '%s', '%s', %F, %F);",
+			$query = sprintf("DELETE FROM \"%sguids\" WHERE \"guid\"=%u; INSERT INTO \"%sguids\" (\"guid\") VALUES (%u);",
 				$this->config->PostgreSQL->prefix['value'],
 				$guid,
 				$this->config->PostgreSQL->prefix['value'],
+				$guid);
+			if ( !(@pg_send_query($this->link, $query)) ) {
+				throw new NymphQueryFailedException('Query failed: ' . pg_last_error(), 0, null, $query);
+			}
+			if ( !($result = @pg_get_result($this->link)) ) {
+				throw new NymphQueryFailedException('Query failed: ' . pg_last_error(), 0, null, $query);
+			}
+			if ($error = pg_result_error_field($result, PGSQL_DIAG_SQLSTATE)) {
+				// If the tables don't exist yet, create them.
+				if ($error == '42P01' && $this->createTables()) {
+					if (isset($etype_dirty))
+						$this->createTables($etype_dirty);
+					if ( !($result = @pg_query($this->link, $query)) ) {
+						throw new NymphQueryFailedException('Query failed: ' . pg_last_error(), 0, null, $query);
+					}
+					if ( !($result = @pg_query($this->link, 'BEGIN;')) ) {
+						throw new NymphQueryFailedException('Query failed: ' . pg_last_error(), 0, null, 'BEGIN;');
+					}
+				} else {
+					throw new NymphQueryFailedException('Query failed: ' . pg_last_error(), 0, null, $query);
+				}
+			}
+			$query = sprintf("DELETE FROM \"%sentities_%s\" WHERE \"guid\"=%u; INSERT INTO \"%sentities_%s\" (\"guid\", \"tags\", \"varlist\", \"cdate\", \"mdate\") VALUES (%u, '%s', '%s', %F, %F);",
+				$this->config->PostgreSQL->prefix['value'],
+				$etype,
+				$guid,
+				$this->config->PostgreSQL->prefix['value'],
+				$etype,
 				$guid,
 				pg_escape_string($this->link, '{'.$tags.'}'),
 				pg_escape_string($this->link, '{'.implode(',', array_keys($data)).'}'),
@@ -1019,19 +1111,20 @@ class NymphDriverPostgreSQL extends NymphDriver {
 			if ( !(pg_query($this->link, $query)) ) {
 				throw new NymphQueryFailedException('Query failed: ' . pg_last_error(), 0, null, $query);
 			}
-			$query = sprintf("DELETE FROM \"%sdata\" WHERE \"guid\"=%u;",
+			$query = sprintf("DELETE FROM \"%sdata_%s\" WHERE \"guid\"=%u;",
 				$this->config->PostgreSQL->prefix['value'],
+				$etype,
 				$guid);
 			if ( !(pg_query($this->link, $query)) ) {
 				throw new NymphQueryFailedException('Query failed: ' . pg_last_error(), 0, null, $query);
 			}
+			unset($data['cdate'], $data['mdate']);
 			if ($data) {
 				$query = '';
-				unset($data['cdate'], $data['mdate']);
 				foreach ($data as $name => $value) {
 					preg_match_all('/a:3:\{i:0;s:22:"nymph_entity_reference";i:1;i:(\d+);/', $value, $references, PREG_PATTERN_ORDER);
 					$uvalue = unserialize($value);
-					$query .= "INSERT INTO \"{$this->config->PostgreSQL->prefix['value']}data\" (\"guid\", \"name\", \"value\", \"references\", \"compare_true\", \"compare_one\", \"compare_zero\", \"compare_negone\", \"compare_emptyarray\", \"compare_string\") VALUES ";
+					$query .= "INSERT INTO \"{$this->config->PostgreSQL->prefix['value']}data_{$etype}\" (\"guid\", \"name\", \"value\", \"references\", \"compare_true\", \"compare_one\", \"compare_zero\", \"compare_negone\", \"compare_emptyarray\", \"compare_string\") VALUES ";
 					$query .= sprintf("(%u, '%s', '%s', '%s', %s, %s, %s, %s, %s, %s); ",
 						$guid,
 						pg_escape_string($this->link, $name),
@@ -1140,6 +1233,30 @@ class NymphDriverPostgreSQL extends NymphDriver {
 					break;
 			}
 			$entity->guid = $new_id;
+			$query = sprintf("INSERT INTO \"%sguids\" (\"guid\") VALUES (%u);",
+				$this->config->PostgreSQL->prefix['value'],
+				$new_id);
+			if ( !(@pg_send_query($this->link, $query)) ) {
+				throw new NymphQueryFailedException('Query failed: ' . pg_last_error(), 0, null, $query);
+			}
+			if ( !($result = @pg_get_result($this->link)) ) {
+				throw new NymphQueryFailedException('Query failed: ' . pg_last_error(), 0, null, $query);
+			}
+			if ($error = pg_result_error_field($result, PGSQL_DIAG_SQLSTATE)) {
+				// If the tables don't exist yet, create them.
+				if ($error == '42P01' && $this->createTables()) {
+					if (isset($etype_dirty))
+						$this->createTables($etype_dirty);
+					if ( !($result = @pg_query($this->link, $query)) ) {
+						throw new NymphQueryFailedException('Query failed: ' . pg_last_error(), 0, null, $query);
+					}
+					if ( !($result = @pg_query($this->link, 'BEGIN;')) ) {
+						throw new NymphQueryFailedException('Query failed: ' . pg_last_error(), 0, null, 'BEGIN;');
+					}
+				} else {
+					throw new NymphQueryFailedException('Query failed: ' . pg_last_error(), 0, null, $query);
+				}
+			}
 			$query = sprintf("INSERT INTO \"%sentities%s\" (\"guid\", \"tags\", \"varlist\", \"cdate\", \"mdate\") VALUES (%u, '%s', '%s', %F, %F);",
 				$this->config->PostgreSQL->prefix['value'],
 				$etype,
@@ -1161,6 +1278,9 @@ class NymphDriverPostgreSQL extends NymphDriver {
 						$this->createTables($etype_dirty);
 					if ( !($result = @pg_query($this->link, $query)) ) {
 						throw new NymphQueryFailedException('Query failed: ' . pg_last_error(), 0, null, $query);
+					}
+					if ( !($result = @pg_query($this->link, 'BEGIN;')) ) {
+						throw new NymphQueryFailedException('Query failed: ' . pg_last_error(), 0, null, 'BEGIN;');
 					}
 				} else {
 					throw new NymphQueryFailedException('Query failed: ' . pg_last_error(), 0, null, $query);
@@ -1216,6 +1336,9 @@ class NymphDriverPostgreSQL extends NymphDriver {
 						$this->createTables($etype_dirty);
 					if ( !($result = @pg_query($this->link, $query)) ) {
 						throw new NymphQueryFailedException('Query failed: ' . pg_last_error(), 0, null, $query);
+					}
+					if ( !($result = @pg_query($this->link, 'BEGIN;')) ) {
+						throw new NymphQueryFailedException('Query failed: ' . pg_last_error(), 0, null, 'BEGIN;');
 					}
 				} else {
 					throw new NymphQueryFailedException('Query failed: ' . pg_last_error(), 0, null, $query);
