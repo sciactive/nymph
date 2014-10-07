@@ -2,7 +2,6 @@
 <html ng-app="todoApp">
 	<head>
 		<title>Nymph Angular Todo App</title>
-		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
 		<script type="text/javascript">
 			(function(){
 				var s = document.createElement("script"); s.setAttribute("src", "https://www.promisejs.org/polyfills/promise-5.0.0.min.js");
@@ -39,9 +38,9 @@
 								</label>
 							</div>
 						</div>
-						<div class="col-sm-4" style="text-align: center;">
+						<div ng-show="todos.length > 0" class="col-sm-4" style="text-align: center; margin-bottom: 1em;">
 							<small class="alert alert-info" style="display: block;">{{remaining()}} of {{todos.length}} remaining [ <a href="" ng-click="archive()">archive</a> ]</small>
-							<div style="text-align: left;">
+							<div ng-show="todos.length > 1" style="text-align: left;">
 								Sort: <br>
 								<label style="font-weight: normal;">
 									<input type="radio" ng-model="sort" ng-change="sortTodos()" name="sort" value="name"> Alpha</label>

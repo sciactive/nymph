@@ -238,7 +238,9 @@ class NymphREST {
 			return true;
 		} else {
 			$result = $this->nymph->$method("$data");
-			if (empty($result)) {
+			if ($result === null) {
+				return $this->httpError(404, "Not Found");
+			} elseif (empty($result)) {
 				return $this->httpError(500, "Internal Server Error");
 			}
 			echo $result;

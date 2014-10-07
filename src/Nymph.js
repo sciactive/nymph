@@ -3,16 +3,16 @@ Nymph 0.0.1alpha nymph.io
 (C) 2014 Hunter Perrin
 license LGPL
 */
-// Uses AMD or browser globals for jQuery.
+// Uses AMD or browser globals.
 (function (factory) {
     if (typeof define === 'function' && define.amd) {
         // AMD. Register as a module.
-        define('Nymph', ['jquery', 'NymphOptions', 'Promise'], factory);
+        define('Nymph', ['NymphOptions', 'Promise'], factory);
     } else {
         // Browser globals
-        factory(jQuery, NymphOptions, Promise);
+        factory(NymphOptions, Promise);
     }
-}(function($, NymphOptions, Promise){
+}(function(NymphOptions, Promise){
 	var sortProperty = null,
 		sortParent = null,
 		sortCaseSensitive = null,
@@ -45,6 +45,68 @@ license LGPL
 					return -1;
 			}
 			return 0;
+		},
+		map = function(arr, fn){
+			var results = [];
+			for (var i = 0; i < arr.length; i++)
+				results.push(fn(arr[i], i));
+			return results;
+		},
+		makeUrl = function(url, data, noSep) {
+			if (!data)
+				return url;
+			for (var k in data) {
+				if (noSep) {
+					url = url+(url.length ? '&' : '');
+				} else {
+					url = url+(url.indexOf('?') !== -1 ? '&' : '?');
+				}
+				url = url+encodeURIComponent(k)+'='+encodeURIComponent(data[k]);
+			}
+			return url;
+		},
+		getAjax = function(opt){
+			var request = new XMLHttpRequest();
+			request.open('GET', makeUrl(opt.url, opt.data), true);
+
+			request.onreadystatechange = function() {
+				if (this.readyState === 4){
+					if (this.status >= 200 && this.status < 400){
+						if (opt.dataType === "json") {
+							opt.success(JSON.parse(this.responseText));
+						} else {
+							opt.success(this.responseText);
+						}
+					} else {
+						opt.error({status: this.status, textStatus: this.responseText});
+					}
+				}
+			};
+
+			request.send();
+			request = null;
+		},
+		postputdelAjax = function(opt){
+			var request = new XMLHttpRequest();
+			request.open(opt.type, opt.url, true);
+
+			request.onreadystatechange = function() {
+				if (this.readyState === 4){
+					if (this.status >= 200 && this.status < 400){
+						if (opt.dataType === "json") {
+							opt.success(JSON.parse(this.responseText));
+						} else {
+							opt.success(this.responseText);
+						}
+					} else {
+						opt.error({status: this.status, textStatus: this.responseText});
+					}
+				}
+			};
+
+			request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
+			request.send(makeUrl('', opt.data, true));
+			request = null;
 		};
 
 	Nymph = {
@@ -67,7 +129,7 @@ license LGPL
 		newUID: function(name){
 			var that = this;
 			return new Promise(function(resolve, reject){
-				$.ajax({
+				postputdelAjax({
 					type: 'PUT',
 					url: that.restURL,
 					dataType: 'text',
@@ -75,8 +137,8 @@ license LGPL
 					success: function(data) {
 						resolve(data);
 					},
-					error: function(jqXHR, textStatus, errorThrown){
-						reject({jqXHR: jqXHR, textStatus: textStatus, errorThrown: errorThrown});
+					error: function(errObj){
+						reject(errObj);
 					}
 				});
 			});
@@ -85,16 +147,15 @@ license LGPL
 		getUID: function(name){
 			var that = this;
 			return new Promise(function(resolve, reject){
-				$.ajax({
-					type: 'GET',
+				getAjax({
 					url: that.restURL,
 					dataType: 'text',
 					data: {'action': 'uid', 'data': name},
 					success: function(data) {
 						resolve(data);
 					},
-					error: function(jqXHR, textStatus, errorThrown){
-						reject({jqXHR: jqXHR, textStatus: textStatus, errorThrown: errorThrown});
+					error: function(errObj){
+						reject(errObj);
 					}
 				});
 			});
@@ -103,15 +164,15 @@ license LGPL
 		deleteUID: function(name){
 			var that = this;
 			return new Promise(function(resolve, reject){
-				$.ajax({
+				postputdelAjax({
 					type: 'DELETE',
 					url: that.restURL,
 					data: {'action': 'uid', 'data': name},
 					success: function(data) {
 						resolve(data);
 					},
-					error: function(jqXHR, textStatus, errorThrown){
-						reject({jqXHR: jqXHR, textStatus: textStatus, errorThrown: errorThrown});
+					error: function(errObj){
+						reject(errObj);
 					}
 				});
 			});
@@ -120,7 +181,7 @@ license LGPL
 		saveEntity: function(entity){
 			var that = this;
 			return new Promise(function(resolve, reject){
-				$.ajax({
+				postputdelAjax({
 					type: entity.guid == null ? 'PUT' : 'POST',
 					url: that.restURL,
 					dataType: 'json',
@@ -132,8 +193,8 @@ license LGPL
 							reject({textStatus: "Server error"});
 						}
 					},
-					error: function(jqXHR, textStatus, errorThrown){
-						reject({jqXHR: jqXHR, textStatus: textStatus, errorThrown: errorThrown});
+					error: function(errObj){
+						reject(errObj);
 					}
 				});
 			});
@@ -158,8 +219,7 @@ license LGPL
 			var that = this,
 				args = arguments;
 			return new Promise(function(resolve, reject){
-				$.ajax({
-					type: 'GET',
+				getAjax({
 					url: that.restURL,
 					dataType: 'json',
 					data: {'action': 'entity', 'data': JSON.stringify(args)},
@@ -170,8 +230,8 @@ license LGPL
 							resolve(null);
 						}
 					},
-					error: function(jqXHR, textStatus, errorThrown){
-						reject({jqXHR: jqXHR, textStatus: textStatus, errorThrown: errorThrown});
+					error: function(errObj){
+						reject(errObj);
 					}
 				});
 			});
@@ -181,16 +241,15 @@ license LGPL
 			var that = this,
 				args = arguments;
 			return new Promise(function(resolve, reject){
-				$.ajax({
-					type: 'GET',
+				getAjax({
 					url: that.restURL,
 					dataType: 'json',
 					data: {'action': 'entities', 'data': JSON.stringify(args)},
 					success: function(data) {
-						resolve($.map(data, that.initEntity));
+						resolve(map(data, that.initEntity));
 					},
-					error: function(jqXHR, textStatus, errorThrown){
-						reject({jqXHR: jqXHR, textStatus: textStatus, errorThrown: errorThrown});
+					error: function(errObj){
+						reject(errObj);
 					}
 				});
 			});
@@ -209,9 +268,20 @@ license LGPL
 		},
 
 		deleteEntity: function(entity, plural){
-			var that = this;
+			var that = this, cur;
+			if (plural) {
+				for (var i in entity) {
+					cur = entity[i].toJSON();
+					cur.etype = entity[i].etype;
+					entity[i] = cur;
+				}
+			} else {
+				cur = entity.toJSON();
+				cur.etype = entity.etype;
+				entity = cur;
+			}
 			return new Promise(function(resolve, reject){
-				$.ajax({
+				postputdelAjax({
 					type: 'DELETE',
 					url: that.restURL,
 					dataType: 'json',
@@ -219,8 +289,8 @@ license LGPL
 					success: function(data) {
 						resolve(data);
 					},
-					error: function(jqXHR, textStatus, errorThrown){
-						reject({jqXHR: jqXHR, textStatus: textStatus, errorThrown: errorThrown});
+					error: function(errObj){
+						reject(errObj);
 					}
 				});
 			});

@@ -1,27 +1,30 @@
 // This file is a demo class that extends the Entity class.
-// Uses AMD or browser globals for jQuery.
+// Uses AMD or browser globals.
 (function (factory) {
     if (typeof define === 'function' && define.amd) {
         // AMD. Register as a module.
-        define('NymphEmployee', ['jquery', 'NymphEntity'], factory);
+        define('NymphEmployee', ['NymphEntity'], factory);
     } else {
         // Browser globals
-        factory(jQuery, Entity);
+        factory(Entity);
     }
-}(function($, Entity){
+}(function(Entity){
 	Employee = function(id){
 		this.constructor.call(this, id);
 		this.addTag('employee');
 	};
 	Employee.prototype = new Entity();
 
-	$.extend(Employee.prototype, {
+	var thisClass = {
 		// === The Name of the Class ===
 		class: 'Employee',
 
 		// === Class Variables ===
 		etype: "employee"
-	});
+	};
+	for (var p in thisClass) {
+		Employee.prototype[p] = thisClass[p];
+	}
 
 	return Employee;
 }));
