@@ -35,4 +35,4 @@ There are several ways to contact the Nymph developers with your questions, conc
 
 - Nymph is part of [2be on Twitter](http://twitter.com/2be_io).
 - Bug reports, questions, and feature requests can be filed at the [issues page](https://github.com/sciactive/nymph/issues).
-- You can directly [email Hunter Perrin](mailto:hunter@sciactive.com), the creator of Nymph. Note that your message may be accidentally caught by the spam filter.
+- You can directly [email Hunter Perrin](mailto:hunter@sciactive.com), the creator of Nymph.
