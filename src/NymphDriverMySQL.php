@@ -165,7 +165,7 @@ class NymphDriverMySQL extends NymphDriver {
 		if (!$fhandle = fopen($filename, 'w'))
 			throw new NymphInvalidParametersException('Provided filename is not writeable.');
 		fwrite($fhandle, "# Nymph Entity Exchange\n");
-		fwrite($fhandle, "# Nymph Version 1.0.0\n");
+		fwrite($fhandle, "# Nymph Version ".NYMPH_VERSION."\n");
 		fwrite($fhandle, "# sciactive.com\n");
 		fwrite($fhandle, "#\n");
 		fwrite($fhandle, "# Generation Time: ".date('r')."\n");
@@ -247,7 +247,7 @@ class NymphDriverMySQL extends NymphDriver {
 		// End all output buffering.
 		while (@ob_end_clean());
 		echo "# Nymph Entity Exchange\n";
-		echo "# Nymph Version 1.0.0\n";
+		echo "# Nymph Version ".NYMPH_VERSION."\n";
 		echo "# sciactive.com\n";
 		echo "#\n";
 		echo "# Generation Time: ".date('r')."\n";

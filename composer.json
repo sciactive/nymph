@@ -1,0 +1,45 @@
+{
+	"name": "sciactive/nymph",
+	"description": "An object relational mapper with PHP and JavaScript interfaces.",
+	"version": "0.0.2alpha",
+	"time": "2014-10-07",
+	"homepage": "http://nymph.io/",
+	"type": "library",
+	"authors": [
+		{
+			"name": "Hunter Perrin",
+			"email": "hunter@sciactive.com",
+			"homepage": "https://github.com/hperrin",
+			"role": "Developer"
+		}
+	],
+	"keywords": [
+		"orm",
+		"mysql",
+		"postgres",
+		"postgresql",
+		"object database",
+		"object relational mapper",
+		"object relational mapping"
+	],
+	"license": "LGPL",
+	"support": {
+		"issues": "https://github.com/sciactive/nymph/issues",
+		"wiki": "https://github.com/sciactive/nymph/wiki",
+		"source": "https://github.com/sciactive/nymph"
+	},
+	"archive": {
+		"exclude": [
+			"**/.*",
+			"node_modules",
+			"bower_components",
+			"examples",
+			"lib",
+			"vendor",
+			"bower.json"
+		]
+	},
+	"require": {
+		"sciactive/requirephp": "~1.0"
+	}
+}

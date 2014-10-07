@@ -1,0 +1,35 @@
+{
+	"name": "nymph",
+	"description": "An object relational mapper with PHP and JavaScript interfaces.",
+	"version": "0.0.2alpha",
+	"homepage": "http://nymph.io/",
+	"authors": [
+		"Hunter Perrin <hunter@sciactive.com>"
+	],
+	"main": "src/Nymph.php",
+	"moduleType": [
+		"amd"
+	],
+	"keywords": [
+		"orm",
+		"mysql",
+		"postgres",
+		"postgresql",
+		"object database",
+		"object relational mapper",
+		"object relational mapping"
+	],
+	"license": "LGPL",
+	"ignore": [
+		"**/.*",
+		"node_modules",
+		"bower_components",
+		"examples",
+		"lib",
+		"vendor",
+		"composer.json"
+	],
+	"dependencies": {
+		"requirephp": "~1.0"
+	}
+}

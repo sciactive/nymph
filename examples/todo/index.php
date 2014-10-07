@@ -1,3 +1,7 @@
+<?php
+// Make sure RequirePHP is installed.
+require '../../lib/require.php';
+?>
 <!doctype html>
 <html ng-app="todoApp">
 	<head>
@@ -7,19 +11,26 @@
 				var s = document.createElement("script"); s.setAttribute("src", "https://www.promisejs.org/polyfills/promise-5.0.0.min.js");
 				(typeof Promise !== "undefined" && typeof Promise.all === "function") || document.getElementsByTagName('head')[0].appendChild(s);
 			})();
-		</script>
-		<script>
 			NymphOptions = {
 				restURL: '../rest.php'
 			};
 		</script>
+		<style type="text/css">
+			label.list-group-item {
+				font-weight: normal;
+				cursor: pointer;
+			}
+			span.done-true {
+				text-decoration: line-through;
+				color: grey;
+			}
+		</style>
 		<script src="../../src/Nymph.js"></script>
 		<script src="../../src/Entity.js"></script>
 		<script src="../classes/Todo.js"></script>
 
 		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.0-rc.1/angular.min.js"></script>
 		<script src="todoApp.js"></script>
-		<link rel="stylesheet" href="todo.css">
 		<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
 	</head>
 	<body>
