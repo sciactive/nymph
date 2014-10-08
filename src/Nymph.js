@@ -360,8 +360,10 @@ license LGPL
 				}
 				if (!changed) {
 					// If there are any unexpected errors and the array isn't changed, just stick the rest on the end.
-					if (array.length)
+					if (array.length) {
 						new_array = new_array.concat(array);
+						array = [];
+					}
 				}
 			}
 			// Now push the new array out.
