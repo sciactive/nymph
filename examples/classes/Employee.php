@@ -1,5 +1,4 @@
 <?php
-
 // This file is a demo class that extends the Entity class.
 
 define('IS_MANAGER', true);
@@ -18,10 +17,10 @@ define('IS_MANAGER', true);
  */
 class Employee extends Entity {
 	public function __construct($id = 0) {
+		$this->addTag('employee');
 		$this->current = true;
 		$this->start_date = time();
 		$this->subordinates = array();
-		$this->addTag('employee');
 		parent::__construct($id);
 		if (!IS_MANAGER) {
 			$this->privateData[] = 'salary';

@@ -271,5 +271,96 @@ if (!(entity.tags&lt;["test"]||entity.tags&gt;["test"])) {
 }, function(errObj){
 	$("#result").html(errObj.textStatus);
 });</pre>
+		<h4>Hierarchical Sort</h4>
+		<pre>var array = [], promises = [], promises2 = [], promises3 = [];
+for (var i = 0; i < 10; i++) {
+	var emp = new Employee();
+	emp.set({
+		"name": "Jane Doe",
+		"current": true,
+		"salary": 8000000,
+		"start_date": (new Date().getTime()) / 1000,
+		"manager": null,
+		"title": "Seniorer Person"
+	});
+	array.push(emp);
+}
+array[0].data.name += " 0";
+promises.push(array[0].save().then(function(){
+	array[1].data.name += " 1";
+	array[1].data.manager = array[0];
+	promises2.push(array[1].save().then(function(){
+		array[2].data.name += " 2";
+		array[2].data.manager = array[1];
+		promises3.push(array[2].save());
+		array[3].data.name += " 2";
+		array[3].data.manager = array[1];
+		promises3.push(array[3].save());
+	}));
+}));
+array[4].data.name += " 0";
+promises.push(array[4].save().then(function(){
+	array[5].data.name += " 1";
+	array[5].data.manager = array[4];
+	promises2.push(array[5].save().then(function(){
+		array[6].data.name += " 2";
+		array[6].data.manager = array[5];
+		promises3.push(array[6].save());
+	}));
+}));
+array[7].data.name += " 0";
+promises.push(array[7].save().then(function(){
+	array[8].data.name += " 1";
+	array[8].data.manager = array[7];
+	promises2.push(array[8].save().then(function(){
+		array[9].data.name += " 2";
+		array[9].data.manager = array[8];
+		promises3.push(array[9].save());
+	}));
+}));
+
+Promise.all(promises).then(function(){
+	Promise.all(promises2).then(function(){
+		Promise.all(promises3).then(function(){
+			array.sort(function() {
+				return .5 - Math.random();
+			});
+			var promises4 = [];
+			for (var i in array) {
+				promises4.push(array[i].readyAll());
+			}
+			Promise.all(promises4).then(function(){
+				$("#result").empty();
+				var dashes;
+				for (var i in array) {
+					dashes = [];
+					var parent = array[i].data.manager;
+					while (parent) {
+						dashes.push("-&amp;nbsp;");
+						if (parent.data)
+							parent = parent.data.manager;
+						else
+							parent = false;
+					}
+					$("#result").append(i+": "+dashes.join("")+array[i].data.name+"&lt;br&gt;");
+				}
+				$("#result").append("&lt;br&gt;&lt;br&gt;");
+				array = Nymph.hsort(array, "name", "manager");
+				for (var i in array) {
+					dashes = [];
+					var parent = array[i].data.manager;
+					while (parent) {
+						dashes.push("-&amp;nbsp;");
+						if (parent.data.manager)
+							parent = parent.data.manager;
+						else
+							parent = false;
+					}
+					$("#result").append(i+": "+dashes.join("")+array[i].data.name+"&lt;br&gt;");
+				}
+			});
+		});
+	});
+});</pre>
 	</body>
 </html>

@@ -12,6 +12,8 @@
 	Employee = function(id){
 		this.constructor.call(this, id);
 		this.addTag('employee');
+		this.data.current = true;
+		this.data.subordinates = [];
 	};
 	Employee.prototype = new Entity();
 

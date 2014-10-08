@@ -301,6 +301,73 @@ license LGPL
 		},
 
 
+		hsort: function(array, property, parentProperty, caseSensitive, reverse) {
+			// First sort by the requested property.
+			this.sort(array, property, caseSensitive, reverse);
+			if (typeof parentProperty === "undefined" || parentProperty === null)
+				return array;
+
+			// Now sort by children.
+			var new_array = [];
+			// Look for entities ready to go in order.
+			var changed, pkey, ancestry, new_key;
+			while (array.length) {
+				changed = false;
+				for (var key in array) {
+					// Must break after adding one, so any following children don't go in the wrong order.
+					if (
+							typeof array[key].data[parentProperty] === "undefined" ||
+							array[key].data[parentProperty] === null ||
+							typeof array[key].data[parentProperty].inArray !== "function" ||
+							!array[key].data[parentProperty].inArray(new_array.concat(array))
+						) {
+						// If they have no parent (or their parent isn't in the array), they go on the end.
+						new_array.push(array[key]);
+						array.splice(key, 1);
+						changed = true;
+						break;
+					} else {
+						// Else find the parent.
+						pkey = array[key].data[parentProperty].arraySearch(new_array);
+						if (pkey !== false) {
+							// And insert after the parent.
+							// This makes entities go to the end of the child list.
+							ancestry = [array[key].data[parentProperty].guid];
+							new_key = Number(pkey);
+							while (
+									typeof new_array[new_key + 1] !== "undefined" &&
+									typeof new_array[new_key + 1].data[parentProperty] !== "undefined" &&
+									new_array[new_key + 1].data[parentProperty] !== null &&
+									ancestry.indexOf(new_array[new_key + 1].data[parentProperty].guid) !== -1
+								) {
+								ancestry.push(new_array[new_key + 1].data[parentProperty].guid);
+								new_key += 1;
+							}
+							// Where to place the entity.
+							new_key += 1;
+							if (typeof new_array[new_key] !== "undefined") {
+								// If it already exists, we have to splice it in.
+								new_array.splice(new_key, 0, array[key]);
+							} else {
+								// Else just add it.
+								new_array.push(array[key]);
+							}
+							array.splice(key, 1);
+							changed = true;
+							break;
+						}
+					}
+				}
+				if (!changed) {
+					// If there are any unexpected errors and the array isn't changed, just stick the rest on the end.
+					if (array.length)
+						new_array = new_array.concat(array);
+				}
+			}
+			// Now push the new array out.
+			array = new_array;
+			return array;
+		},
 		psort: function(array, property, parentProperty, caseSensitive, reverse) {
 			// Sort by the requested property.
 			if (typeof property !== "undefined") {

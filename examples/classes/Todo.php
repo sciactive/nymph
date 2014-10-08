@@ -1,5 +1,4 @@
 <?php
-
 // This file is a demo class that extends the Entity class.
 
 /**
@@ -8,8 +7,8 @@
  */
 class Todo extends Entity {
 	public function __construct($id = 0) {
-		$this->done = false;
 		$this->addTag('todo');
+		$this->done = false;
 		parent::__construct($id);
 	}
 

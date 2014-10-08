@@ -362,7 +362,7 @@ license LGPL
 						}, function(errObj){
 							reject(errObj);
 							if (typeof error === "function")
-								error(that);
+								error(errObj);
 						});
 					} else {
 						Nymph.getEntityData({"class":that.sleepingReference[2]}, {"type":"&","guid":that.sleepingReference[1]}).then(function(data){
@@ -374,12 +374,44 @@ license LGPL
 							that.readyPromise = null;
 							reject(errObj);
 							if (typeof error === "function")
-								error(that);
+								error(errObj);
 						});
 					}
 				}
 			});
 			return this.readyPromise;
+		},
+		readyAll: function(success, error){
+			var that = this;
+			return new Promise(function(resolve, reject){
+				that.ready(function(){
+					var promises = [];
+					for (var k in that.data) {
+						if (that.data[k] instanceof Entity) {
+							promises.push(that.data[k].readyAll());
+						} else if (isArray(that.data[k])) {
+							for (var i in that.data[k]) {
+								if (that.data[k][i] instanceof Entity) {
+									promises.push(that.data[k][i].readyAll());
+								}
+							}
+						}
+					}
+					Promise.all(promises).then(function(){
+						resolve(that);
+						if (typeof success === "function")
+							success(that);
+					}, function(errObj){
+						reject(errObj);
+						if (typeof error === "function")
+							error(errObj);
+					});
+				}, function(errObj){
+					reject(errObj);
+					if (typeof error === "function")
+						error(errObj);
+				});
+			});
 		}
 	};
 	for (var p in thisClass) {
