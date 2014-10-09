@@ -3,7 +3,7 @@
 (function (factory) {
     if (typeof define === 'function' && define.amd) {
         // AMD. Register as a module.
-        define('NymphEmployee', ['NymphEntity'], factory);
+        define('NymphTodo', ['NymphEntity'], factory);
     } else {
         // Browser globals
         factory(Entity);
