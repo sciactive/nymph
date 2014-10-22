@@ -533,14 +533,14 @@ class NymphDriverMySQL extends NymphDriver {
 				$this->config->MySQL->prefix['value'],
 				$etype,
 				'('.implode(') AND (', $query_parts).')',
-				$options['reverse'] ? $sort.' DESC' : $sort);
+				(isset($options['reverse']) && $options['reverse']) ? $sort.' DESC' : $sort);
 		} else {
 			$query = sprintf("SELECT e.`guid`, e.`tags`, e.`cdate`, e.`mdate`, d.`name`, d.`value` FROM `%sentities%s` e LEFT JOIN `%sdata%s` d ON e.`guid`=d.`guid` ORDER BY %s;",
 				$this->config->MySQL->prefix['value'],
 				$etype,
 				$this->config->MySQL->prefix['value'],
 				$etype,
-				$options['reverse'] ? $sort.' DESC' : $sort);
+				(isset($options['reverse']) && $options['reverse']) ? $sort.' DESC' : $sort);
 		}
 		if ( !($result = @mysql_query($query, $this->link)) ) {
 			// If the tables don't exist yet, create them.
@@ -680,7 +680,7 @@ class NymphDriverMySQL extends NymphDriver {
 			}
 			unset($cur_selector);
 			if ($pass_all) {
-				if ($ocount < $options['offset']) {
+				if (isset($options['offset']) && ($ocount < $options['offset'])) {
 					// We must be sure this entity is actually a match before
 					// incrementing the offset.
 					$ocount++;
@@ -699,10 +699,11 @@ class NymphDriverMySQL extends NymphDriver {
 					if ($this->config->cache['value'])
 						$this->pushCache($entity, $class);
 				}
-				$entity->_nUseSkipAC = (bool) $options['skip_ac'];
+                if (isset($options['skip_ac']))
+                    $entity->_nUseSkipAC = (bool) $options['skip_ac'];
 				$entities[] = $entity;
 				$count++;
-				if ($options['limit'] && $count >= $options['limit'])
+				if (isset($options['limit']) && $count >= $options['limit'])
 					break;
 			}
 		}

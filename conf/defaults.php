@@ -35,6 +35,11 @@ return (object) array(
 		'description' => 'The number of recently retrieved entities to cache. If you\'re running out of memory, try lowering this value. 0 means unlimited.',
 		'value' => 50,
 	),
+	'empty_list_error' => array(
+		'cname' => 'Empty List Returns an Error',
+		'description' => 'When querying for multiple entities with NymphREST, if the list is empty, return a 404 error.',
+		'value' => false,
+	),
 	'MySQL' => (object) array(
 		'host' => array(
 			'cname' => 'Host',

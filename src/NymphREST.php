@@ -50,6 +50,7 @@ class NymphREST {
 		if (!in_array($action, array('entity', 'entities', 'uid'))) {
 			return $this->httpError(400, "Bad Request");
 		}
+		ob_start();
 		if (in_array($action, array('entity', 'entities'))) {
 			$ents = json_decode($data, true);
 			if ($action === 'entity')
@@ -86,6 +87,7 @@ class NymphREST {
 			}
 			header("HTTP/1.1 204 No Content", true, 204);
 		}
+		ob_end_flush();
 		return true;
 	}
 
@@ -93,6 +95,7 @@ class NymphREST {
 		if (!in_array($action, array('entity', 'entities', 'uid'))) {
 			return $this->httpError(400, "Bad Request");
 		}
+		ob_start();
 		if (in_array($action, array('entity', 'entities'))) {
 			$ents = json_decode($data, true);
 			if ($action === 'entity')
@@ -136,6 +139,7 @@ class NymphREST {
 			echo $result;
 		}
 		header("HTTP/1.1 201 Created", true, 201);
+		ob_end_flush();
 		return true;
 	}
 
@@ -143,6 +147,7 @@ class NymphREST {
 		if (!in_array($action, array('entity', 'entities'))) {
 			return $this->httpError(400, "Bad Request");
 		}
+		ob_start();
 		$ents = json_decode($data, true);
 		if ($action === 'entity')
 			$ents = array($ents);
@@ -199,6 +204,7 @@ class NymphREST {
 		else
 			echo json_encode($saved);
 		header("HTTP/1.1 200 OK", true, 200);
+		ob_end_flush();
 		return true;
 	}
 
@@ -232,7 +238,11 @@ class NymphREST {
 				$result = call_user_func_array(array($this->nymph, $method), $args);
 			}
 			if (empty($result)) {
-				return $this->httpError(404, "Not Found");
+				global $NymphRequire;
+				$config = $NymphRequire('NymphConfig');
+				if ($action === 'entity' || $config->empty_list_error['value']) {
+					return $this->httpError(404, "Not Found");
+				}
 			}
 			echo json_encode($result);
 			return true;
