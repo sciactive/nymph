@@ -574,7 +574,7 @@ class Entity implements EntityInterface {
 		if ($this->isASleepingReference)
 			$this->referenceWake();
 		if ((array) $item === $item) {
-			if ($item[0] === 'nymph_entity_reference') {
+			if (isset($item[0]) && $item[0] === 'nymph_entity_reference') {
 				if (!isset($this->entityCache["reference_guid: {$item[1]}"]))
 					$this->entityCache["reference_guid: {$item[1]}"] = call_user_func(array($item[2], 'factoryReference'), $item);
 				$item = $this->entityCache["reference_guid: {$item[1]}"];

@@ -1,7 +1,7 @@
 {
 	"name": "sciactive/nymph",
 	"description": "An object relational mapper with PHP and JavaScript interfaces.",
-	"version": "0.0.2alpha",
+	"version": "0.0.3alpha",
 	"time": "2014-10-07",
 	"homepage": "http://nymph.io/",
 	"type": "library",

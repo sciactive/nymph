@@ -12,7 +12,7 @@
  * @link http://sciactive.com/
  */
 
-define('NYMPH_VERSION', '0.0.2alpha');
+define('NYMPH_VERSION', '0.0.3alpha');
 
 /**
  * Setup Nymph in a RequirePHP variable.
