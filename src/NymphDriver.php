@@ -93,7 +93,7 @@ class NymphDriver implements NymphDriverInterface {
 
 	public function deleteEntity(&$entity) {
 		$class = get_class($entity);
-		$return = $this->deleteEntityByID($entity->guid, $class::etype());
+		$return = $this->deleteEntityByID($entity->guid, $class::etype);
 		if ( $return )
 			$entity->guid = null;
 		return $return;

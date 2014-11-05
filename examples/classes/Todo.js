@@ -21,7 +21,13 @@
 		class: 'Todo',
 
 		// === Class Variables ===
-		etype: "todo"
+		etype: "todo",
+
+		// === Class Methods ===
+
+		archive: function(){
+			return this.serverCall('archive', arguments);
+		}
 	};
 	for (var p in thisClass) {
 		Todo.prototype[p] = thisClass[p];

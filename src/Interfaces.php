@@ -379,6 +379,7 @@ interface DataObjectInterface {
 	 * - url_list - The URL where this object, and others like it, can be found.
 	 *   (E.g., to a list of users.)
 	 * - icon - The class to apply for an icon representing this object.
+	 *   (Generally a Font Awesome or Bootstrap class.)
 	 * - image - The URL to an image representing this object.
 	 *
 	 * @param string $type The type of information being requested.

@@ -479,13 +479,8 @@ class NymphDriverPostgreSQL extends NymphDriver {
 			$etype_dirty = $options['etype'];
 			$etype = '_'.pg_escape_string($this->link, $etype_dirty);
 		} else {
-			if (method_exists($class, 'etype')) {
-				$etype_dirty = $class::etype();
-				$etype = '_'.pg_escape_string($this->link, $etype_dirty);
-			} else {
-				$etype_dirty = null;
-				$etype = '';
-			}
+			$etype_dirty = $class::etype;
+			$etype = '_'.pg_escape_string($this->link, $etype_dirty);
 		}
 		$sort = isset($options['sort']) ? $options['sort'] : 'cdate';
 		$count = $ocount = 0;
@@ -1212,7 +1207,7 @@ class NymphDriverPostgreSQL extends NymphDriver {
 		$sdata = $entity->getSData();
 		$varlist = array_merge(array_keys($data), array_keys($sdata));
 		$class = get_class($entity);
-		$etype_dirty = $class::etype();
+		$etype_dirty = $class::etype;
 		$etype = '_'.pg_escape_string($this->link, $etype_dirty);
 		if ( !(@pg_query($this->link, 'BEGIN;')) ) {
 			throw new NymphQueryFailedException('Query failed: ' . pg_last_error(), 0, null, 'BEGIN;');

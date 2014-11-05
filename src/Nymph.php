@@ -20,7 +20,6 @@ define('NYMPH_VERSION', '0.0.3alpha');
  * @param RequirePHP $require The RequirePHP variable.
  */
 function setupNymph($require) {
-	$GLOBALS['NymphRequire'] = &$require;
 	$require('Nymph', array('NymphConfig'), function($NymphConfig){
 		require(dirname(__FILE__).DIRECTORY_SEPARATOR.'Interfaces.php');
 		require(dirname(__FILE__).DIRECTORY_SEPARATOR.'Exceptions.php');
@@ -30,12 +29,15 @@ function setupNymph($require) {
 		require(dirname(__FILE__).DIRECTORY_SEPARATOR.$class.'.php');
 
 		$Nymph = new $class($NymphConfig);
+		Entity::$nymph = $Nymph;
+		Entity::$nymphConfig = $NymphConfig;
 		return $Nymph;
 	});
-	$require('NymphREST', array('Nymph'), function(){
+	$require('NymphREST', array('Nymph'), function($Nymph){
 		require(dirname(__FILE__).DIRECTORY_SEPARATOR.'NymphREST.php');
 
 		$NymphREST = new NymphREST();
+		NymphREST::$nymph = $Nymph;
 		return $NymphREST;
 	});
 }

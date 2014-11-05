@@ -48,9 +48,11 @@ angular.module('todoApp', []).controller('TodoController', ['$scope', function($
 		$scope.todos = [];
 		angular.forEach(oldTodos, function(todo) {
 			if (todo.get('done')) {
-				todo.addTag('archived');
-				todo.save().then(null, function(errObj){
-					alert("Error: "+errObj.textStatus);
+				todo.archive().then(function(success){
+					if (!success)
+						alert("Couldn't save changes to "+todo.get('name'));
+				}, function(errObj){
+					alert("Error: "+errObj.textStatus+"\nCouldn't archive "+todo.get('name'));
 				});
 			} else {
 				$scope.todos.push(todo);

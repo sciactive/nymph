@@ -316,6 +316,26 @@ license LGPL
 			});
 		},
 
+		serverCall: function(method, params, dontUpdateAfterCall){
+			if (this.isASleepingReference)
+				throw new EntityIsSleepingReferenceError(sleepErr);
+			var that = this;
+			// Turn the params into a real array, in case an arguments object was passed.
+			paramArray = [];
+			for (var n in params) {
+				paramArray.push(params[n]);
+			}
+			return new Promise(function(resolve, reject){
+				Nymph.serverCall(that, method, params).then(function(data){
+					if (!dontUpdateAfterCall)
+						that.init(data.entity);
+					resolve(data.return);
+				}, function(errObj){
+					reject(errObj);
+				});
+			});
+		},
+
 		toJSON: function(){
 			if (this.isASleepingReference)
 				throw new EntityIsSleepingReferenceError(sleepErr);

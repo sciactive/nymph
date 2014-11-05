@@ -15,6 +15,21 @@
  * @package Nymph
  */
 class Entity implements EntityInterface {
+	const etype = 'entity';
+
+	/**
+	 * @access public
+	 * @static
+	 * @var NymphDriver
+	 */
+	public static $nymph;
+	/**
+	 * @access public
+	 * @static
+	 * @var
+	 */
+	public static $nymphConfig;
+
 	/**
 	 * The GUID of the entity.
 	 *
@@ -76,6 +91,14 @@ class Entity implements EntityInterface {
 	 */
 	public $privateData = array();
 	/**
+	 * The names of the methods allowed to be called by client side JavaScript
+	 * with serverCall.
+	 *
+	 * @var array
+	 * @access public
+	 */
+	public $clientEnabledMethods = array();
+	/**
 	 * The entries listed here correspond to variables that should be converted
 	 * to standard objects instead of arrays when unserializing from JSON.
 	 *
@@ -97,7 +120,7 @@ class Entity implements EntityInterface {
 	public function __construct($id = 0) {
 		if ($id > 0) {
 			global $NymphRequire;
-			$entity = $NymphRequire('Nymph')->getEntity(array('class' => get_class($this)), array('&', 'guid' => $id, 'tag' => $this->tags));
+			$entity = Entity::$nymph->getEntity(array('class' => get_class($this)), array('&', 'guid' => $id, 'tag' => $this->tags));
 			if (isset($entity)) {
 				$this->guid = $entity->guid;
 				$this->tags = $entity->tags;
@@ -343,7 +366,7 @@ class Entity implements EntityInterface {
 		global $NymphRequire;
 		if ($this->isASleepingReference)
 			$this->referenceWake();
-		return $NymphRequire('Nymph')->deleteEntity($this);
+		return Entity::$nymph->deleteEntity($this);
 	}
 
 	/**
@@ -379,10 +402,6 @@ class Entity implements EntityInterface {
 		$ob_data = $object->getData();
 		$my_data = $this->getData();
 		return ($ob_data == $my_data);
-	}
-
-	public static function etype() {
-		return 'entity';
 	}
 
 	public function getData() {
@@ -598,7 +617,7 @@ class Entity implements EntityInterface {
 		if (!$this->isASleepingReference)
 			return true;
 		global $NymphRequire;
-		$entity = $NymphRequire('Nymph')->getEntity(array('class' => $this->sleepingReference[2], 'skip_ac' => (bool) $this->_nUseSkipAC), array('&', 'guid' => $this->sleepingReference[1]));
+		$entity = Entity::$nymph->getEntity(array('class' => $this->sleepingReference[2], 'skip_ac' => (bool) $this->_nUseSkipAC), array('&', 'guid' => $this->sleepingReference[1]));
 		if (!isset($entity))
 			return false;
 		$this->isASleepingReference = false;
@@ -615,7 +634,7 @@ class Entity implements EntityInterface {
 		if (!isset($this->guid))
 			return false;
 		global $NymphRequire;
-		$refresh = $NymphRequire('Nymph')->getEntity(array('class' => get_class($this)), array('&', 'guid' => $this->guid));
+		$refresh = Entity::$nymph->getEntity(array('class' => get_class($this)), array('&', 'guid' => $this->guid));
 		if (!isset($refresh))
 			return 0;
 		$this->tags = $refresh->tags;
@@ -643,7 +662,7 @@ class Entity implements EntityInterface {
 		global $NymphRequire;
 		if ($this->isASleepingReference)
 			$this->referenceWake();
-		return $NymphRequire('Nymph')->saveEntity($this);
+		return Entity::$nymph->saveEntity($this);
 	}
 
 	public function toReference() {

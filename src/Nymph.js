@@ -301,6 +301,25 @@ license LGPL
 		},
 
 
+		serverCall: function(entity, method, params) {
+			var that = this;
+			return new Promise(function(resolve, reject){
+				postputdelAjax({
+					type: 'POST',
+					url: that.restURL,
+					dataType: 'json',
+					data: {'action': 'method', 'data': JSON.stringify({'entity': entity, 'method': method, 'params': params})},
+					success: function(data) {
+						resolve(data);
+					},
+					error: function(errObj){
+						reject(errObj);
+					}
+				});
+			});
+		},
+
+
 		hsort: function(array, property, parentProperty, caseSensitive, reverse) {
 			// First sort by the requested property.
 			this.sort(array, property, caseSensitive, reverse);

@@ -6,6 +6,9 @@
  * @property bool $done Whether it's done.
  */
 class Todo extends Entity {
+	const etype = 'todo';
+	public $clientEnabledMethods = array('archive');
+
 	public function __construct($id = 0) {
 		$this->addTag('todo');
 		$this->done = false;
@@ -22,7 +25,10 @@ class Todo extends Entity {
 		return null;
 	}
 
-	public static function etype() {
-		return 'todo';
+	public function archive() {
+		if ($this->hasTag('archived'))
+			return true;
+		$this->addTag('archived');
+		return $this->save();
 	}
 }

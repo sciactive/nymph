@@ -345,13 +345,8 @@ class NymphDriverMySQL extends NymphDriver {
 			$etype_dirty = $options['etype'];
 			$etype = '_'.mysql_real_escape_string($etype_dirty, $this->link);
 		} else {
-			if (method_exists($class, 'etype')) {
-				$etype_dirty = $class::etype();
-				$etype = '_'.mysql_real_escape_string($etype_dirty, $this->link);
-			} else {
-				$etype_dirty = null;
-				$etype = '';
-			}
+			$etype_dirty = $class::etype;
+			$etype = '_'.mysql_real_escape_string($etype_dirty, $this->link);
 		}
 		$sort = isset($options['sort']) ? $options['sort'] : 'cdate';
 		$count = $ocount = 0;
@@ -995,7 +990,7 @@ class NymphDriverMySQL extends NymphDriver {
 		$sdata = $entity->getSData();
 		$varlist = array_merge(array_keys($data), array_keys($sdata));
 		$class = get_class($entity);
-		$etype_dirty = $class::etype();
+		$etype_dirty = $class::etype;
 		$etype = '_'.mysql_real_escape_string($etype_dirty, $this->link);
 		if ( !isset($entity->guid) ) {
 			while (true) {
