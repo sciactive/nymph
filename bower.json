@@ -30,6 +30,6 @@
 		"composer.json"
 	],
 	"dependencies": {
-		"requirephp": "~1.0"
+		"requirephp": "~1.1"
 	}
 }

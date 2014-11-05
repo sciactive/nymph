@@ -19,13 +19,6 @@
  */
 class NymphREST {
 	/**
-	 * @access public
-	 * @static
-	 * @var NymphDriver
-	 */
-	public static $nymph;
-
-	/**
 	 * Run the Nymph REST server process.
 	 *
 	 * Note that on failure, an HTTP error status code will be sent, usually
@@ -59,7 +52,7 @@ class NymphREST {
 				$guid = (int) $delEnt['guid'];
 				$etype = $delEnt['etype'];
 				try {
-					if (NymphREST::$nymph->deleteEntityByID($guid, $etype)) {
+					if (RPHP::_('Nymph')->deleteEntityByID($guid, $etype)) {
 						$deleted[] = $guid;
 					} else {
 						$failures = true;
@@ -80,7 +73,7 @@ class NymphREST {
 				echo json_encode($deleted);
 			header("HTTP/1.1 200 OK", true, 200);
 		} else {
-			if (!NymphREST::$nymph->deleteUID("$data")) {
+			if (!RPHP::_('Nymph')->deleteUID("$data")) {
 				return $this->httpError(500, "Internal Server Error");
 			}
 			header("HTTP/1.1 204 No Content", true, 204);
@@ -129,7 +122,7 @@ class NymphREST {
 			else
 				echo json_encode($created);
 		} else {
-			$result = NymphREST::$nymph->newUID("$data");
+			$result = RPHP::_('Nymph')->newUID("$data");
 			if (empty($result)) {
 				return $this->httpError(500, "Internal Server Error");
 			}
@@ -215,7 +208,7 @@ class NymphREST {
 		if (in_array($action, array('entity', 'entities'))) {
 			$args = json_decode($data, true);
 			if (is_int($args)) {
-				$result = NymphREST::$nymph->$method($args);
+				$result = RPHP::_('Nymph')->$method($args);
 			} else {
 				$count = count($args);
 				if ($count > 1) {
@@ -229,18 +222,17 @@ class NymphREST {
 						$args[$i] = $newArg;
 					}
 				}
-				$result = call_user_func_array(array(NymphREST::$nymph, $method), $args);
+				$result = call_user_func_array(array(RPHP::_('Nymph'), $method), $args);
 			}
 			if (empty($result)) {
-				global $NymphRequire;
-				if ($action === 'entity' || Entity::$nymphConfig->empty_list_error['value']) {
+				if ($action === 'entity' || RPHP::_('NymphConfig')->empty_list_error['value']) {
 					return $this->httpError(404, "Not Found");
 				}
 			}
 			echo json_encode($result);
 			return true;
 		} else {
-			$result = NymphREST::$nymph->$method("$data");
+			$result = RPHP::_('Nymph')->$method("$data");
 			if ($result === null) {
 				return $this->httpError(404, "Not Found");
 			} elseif (empty($result)) {
@@ -255,7 +247,7 @@ class NymphREST {
 		if (!class_exists($entityData['class']))
 			return false;
 		if ((int)$entityData['guid'] > 0) {
-			$entity = NymphREST::$nymph->getEntity(
+			$entity = RPHP::_('Nymph')->getEntity(
 					array('class' => $entityData['class']),
 					array('&',
 						'guid' => (int)$entityData['guid']

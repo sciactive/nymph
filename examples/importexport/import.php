@@ -3,19 +3,18 @@
 if ($_FILES) {
 	if ($_FILES['nex']['error'] === 0) {
 		require '../../lib/require.php';
-		$require = new RequirePHP();
 
 		require '../../src/Nymph.php';
-		$require('NymphConfig', array(), function(){
+		RPHP::_('NymphConfig', array(), function(){
 			return include '../config.php';
 		});
 
-		$require(array('Nymph'), function(){
+		RPHP::_(array('Nymph'), function(){
 			require '../classes/Employee.php';
 			require '../classes/Todo.php';
 		});
 
-		$result = $require('Nymph')->import($_FILES['nex']['tmp_name']);
+		$result = RPHP::_('Nymph')->import($_FILES['nex']['tmp_name']);
 	} else {
 		$result = false;
 	}

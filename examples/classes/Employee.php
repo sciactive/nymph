@@ -40,7 +40,6 @@ class Employee extends Entity {
 	}
 
 	public function save() {
-		global $require;
 		// Validate employee data.
 		$exc = new EntityInvalidDataException();
 		if (empty($this->name)) {
@@ -57,7 +56,7 @@ class Employee extends Entity {
 		}
 		// Generate employee ID.
 		if (!isset($this->id)) {
-			$this->id = $require('Nymph')->newUID('employee');
+			$this->id = RPHP::_('Nymph')->newUID('employee');
 		}
 		return parent::save();
 	}

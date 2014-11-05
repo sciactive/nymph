@@ -1,14 +1,13 @@
 <?php
 
 require '../lib/require.php';
-$require = new RequirePHP();
 
 require '../src/Nymph.php';
-$require('NymphConfig', array(), function(){
+RPHP::_('NymphConfig', array(), function(){
 	return include 'config.php';
 });
 
-$require(array('Nymph'), function(){
+RPHP::_(array('Nymph'), function(){
 	require 'classes/Employee.php';
 });
 
@@ -25,7 +24,7 @@ $newEntity2->salary = 8000000;
 $newEntity2->subordinates[] = $newEntity;
 $newEntity2->save();
 
-$entity = $require('Nymph')->getEntity(array('class' => Employee), array('&', 'guid' => $newEntity2->guid));
+$entity = RPHP::_('Nymph')->getEntity(array('class' => Employee), array('&', 'guid' => $newEntity2->guid));
 
 ?>
 <!DOCTYPE html>

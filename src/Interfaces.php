@@ -157,7 +157,7 @@ interface NymphDriverInterface {
 	 * - If age is 22 or more, then pay is not greater than 8.
 	 *
 	 * <pre>
-	 * $entities = $require('Nymph')->getEntities(
+	 * $entities = RPHP::_('Nymph')->getEntities(
 	 *	array('reverse' => true, 'limit' => 2),
 	 *	array(
 	 *		'&', // all must be true

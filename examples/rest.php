@@ -1,14 +1,13 @@
 <?php
 
 require '../lib/require.php';
-$require = new RequirePHP();
 
 require '../src/Nymph.php';
-$require('NymphConfig', array(), function(){
+RPHP::_('NymphConfig', array(), function(){
 	return include 'config.php';
 });
 
-$NymphREST = $require('NymphREST');
+$NymphREST = RPHP::_('NymphREST');
 
 require 'classes/Employee.php';
 require 'classes/Todo.php';

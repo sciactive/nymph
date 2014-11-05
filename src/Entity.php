@@ -18,19 +18,6 @@ class Entity implements EntityInterface {
 	const etype = 'entity';
 
 	/**
-	 * @access public
-	 * @static
-	 * @var NymphDriver
-	 */
-	public static $nymph;
-	/**
-	 * @access public
-	 * @static
-	 * @var
-	 */
-	public static $nymphConfig;
-
-	/**
 	 * The GUID of the entity.
 	 *
 	 * @var int
@@ -119,8 +106,7 @@ class Entity implements EntityInterface {
 	 */
 	public function __construct($id = 0) {
 		if ($id > 0) {
-			global $NymphRequire;
-			$entity = Entity::$nymph->getEntity(array('class' => get_class($this)), array('&', 'guid' => $id, 'tag' => $this->tags));
+			$entity = RPHP::_('Nymph')->getEntity(array('class' => get_class($this)), array('&', 'guid' => $id, 'tag' => $this->tags));
 			if (isset($entity)) {
 				$this->guid = $entity->guid;
 				$this->tags = $entity->tags;
@@ -363,10 +349,9 @@ class Entity implements EntityInterface {
 	}
 
 	public function delete() {
-		global $NymphRequire;
 		if ($this->isASleepingReference)
 			$this->referenceWake();
-		return Entity::$nymph->deleteEntity($this);
+		return RPHP::_('Nymph')->deleteEntity($this);
 	}
 
 	/**
@@ -616,8 +601,7 @@ class Entity implements EntityInterface {
 	private function referenceWake() {
 		if (!$this->isASleepingReference)
 			return true;
-		global $NymphRequire;
-		$entity = Entity::$nymph->getEntity(array('class' => $this->sleepingReference[2], 'skip_ac' => (bool) $this->_nUseSkipAC), array('&', 'guid' => $this->sleepingReference[1]));
+		$entity = RPHP::_('Nymph')->getEntity(array('class' => $this->sleepingReference[2], 'skip_ac' => (bool) $this->_nUseSkipAC), array('&', 'guid' => $this->sleepingReference[1]));
 		if (!isset($entity))
 			return false;
 		$this->isASleepingReference = false;
@@ -633,8 +617,7 @@ class Entity implements EntityInterface {
 			$this->referenceWake();
 		if (!isset($this->guid))
 			return false;
-		global $NymphRequire;
-		$refresh = Entity::$nymph->getEntity(array('class' => get_class($this)), array('&', 'guid' => $this->guid));
+		$refresh = RPHP::_('Nymph')->getEntity(array('class' => get_class($this)), array('&', 'guid' => $this->guid));
 		if (!isset($refresh))
 			return 0;
 		$this->tags = $refresh->tags;
@@ -659,10 +642,9 @@ class Entity implements EntityInterface {
 	}
 
 	public function save() {
-		global $NymphRequire;
 		if ($this->isASleepingReference)
 			$this->referenceWake();
-		return Entity::$nymph->saveEntity($this);
+		return RPHP::_('Nymph')->saveEntity($this);
 	}
 
 	public function toReference() {
