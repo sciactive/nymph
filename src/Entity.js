@@ -1,5 +1,5 @@
 /*
-Nymph Entity 0.0.3alpha nymph.io
+Nymph Entity 0.0.4alpha nymph.io
 (C) 2014 Hunter Perrin
 license LGPL
 */
@@ -130,7 +130,7 @@ license LGPL
 
 	var thisClass = {
 		// The current version of Entity.
-		version: "0.0.3alpha",
+		version: "0.0.4alpha",
 
 		// === The Name of the Class ===
 		class: 'Entity',

@@ -12,7 +12,7 @@
  * @link http://sciactive.com/
  */
 
-define('NYMPH_VERSION', '0.0.3alpha');
+define('NYMPH_VERSION', '0.0.4alpha');
 
 RPHP::_('Nymph', array('NymphConfig'), function($NymphConfig){
 	require(dirname(__FILE__).DIRECTORY_SEPARATOR.'Interfaces.php');
