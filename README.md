@@ -19,7 +19,7 @@ Nymph takes the objects that hold your data and translates them to relational da
 
 Both of these things exist in PHP and JavaScript, and interacting with them in either environment is very similar. The main difference being that in JavaScript, since data can't be retrieved immediately without halting execution until the server responds, Nymph will return JavaScript promise objects instead of actual data. Promise objects let you cleanly handle situations where Nymph fails to retrieve the requested data from the server.
 
-Nymph in JavaScript handles any database interaction by using a NymphREST endpoint. You can build your own endpoint very easily, by following the instructions in the [Setup Guide](https://github.com/sciactive/nymph/wiki/SetupGuide).
+Nymph in JavaScript handles any database interaction by using a NymphREST endpoint. You can build your own endpoint very easily, by following the instructions in the [Setup Guide](https://github.com/sciactive/nymph/wiki/Setup-Guide).
 
 ## Setting up a Nymph Application
 
