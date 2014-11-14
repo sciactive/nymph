@@ -9,8 +9,9 @@ RPHP::_('NymphConfig', array(), function(){
 
 $NymphREST = RPHP::_('NymphREST');
 
-require 'classes/Employee.php';
-require 'classes/Todo.php';
+require 'employee/Employee.php';
+require 'todo/Todo.php';
+require 'sudoku/Game.php';
 
 if (in_array($_SERVER['REQUEST_METHOD'], array('PUT', 'DELETE'))) {
 	parse_str(file_get_contents("php://input"), $args);

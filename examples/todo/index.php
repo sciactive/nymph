@@ -27,7 +27,7 @@ require '../../lib/require.php';
 		</style>
 		<script src="../../src/Nymph.js"></script>
 		<script src="../../src/Entity.js"></script>
-		<script src="../classes/Todo.js"></script>
+		<script src="Todo.js"></script>
 
 		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.0-rc.1/angular.min.js"></script>
 		<script src="todoApp.js"></script>

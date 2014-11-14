@@ -1,14 +1,17 @@
 <?php
 
-require '../lib/require.php';
+// This file is to test whether GUIDs get properly encoded into JSON.
+// When GUIDs had a larger range of numbers, some would be truncated.
 
-require '../src/Nymph.php';
+require '../../lib/require.php';
+
+require '../../src/Nymph.php';
 RPHP::_('NymphConfig', array(), function(){
-	return include 'config.php';
+	return include '../config.php';
 });
 
 RPHP::_(array('Nymph'), function(){
-	require 'classes/Employee.php';
+	require 'Employee.php';
 });
 
 $newEntity = new Employee();
