@@ -43,7 +43,7 @@ return (object) array(
 	'MySQL' => (object) array(
 		'host' => array(
 			'cname' => 'Host',
-			'description' => 'The host on which to connect to MySQL.',
+			'description' => 'The host on which to connect to MySQL. Can include a port, like hostname:port.',
 			'value' => 'localhost',
 		),
 		'user' => array(
@@ -81,6 +81,11 @@ return (object) array(
 			'cname' => 'Host',
 			'description' => 'The host on which to connect to PostgreSQL.',
 			'value' => 'localhost',
+		),
+		'port' => array(
+			'cname' => 'Port',
+			'description' => 'The port on which to connect to PostgreSQL.',
+			'value' => 5432,
 		),
 		'user' => array(
 			'cname' => 'User',

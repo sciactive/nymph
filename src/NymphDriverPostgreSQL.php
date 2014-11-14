@@ -55,15 +55,16 @@ class NymphDriverPostgreSQL extends NymphDriver {
 		if (!is_callable('pg_connect')) {
 			throw new NymphUnableToConnectException('PostgreSQL PHP extension is not available. It probably has not been installed. Please install and configure it in order to use PostgreSQL.');
 		}
-		$host = $this->config->PostgreSQL->host['value'];
 		$connection_type = $this->config->PostgreSQL->connection_type['value'];
+		$host = $this->config->PostgreSQL->host['value'];
+		$port = $this->config->PostgreSQL->port['value'];
 		$user = $this->config->PostgreSQL->user['value'];
 		$password = $this->config->PostgreSQL->password['value'];
 		$database = $this->config->PostgreSQL->database['value'];
 		// Connecting, selecting database
 		if (!$this->connected) {
 			if ($connection_type == 'host')
-				$connect_string = 'host=\''.addslashes($host).'\' dbname=\''.addslashes($database).'\' user=\''.addslashes($user).'\' password=\''.addslashes($password).'\' connect_timeout=5';
+				$connect_string = 'host=\''.addslashes($host).'\' port=\''.addslashes($port).'\'dbname=\''.addslashes($database).'\' user=\''.addslashes($user).'\' password=\''.addslashes($password).'\' connect_timeout=5';
 			else
 				$connect_string = 'dbname=\''.addslashes($database).'\' user=\''.addslashes($user).'\' password=\''.addslashes($password).'\' connect_timeout=5';
 			if ($this->config->PostgreSQL->allow_persistent['value'])
