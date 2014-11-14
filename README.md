@@ -1,4 +1,4 @@
-# <img alt="logo" src="https://raw.githubusercontent.com/sciactive/2be-extras/master/logo/product-icon-40-bw.png" align="top" /> Nymph - an ORM for PHP and JavaScript
+# <img alt="logo" src="https://raw.githubusercontent.com/sciactive/2be-extras/master/logo/product-icon-40-bw.png" align="top" /> Nymph - a PHP and JS ORM
 
 The goal of Nymph is to be easy to set up, easy to learn, and suitable for not only prototyping, but production projects. Nymph automatically creates tables the first time a new class is instantiated. Nymph entities are accessed just like any other object, in both PHP and JavaScript. There is a built in REST server, which makes building JavaScript applications with Nymph trivial. Nymph is based on the ORM in the Pines framework, which has been rigorously tested in real world, high demand web applications.
 
@@ -10,7 +10,7 @@ You can find working versions of the demos in the "examples" directory hosted on
 
 The pain of binding your models to your HTML was relieved with frontend libraries like Angular. But developers so often still have to go through the pain of creating many endpoints to communicate your actual models to the frontend. Then there's the additional code required to query your database, translate the results, and relay that to the frontend. Where Angular left off, Nymph comes in. Nymph provides the models to build complex MVC applications simply. Querying logic can be entirely (or partially) handled on the frontend, with never a single line of SQL. This means less context switching between frontend and backend, and far less time to develop complex, functional apps. Unlike most other ORMs, Nymph is designed to let you put your business logic wherever you see fit.
 
-Nymph also frees you from lots of database maintenance. There's no need to run a migration script every time you add a property to one of your objects. Nymph is flexible and automatic with object data. Less time spent crafting databases means more time spent building useful applications.
+Nymph also frees you from lots of database maintenance. There's no need to run a migration script every time you add a property to one of your objects. Nymph is flexible and automatic with object data. Never switching out of an Object Oriented context makes coding a lot easier and a lot more fun. Less time spent crafting databases means more time spent building useful applications.
 
 ## History
 
