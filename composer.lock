@@ -1,0 +1,55 @@
+{
+    "_readme": [
+        "This file locks the dependencies of your project to a known state",
+        "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "This file is @generated automatically"
+    ],
+    "hash": "14727ec4314b8cb321d2812c5aec8806",
+    "packages": [
+        {
+            "name": "sciactive/requirephp",
+            "version": "1.1.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/sciactive/requirephp.git",
+                "reference": "21f8c2c4f4cfa4b58afb0d153845a30e3449897a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/sciactive/requirephp/zipball/21f8c2c4f4cfa4b58afb0d153845a30e3449897a",
+                "reference": "21f8c2c4f4cfa4b58afb0d153845a30e3449897a",
+                "shasum": ""
+            },
+            "type": "library",
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "LGPL"
+            ],
+            "authors": [
+                {
+                    "name": "Hunter Perrin",
+                    "email": "hunter@sciactive.com",
+                    "homepage": "https://github.com/hperrin",
+                    "role": "Developer"
+                }
+            ],
+            "description": "An implementation of dependency injection (like RequireJS) in PHP.",
+            "homepage": "http://requirephp.org/",
+            "keywords": [
+                "amd",
+                "dependency injection",
+                "dependency injector",
+                "service location",
+                "service locator"
+            ],
+            "time": "2014-11-04 00:00:00"
+        }
+    ],
+    "packages-dev": [],
+    "aliases": [],
+    "minimum-stability": "stable",
+    "stability-flags": [],
+    "prefer-stable": false,
+    "platform": [],
+    "platform-dev": []
+}
