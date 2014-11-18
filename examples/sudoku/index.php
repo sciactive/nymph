@@ -1,6 +1,7 @@
 <?php
 
-if ($_REQUEST['action'] === 'export') {
+if ($_REQUEST['action'] === 'export' && !getenv('DATABASE_URL')) {
+	// No import/export on Heroku.
 	require '../../lib/require.php';
 
 	require '../../src/Nymph.php';
@@ -31,6 +32,7 @@ if ($_REQUEST['action'] === 'export') {
 			NymphOptions = {
 				restURL: '../rest.php'
 			};
+			isHeroku = <?php echo json_encode(!!getenv('DATABASE_URL')); ?>; // No import/export on Heroku.
 		</script>
 		<script src="../../src/Nymph.js"></script>
 		<script src="../../src/Entity.js"></script>
@@ -81,7 +83,7 @@ if ($_REQUEST['action'] === 'export') {
 					<div class="column">
 						<div>
 							<h3>Saved Games</h3>
-							<p>
+							<p ng-if="!isHeroku()">
 								<a href="import.php">Import Saved Games</a>
 								<span ng-if="uiState.games.length">
 									| <a href="?action=export">Export Saved Games</a>

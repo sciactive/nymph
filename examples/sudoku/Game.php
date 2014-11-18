@@ -10,7 +10,10 @@
  */
 class Game extends Entity {
 	const etype = 'game';
-	public $clientEnabledMethods = array('generateBoard', 'makeItFun');
+	protected $protectedTags = array('game');
+	protected $whitelistTags = array();
+	protected $whitelistData = array('name', 'difficulty', 'board', 'solvedBoard', 'playBoard', 'time', 'done');
+	protected $clientEnabledMethods = array('generateBoard', 'makeItFun');
 
 	public function __construct($id = 0) {
 		$this->addTag('game');

@@ -142,7 +142,7 @@ class NymphREST {
 			$args = json_decode($data, true);
 			array_walk($args['params'], array($this, 'referenceToEntity'));
 			$entity = $this->loadEntity($args['entity']);
-			if (!in_array($args['method'], $entity->clientEnabledMethods))
+			if (!in_array($args['method'], $entity->clientEnabledMethods()))
 				return $this->httpError(403, "Forbidden");
 			if (!$entity || ((int)$args['entity']['guid'] > 0 && !$entity->guid) || !is_callable(array($entity, $args['method'])))
 				return $this->httpError(400, "Bad Request");
@@ -258,18 +258,12 @@ class NymphREST {
 		} else {
 			$entity = new $entityData['class'];
 		}
-		$entity->removeTag($entity->getTags());
-		$entity->addTag($entityData['tags']);
-		$entity->jsonUnserializeData($entityData['data']);
-		$privateData = array();
-		foreach ($entity->privateData as $var) {
-			$privateData[$var] = $entity->$var;
-		}
-		$entity->putData(array_merge($privateData, $entityData['data']));
+		$entity->jsonAcceptTags($entityData['tags']);
 		if (isset($entityData['cdate']))
-			$entity->cdate = $entityData['cdate'];
+			$entityData['data']['cdate'] = $entityData['cdate'];
 		if (isset($entityData['mdate']))
-			$entity->mdate = $entityData['mdate'];
+			$entityData['data']['mdate'] = $entityData['mdate'];
+		$entity->jsonAcceptData($entityData['data']);
 		return $entity;
 	}
 

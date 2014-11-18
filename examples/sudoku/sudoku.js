@@ -132,4 +132,8 @@ angular.module('sudokuApp', []).controller('SudokuController', ['$scope', '$inte
 	$scope.stopTimer = function(){
 		$interval.cancel(gameTimer);
 	};
+
+	$scope.isHeroku = function(){
+		return isHeroku;
+	};
 }]);

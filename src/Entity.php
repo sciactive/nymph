@@ -70,22 +70,6 @@ class Entity implements EntityInterface {
 	 */
 	private $sleepingReference = false;
 	/**
-	 * The entries listed here correspond to variables that will not be
-	 * serialized into JSON with json_encode().
-	 *
-	 * @var array
-	 * @access public
-	 */
-	public $privateData = array();
-	/**
-	 * The names of the methods allowed to be called by client side JavaScript
-	 * with serverCall.
-	 *
-	 * @var array
-	 * @access public
-	 */
-	public $clientEnabledMethods = array();
-	/**
 	 * The entries listed here correspond to variables that should be converted
 	 * to standard objects instead of arrays when unserializing from JSON.
 	 *
@@ -94,9 +78,67 @@ class Entity implements EntityInterface {
 	 */
 	public $objectData = array('ac');
 	/**
+	 * The entries listed here correspond to properties that will not be
+	 * serialized into JSON with json_encode(). This can also be considered a
+	 * blacklist, because these properties will not be set with incoming JSON.
+	 *
+	 * @var array
+	 * @access protected
+	 */
+	protected $privateData = array();
+	/**
+	 * The entries listed here correspond to properties that can only be
+	 * modified by server side code. They will still be visible on the frontend,
+	 * unlike privateData, but any changes to them that come from the frontend
+	 * will be ignored. This can also be considered a blacklist.
+	 *
+	 * @var array
+	 * @access protected
+	 */
+	protected $protectedData = array();
+	/**
+	 * If this is an array, then entries listed here correspond to the only
+	 * properties that will be accepted from incoming JSON. Any other properties
+	 * will be ignored.
+	 *
+	 * If you use a whitelist, you don't need to use protectedData, since you
+	 * can simply leave those entries out of whitelistData.
+	 *
+	 * @var array
+	 * @access protected
+	 */
+	protected $whitelistData = false;
+	/**
+	 * The entries listed here correspond to tags that can only be added/removed
+	 * by server side code. They will still be visible on the frontend, but any
+	 * changes to them that come from the frontend will be ignored. This can
+	 * also be considered a blacklist.
+	 *
+	 * @var array
+	 * @access protected
+	 */
+	protected $protectedTags = array();
+	/**
+	 * If this is an array, then tags listed here are the only tags that will be
+	 * accepted from incoming JSON. Any other tags will be ignored.
+	 *
+	 * @var array
+	 * @access protected
+	 */
+	protected $whitelistTags = false;
+	/**
+	 * The names of the methods allowed to be called by client side JavaScript
+	 * with serverCall.
+	 *
+	 * @var array
+	 * @access protected
+	 */
+	protected $clientEnabledMethods = array();
+	/**
 	 * Whether to use "skip_ac" when accessing entity references.
 	 *
 	 * @var bool
+	 * @access public
 	 */
 	public $_nUseSkipAC = false;
 
@@ -348,6 +390,10 @@ class Entity implements EntityInterface {
 		unset($value);
 	}
 
+	public function clientEnabledMethods() {
+		return $this->clientEnabledMethods;
+	}
+
 	public function delete() {
 		if ($this->isASleepingReference)
 			$this->referenceWake();
@@ -519,12 +565,60 @@ class Entity implements EntityInterface {
 		return $object;
 	}
 
-	public function jsonUnserializeData(&$data) {
+	public function jsonAcceptTags($tags) {
+		$currentTags = $this->getTags();
+		$protectedTags = array_intersect($this->protectedTags, $currentTags);
+		$tags = array_diff($tags, $this->protectedTags);
+
+		if ($this->whitelistTags !== false) {
+			$tags = array_intersect($tags, $this->whitelistTags);
+		}
+
+		$this->removeTag($currentTags);
+		$this->addTag(array_keys(array_flip(array_merge($tags, $protectedTags))));
+	}
+
+	public function jsonAcceptData($data) {
 		foreach ($this->objectData as $var) {
 			if (isset($data[$var]) && (array) $data[$var] === $data) {
 				$data[$var] = (object) $data[$var];
 			}
 		}
+
+		$privateData = array();
+		foreach ($this->privateData as $var) {
+			if (key_exists($var, $this->data) || key_exists($var, $this->sdata) || $var === 'cdate' || $var === 'mdate')
+				$privateData[$var] = $this->$var;
+			if (key_exists($var, $data))
+				unset($data[$var]);
+		}
+
+		$protectedData = array();
+		foreach ($this->protectedData as $var) {
+			if (key_exists($var, $this->data) || key_exists($var, $this->sdata) || $var === 'cdate' || $var === 'mdate')
+				$protectedData[$var] = $this->$var;
+			if (key_exists($var, $data))
+				unset($data[$var]);
+		}
+
+		if ($this->whitelistData !== false) {
+			foreach ($data as $var => $val) {
+				if (!in_array($var, $this->whitelistData))
+					unset($data[$var]);
+			}
+		}
+
+		$data = array_merge($data, $protectedData, $privateData);
+
+		if (isset($data['cdate'])) {
+			$this->cdate = $data['cdate'];
+			unset($data['cdate']);
+		}
+		if (isset($data['mdate'])) {
+			$this->mdate = $data['mdate'];
+			unset($data['mdate']);
+		}
+		$this->putData($data);
 	}
 
 	public function putData($data, $sdata = array()) {
