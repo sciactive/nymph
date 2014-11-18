@@ -1,7 +1,7 @@
 {
 	"name": "nymph",
 	"description": "An object relational mapper with PHP and JavaScript interfaces.",
-	"version": "1.0.0beta1",
+	"version": "1.0.0beta2",
 	"homepage": "http://nymph.io/",
 	"authors": [
 		"Hunter Perrin <hunter@sciactive.com>"
