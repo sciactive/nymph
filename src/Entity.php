@@ -566,6 +566,9 @@ class Entity implements EntityInterface {
 	}
 
 	public function jsonAcceptTags($tags) {
+		if ($this->isASleepingReference)
+			$this->referenceWake();
+
 		$currentTags = $this->getTags();
 		$protectedTags = array_intersect($this->protectedTags, $currentTags);
 		$tags = array_diff($tags, $this->protectedTags);
@@ -579,6 +582,9 @@ class Entity implements EntityInterface {
 	}
 
 	public function jsonAcceptData($data) {
+		if ($this->isASleepingReference)
+			$this->referenceWake();
+
 		foreach ($this->objectData as $var) {
 			if (isset($data[$var]) && (array) $data[$var] === $data) {
 				$data[$var] = (object) $data[$var];
@@ -587,7 +593,7 @@ class Entity implements EntityInterface {
 
 		$privateData = array();
 		foreach ($this->privateData as $var) {
-			if (key_exists($var, $this->data) || key_exists($var, $this->sdata) || $var === 'cdate' || $var === 'mdate')
+			if (key_exists($var, $this->data) || key_exists($var, $this->sdata))
 				$privateData[$var] = $this->$var;
 			if (key_exists($var, $data))
 				unset($data[$var]);
@@ -595,7 +601,7 @@ class Entity implements EntityInterface {
 
 		$protectedData = array();
 		foreach ($this->protectedData as $var) {
-			if (key_exists($var, $this->data) || key_exists($var, $this->sdata) || $var === 'cdate' || $var === 'mdate')
+			if (key_exists($var, $this->data) || key_exists($var, $this->sdata))
 				$protectedData[$var] = $this->$var;
 			if (key_exists($var, $data))
 				unset($data[$var]);
@@ -610,14 +616,11 @@ class Entity implements EntityInterface {
 
 		$data = array_merge($data, $protectedData, $privateData);
 
-		if (isset($data['cdate'])) {
-			$this->cdate = $data['cdate'];
-			unset($data['cdate']);
-		}
-		if (isset($data['mdate'])) {
-			$this->mdate = $data['mdate'];
-			unset($data['mdate']);
-		}
+		if (!isset($data['cdate']))
+			$data['cdate'] = $this->cdate;
+		if (!isset($data['mdate']))
+			$data['mdate'] = $this->mdate;
+
 		$this->putData($data);
 	}
 

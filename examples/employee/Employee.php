@@ -19,7 +19,7 @@ class Employee extends Entity {
 	const etype = 'employee';
 	protected $protectedTags = array('employee');
 	protected $whitelistTags = array('boss', 'bigcheese');
-	protected $whitelistData = array('name', 'id', 'title', 'department', 'subordinates', 'salary', 'current', 'start_date', 'end_date', 'phone');
+	protected $whitelistData = array('name', 'id', 'title', 'department', 'subordinates', 'salary', 'current', 'start_date', 'end_date', 'phone', 'manager');
 
 	public function __construct($id = 0) {
 		$this->addTag('employee');

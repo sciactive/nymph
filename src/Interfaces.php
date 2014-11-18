@@ -420,10 +420,11 @@ interface DataObjectInterface {
  * even after deletion. It's the job of the entity manager to make sure no two
  * entities ever have the same GUID.
  *
- * Tags are used to classify entities. Though not strictly necessary, it is
- * *HIGHLY RECOMMENDED* to give every entity your component creates a tag
- * indentical to your component's name, such as 'com_xmlparser'. You don't want
- * to accidentally get another component's entities.
+ * Tags are used to classify entities. Where an etype is used to separate data
+ * by table, tags are used to separate entities within a table. You can define
+ * specific tags to be protected, meaning they cannot be added/removed on the
+ * frontend. It can be useful to allow user defined tags, such as for a blog
+ * post.
  *
  * Simply calling delete() will not unset the entity. It will still take up
  * memory. Likewise, simply calling unset will not delete the entity from
