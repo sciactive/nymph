@@ -131,7 +131,11 @@ interface NymphDriverInterface {
 	 * - array - An array with a name, then value. True if the named variable is
 	 *   an array containing the value. Uses in_array().
 	 * - match - An array with a name, then regular expression. True if the
-	 *   named variable matches. Uses preg_match().
+	 *   named variable matches. Uses preg_match(). More powerful than "pmatch"
+	 *   but slower. Must be surrounded by "/" delimiters.
+	 * - pmatch - An array with a name, then regular expression. True if the
+	 *   named variable matches. Uses POSIX RegExp. Case sensitive. Faster than
+	 *   "match". Must *not* be surrounded by any delimiters.
 	 * - like - An array with a name, then pattern. True if the named variable
 	 *   matches. Uses % for variable length wildcard and _ for single character
 	 *   wildcard.
@@ -182,9 +186,9 @@ interface NymphDriverInterface {
 	 *			array('name', 'Clark'),
 	 *			array('name', 'James')
 	 *		),
-	 *		'match' => array(
-	 *			array('name', '/Chris(topher)?/'),
-	 *			array('name', '/Ja(ke|cob)/')
+	 *		'pmatch' => array(
+	 *			array('name', 'Chris(topher)?'),
+	 *			array('name', 'Ja(ke|cob)')
 	 *		)
 	 *	),
 	 *	array(

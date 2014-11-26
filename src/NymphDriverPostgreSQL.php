@@ -611,18 +611,37 @@ class NymphDriverPostgreSQL extends NymphDriver {
 							if ($cur_value[0] == 'cdate') {
 								if ( $cur_query )
 									$cur_query .= $type_is_or ? ' OR ' : ' AND ';
-								$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'e.`cdate` LIKE \''.pg_escape_string($this->link, $cur_value[1]).'\'';
+								$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'(e."cdate" LIKE \''.pg_escape_string($this->link, $cur_value[1]).'\')';
 								break;
 							} elseif ($cur_value[0] == 'mdate') {
 								if ( $cur_query )
 									$cur_query .= $type_is_or ? ' OR ' : ' AND ';
-								$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'e.`mdate` LIKE \''.pg_escape_string($this->link, $cur_value[1]).'\'';
+								$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'(e."mdate" LIKE \''.pg_escape_string($this->link, $cur_value[1]).'\')';
 								break;
 							} else {
 								if ( $cur_query )
 									$cur_query .= ($type_is_or ? ' OR ' : ' AND ');
 								$alias = $this->addDataAlias($data_aliases);
-								$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'e."guid" IN (SELECT "guid" FROM "'.$this->config->PostgreSQL->prefix['value'].'data'.$etype.'" WHERE "name"=\''.pg_escape_string($this->link, $cur_value[0]).'\' AND "compare_one" ILIKE \''.pg_escape_string($this->link, $cur_value[1]).'\')';
+								$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'e."guid" IN (SELECT "guid" FROM "'.$this->config->PostgreSQL->prefix['value'].'data'.$etype.'" WHERE "name"=\''.pg_escape_string($this->link, $cur_value[0]).'\' AND "compare_string" ILIKE \''.pg_escape_string($this->link, $cur_value[1]).'\')';
+							}
+							break;
+						case 'pmatch':
+						case '!pmatch':
+							if ($cur_value[0] == 'cdate') {
+								if ( $cur_query )
+									$cur_query .= $type_is_or ? ' OR ' : ' AND ';
+								$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'(e."cdate" ~ \''.pg_escape_string($this->link, $cur_value[1]).'\')';
+								break;
+							} elseif ($cur_value[0] == 'mdate') {
+								if ( $cur_query )
+									$cur_query .= $type_is_or ? ' OR ' : ' AND ';
+								$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'(e."mdate" ~ \''.pg_escape_string($this->link, $cur_value[1]).'\')';
+								break;
+							} else {
+								if ( $cur_query )
+									$cur_query .= ($type_is_or ? ' OR ' : ' AND ');
+								$alias = $this->addDataAlias($data_aliases);
+								$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'e."guid" IN (SELECT "guid" FROM "'.$this->config->PostgreSQL->prefix['value'].'data'.$etype.'" WHERE "name"=\''.pg_escape_string($this->link, $cur_value[0]).'\' AND "compare_string" ~ \''.pg_escape_string($this->link, $cur_value[1]).'\')';
 							}
 							break;
 						case 'match':

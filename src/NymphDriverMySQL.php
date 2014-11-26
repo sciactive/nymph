@@ -474,18 +474,37 @@ class NymphDriverMySQL extends NymphDriver {
 							if ($cur_value[0] == 'cdate') {
 								if ( $cur_query )
 									$cur_query .= $type_is_or ? ' OR ' : ' AND ';
-								$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'e.`cdate` LIKE \''.mysql_real_escape_string($cur_value[1], $this->link).'\'';
+								$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'(e.`cdate` LIKE \''.mysql_real_escape_string($cur_value[1], $this->link).'\')';
 								break;
 							} elseif ($cur_value[0] == 'mdate') {
 								if ( $cur_query )
 									$cur_query .= $type_is_or ? ' OR ' : ' AND ';
-								$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'e.`mdate` LIKE \''.mysql_real_escape_string($cur_value[1], $this->link).'\'';
+								$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'(e.`mdate` LIKE \''.mysql_real_escape_string($cur_value[1], $this->link).'\')';
 								break;
 							} else {
 								if ( $cur_query )
 									$cur_query .= ($type_is_or ? ' OR ' : ' AND ');
 								$alias = $this->addDataAlias($data_aliases);
 								$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'(e.`guid`='.$alias.'.`guid` AND '.$alias.'.`name`=\''.mysql_real_escape_string($cur_value[0], $this->link).'\' AND '.$alias.'.`compare_string` LIKE \''.mysql_real_escape_string($cur_value[1], $this->link).'\')';
+							}
+							break;
+						case 'pmatch':
+						case '!pmatch':
+							if ($cur_value[0] == 'cdate') {
+								if ( $cur_query )
+									$cur_query .= $type_is_or ? ' OR ' : ' AND ';
+								$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'(e.`cdate` REGEXP \''.mysql_real_escape_string($cur_value[1], $this->link).'\')';
+								break;
+							} elseif ($cur_value[0] == 'mdate') {
+								if ( $cur_query )
+									$cur_query .= $type_is_or ? ' OR ' : ' AND ';
+								$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'(e.`mdate` REGEXP \''.mysql_real_escape_string($cur_value[1], $this->link).'\')';
+								break;
+							} else {
+								if ( $cur_query )
+									$cur_query .= ($type_is_or ? ' OR ' : ' AND ');
+								$alias = $this->addDataAlias($data_aliases);
+								$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'(e.`guid`='.$alias.'.`guid` AND '.$alias.'.`name`=\''.mysql_real_escape_string($cur_value[0], $this->link).'\' AND '.$alias.'.`compare_string` REGEXP \''.mysql_real_escape_string($cur_value[1], $this->link).'\')';
 							}
 							break;
 						case 'match':
@@ -735,6 +754,9 @@ class NymphDriverMySQL extends NymphDriver {
 						// Handled by the query.
 						$pass = true;
 					} elseif ($key === 'like' || $key === '!like') {
+						// Handled by the query.
+						$pass = true;
+					} elseif ($key === 'pmatch' || $key === '!pmatch') {
 						// Handled by the query.
 						$pass = true;
 					} else {
