@@ -132,6 +132,9 @@ interface NymphDriverInterface {
 	 *   an array containing the value. Uses in_array().
 	 * - match - An array with a name, then regular expression. True if the
 	 *   named variable matches. Uses preg_match().
+	 * - like - An array with a name, then pattern. True if the named variable
+	 *   matches. Uses % for variable length wildcard and _ for single character
+	 *   wildcard.
 	 * - gt - An array with a name, then value. True if the named variable is
 	 *   greater than the value.
 	 * - gte - An array with a name, then value. True if the named variable is

@@ -15,8 +15,9 @@ RPHP::_('NymphConfig', array(), function(){
 });
 
 RPHP::_(array('Nymph'), function(){
-	require '../classes/Employee.php';
-	require '../classes/Todo.php';
+	require '../employee/Employee.php';
+	require '../sudoku/Game.php';
+	require '../todo/Todo.php';
 });
 
 RPHP::_('Nymph')->exportPrint();

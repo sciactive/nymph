@@ -13,9 +13,13 @@ require 'employee/Employee.php';
 require 'todo/Todo.php';
 require 'sudoku/Game.php';
 
-if (in_array($_SERVER['REQUEST_METHOD'], array('PUT', 'DELETE'))) {
-	parse_str(file_get_contents("php://input"), $args);
-	$NymphREST->run($_SERVER['REQUEST_METHOD'], $args['action'], $args['data']);
-} else {
-	$NymphREST->run($_SERVER['REQUEST_METHOD'], $_REQUEST['action'], $_REQUEST['data']);
+try {
+	if (in_array($_SERVER['REQUEST_METHOD'], array('PUT', 'DELETE'))) {
+		parse_str(file_get_contents("php://input"), $args);
+		$NymphREST->run($_SERVER['REQUEST_METHOD'], $args['action'], $args['data']);
+	} else {
+		$NymphREST->run($_SERVER['REQUEST_METHOD'], $_REQUEST['action'], $_REQUEST['data']);
+	}
+} catch (NymphQueryFailedException $e) {
+	echo $e->getMessage()."\n\n".$e->getQuery();
 }

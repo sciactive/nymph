@@ -17,11 +17,16 @@ if ($_FILES) {
 		});
 
 		RPHP::_(array('Nymph'), function(){
-			require '../classes/Employee.php';
-			require '../classes/Todo.php';
+			require '../employee/Employee.php';
+			require '../sudoku/Game.php';
+			require '../todo/Todo.php';
 		});
 
-		$result = RPHP::_('Nymph')->import($_FILES['nex']['tmp_name']);
+		try {
+			$result = RPHP::_('Nymph')->import($_FILES['nex']['tmp_name']);
+		} catch (NymphQueryFailedException $e) {
+			echo $e->getMessage()."\n\n".$e->getQuery();
+		}
 	} else {
 		$result = false;
 	}

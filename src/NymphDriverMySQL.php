@@ -102,7 +102,7 @@ class NymphDriverMySQL extends NymphDriver {
 				throw new NymphQueryFailedException('Query failed: ' . mysql_errno() . ': ' . mysql_error(), 0, null, $query);
 			}
 			// Create the data table.
-			$query = sprintf("CREATE TABLE IF NOT EXISTS `%sdata%s` (`guid` bigint(20) unsigned NOT NULL, `name` text NOT NULL, `value` longtext NOT NULL, PRIMARY KEY (`guid`,`name`(255))) DEFAULT CHARSET=utf8;",
+			$query = sprintf("CREATE TABLE IF NOT EXISTS `%sdata%s` (`guid` bigint(20) unsigned NOT NULL, `name` text NOT NULL, `value` longtext NOT NULL, `references` longtext, `compare_true` boolean, `compare_one` boolean, `compare_zero` boolean, `compare_negone` boolean, `compare_emptyarray` boolean, `compare_string` longtext, PRIMARY KEY (`guid`,`name`(255))) DEFAULT CHARSET=utf8;",
 				$this->config->MySQL->prefix['value'],
 				$etype);
 			if ( !(mysql_query($query, $this->link)) ) {
@@ -371,6 +371,7 @@ class NymphDriverMySQL extends NymphDriver {
 		}
 
 		$query_parts = array();
+		$data_aliases = array();
 		foreach ($selectors as &$cur_selector) {
 			$cur_selector_query = '';
 			foreach ($cur_selector as $key => &$value) {
@@ -389,6 +390,7 @@ class NymphDriverMySQL extends NymphDriver {
 				// Any options having to do with data only return if the entity has
 				// the specified variables.
 				foreach ($value as $cur_value) {
+					$query_made = false;
 					switch ($key) {
 						case 'guid':
 						case '!guid':
@@ -408,16 +410,42 @@ class NymphDriverMySQL extends NymphDriver {
 							break;
 						case 'isset':
 						case '!isset':
-							if (!($type_is_not xor $clause_not)) {
-								foreach ($cur_value as $cur_var) {
-									if ( $cur_query )
-										$cur_query .= $type_is_or ? ' OR ' : ' AND ';
-									$cur_query .= 'LOCATE(\','.mysql_real_escape_string($cur_var, $this->link).',\', e.`varlist`)';
+							foreach ($cur_value as $cur_var) {
+								if ( $cur_query )
+									$cur_query .= $type_is_or ? ' OR ' : ' AND ';
+								$cur_query .= '('.(($type_is_not xor $clause_not) ? 'NOT ' : '' ).'LOCATE(\','.mysql_real_escape_string($cur_var, $this->link).',\', e.`varlist`)';
+								if ($type_is_not xor $clause_not) {
+									$alias = $this->addDataAlias($data_aliases);
+									$cur_query .= ' OR (e.`guid`='.$alias.'.`guid` AND '.$alias.'.`name`=\''.mysql_real_escape_string($cur_var, $this->link).'\' AND '.$alias.'.`value`=\'N;\')';
 								}
+								$cur_query .= ')';
 							}
 							break;
-						case 'data':
-						case '!data':
+						case 'ref':
+						case '!ref':
+							$guids = array();
+							if ((array) $cur_value[1] === $cur_value[1]) {
+								foreach ($cur_value[1] as $cur_entity) {
+									if ((object) $cur_entity === $cur_entity)
+										$guids[] = (int) $cur_entity->guid;
+									elseif ((array) $cur_entity === $cur_entity)
+										$guids[] = (int) $cur_entity['guid'];
+									else
+										$guids[] = (int) $cur_entity;
+								}
+							} elseif ((object) $cur_value[1] === $cur_value[1])
+								$guids[] = (int) $cur_value[1]->guid;
+							elseif ((array) $cur_value[1] === $cur_value[1])
+								$guids[] = (int) $cur_value[1]['guid'];
+							else
+								$guids[] = (int) $cur_value[1];
+							foreach ($guids as $cur_qguid) {
+								if ( $cur_query )
+									$cur_query .= $type_is_or ? ' OR ' : ' AND ';
+								$alias = $this->addDataAlias($data_aliases);
+								$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'(e.`guid`='.$alias.'.`guid` AND '.$alias.'.`name`=\''.mysql_real_escape_string($cur_value[0], $this->link).'\' AND LOCATE(\','.mysql_real_escape_string($cur_qguid, $this->link).',\', '.$alias.'.`references`))';
+							}
+							break;
 						case 'strict':
 						case '!strict':
 							if ($cur_value[0] == 'cdate') {
@@ -430,69 +458,173 @@ class NymphDriverMySQL extends NymphDriver {
 									$cur_query .= $type_is_or ? ' OR ' : ' AND ';
 								$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'e.`mdate`='.((float) $cur_value[1]);
 								break;
+							} else {
+								if ( $cur_query )
+									$cur_query .= ($type_is_or ? ' OR ' : ' AND ');
+								if (is_callable(array($cur_value[1], 'toReference')))
+									$svalue = serialize($cur_value[1]->toReference());
+								else
+									$svalue = serialize($cur_value[1]);
+								$alias = $this->addDataAlias($data_aliases);
+								$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'(e.`guid`='.$alias.'.`guid` AND '.$alias.'.`name`=\''.mysql_real_escape_string($cur_value[0], $this->link).'\' AND '.$alias.'.`value`=\''.mysql_real_escape_string($svalue, $this->link).'\')';
 							}
-						case 'gt':
-						case '!gt':
+							break;
+						case 'like':
+						case '!like':
 							if ($cur_value[0] == 'cdate') {
 								if ( $cur_query )
 									$cur_query .= $type_is_or ? ' OR ' : ' AND ';
-								$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'e.`cdate`>'.((float) $cur_value[1]);
+								$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'e.`cdate` LIKE \''.mysql_real_escape_string($cur_value[1], $this->link).'\'';
 								break;
 							} elseif ($cur_value[0] == 'mdate') {
 								if ( $cur_query )
 									$cur_query .= $type_is_or ? ' OR ' : ' AND ';
-								$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'e.`mdate`>'.((float) $cur_value[1]);
+								$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'e.`mdate` LIKE \''.mysql_real_escape_string($cur_value[1], $this->link).'\'';
 								break;
+							} else {
+								if ( $cur_query )
+									$cur_query .= ($type_is_or ? ' OR ' : ' AND ');
+								$alias = $this->addDataAlias($data_aliases);
+								$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'(e.`guid`='.$alias.'.`guid` AND '.$alias.'.`name`=\''.mysql_real_escape_string($cur_value[0], $this->link).'\' AND '.$alias.'.`compare_string` LIKE \''.mysql_real_escape_string($cur_value[1], $this->link).'\')';
 							}
-						case 'gte':
-						case '!gte':
-							if ($cur_value[0] == 'cdate') {
-								if ( $cur_query )
-									$cur_query .= $type_is_or ? ' OR ' : ' AND ';
-								$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'e.`cdate`>='.((float) $cur_value[1]);
-								break;
-							} elseif ($cur_value[0] == 'mdate') {
-								if ( $cur_query )
-									$cur_query .= $type_is_or ? ' OR ' : ' AND ';
-								$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'e.`mdate`>='.((float) $cur_value[1]);
-								break;
-							}
-						case 'lt':
-						case '!lt':
-							if ($cur_value[0] == 'cdate') {
-								if ( $cur_query )
-									$cur_query .= $type_is_or ? ' OR ' : ' AND ';
-								$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'e.`cdate`<'.((float) $cur_value[1]);
-								break;
-							} elseif ($cur_value[0] == 'mdate') {
-								if ( $cur_query )
-									$cur_query .= $type_is_or ? ' OR ' : ' AND ';
-								$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'e.`mdate`<'.((float) $cur_value[1]);
-								break;
-							}
-						case 'lte':
-						case '!lte':
-							if ($cur_value[0] == 'cdate') {
-								if ( $cur_query )
-									$cur_query .= $type_is_or ? ' OR ' : ' AND ';
-								$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'e.`cdate`<='.((float) $cur_value[1]);
-								break;
-							} elseif ($cur_value[0] == 'mdate') {
-								if ( $cur_query )
-									$cur_query .= $type_is_or ? ' OR ' : ' AND ';
-								$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'e.`mdate`<='.((float) $cur_value[1]);
-								break;
-							}
-						case 'array':
-						case '!array':
+							break;
 						case 'match':
 						case '!match':
-						case 'ref':
-						case '!ref':
 							if (!($type_is_not xor $clause_not)) {
 								if ( $cur_query )
 									$cur_query .= $type_is_or ? ' OR ' : ' AND ';
-								$cur_query .= 'LOCATE(\','.mysql_real_escape_string($cur_value[0], $this->link).',\', e.`varlist`)';
+								$cur_query .= 'LOCATE(\','.mysql_real_escape_string($cur_var, $this->link).',\', e.`varlist`)';
+							}
+							break;
+						case 'data':
+						case '!data':
+							if (!$query_made) {
+								if ($cur_value[0] == 'cdate') {
+									$query_made = true;
+									if ( $cur_query )
+										$cur_query .= $type_is_or ? ' OR ' : ' AND ';
+									$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'e."cdate"='.((float) $cur_value[1]);
+									break;
+								} elseif ($cur_value[0] == 'mdate') {
+									$query_made = true;
+									if ( $cur_query )
+										$cur_query .= $type_is_or ? ' OR ' : ' AND ';
+									$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'e."mdate"='.((float) $cur_value[1]);
+									break;
+								} elseif ($cur_value[1] === true || $cur_value[1] === false) {
+									$query_made = true;
+									if ( $cur_query )
+										$cur_query .= ($type_is_or ? ' OR ' : ' AND ');
+									$alias = $this->addDataAlias($data_aliases);
+									$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'(e.`guid`='.$alias.'.`guid` AND '.$alias.'.`name`=\''.mysql_real_escape_string($cur_value[0], $this->link).'\' AND '.$alias.'.`compare_true`='.($cur_value[1] ? 'TRUE' : 'FALSE').')';
+									break;
+								} elseif ($cur_value[1] === 1) {
+									$query_made = true;
+									if ( $cur_query )
+										$cur_query .= ($type_is_or ? ' OR ' : ' AND ');
+									$alias = $this->addDataAlias($data_aliases);
+									$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'(e.`guid`='.$alias.'.`guid` AND '.$alias.'.`name`=\''.mysql_real_escape_string($cur_value[0], $this->link).'\' AND '.$alias.'.`compare_one`=TRUE)';
+									break;
+								} elseif ($cur_value[1] === 0) {
+									$query_made = true;
+									if ( $cur_query )
+										$cur_query .= ($type_is_or ? ' OR ' : ' AND ');
+									$alias = $this->addDataAlias($data_aliases);
+									$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'(e.`guid`='.$alias.'.`guid` AND '.$alias.'.`name`=\''.mysql_real_escape_string($cur_value[0], $this->link).'\' AND '.$alias.'.`compare_zero`=TRUE)';
+									break;
+								} elseif ($cur_value[1] === -1) {
+									$query_made = true;
+									if ( $cur_query )
+										$cur_query .= ($type_is_or ? ' OR ' : ' AND ');
+									$alias = $this->addDataAlias($data_aliases);
+									$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'(e.`guid`='.$alias.'.`guid` AND '.$alias.'.`name`=\''.mysql_real_escape_string($cur_value[0], $this->link).'\' AND '.$alias.'.`compare_negone`=TRUE)';
+									break;
+								} elseif ($cur_value[1] === array()) {
+									$query_made = true;
+									if ( $cur_query )
+										$cur_query .= ($type_is_or ? ' OR ' : ' AND ');
+									$alias = $this->addDataAlias($data_aliases);
+									$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'(e.`guid`='.$alias.'.`guid` AND '.$alias.'.`name`=\''.mysql_real_escape_string($cur_value[0], $this->link).'\' AND '.$alias.'.`compare_emptyarray`=TRUE)';
+									break;
+								}
+							}
+						case 'gt':
+						case '!gt':
+							if (!$query_made) {
+								if ($cur_value[0] == 'cdate') {
+									$query_made = true;
+									if ( $cur_query )
+										$cur_query .= $type_is_or ? ' OR ' : ' AND ';
+									$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'e.`cdate`>'.((float) $cur_value[1]);
+									break;
+								} elseif ($cur_value[0] == 'mdate') {
+									$query_made = true;
+									if ( $cur_query )
+										$cur_query .= $type_is_or ? ' OR ' : ' AND ';
+									$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'e.`mdate`>'.((float) $cur_value[1]);
+									break;
+								}
+							}
+						case 'gte':
+						case '!gte':
+							if (!$query_made) {
+								if ($cur_value[0] == 'cdate') {
+									$query_made = true;
+									if ( $cur_query )
+										$cur_query .= $type_is_or ? ' OR ' : ' AND ';
+									$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'e.`cdate`>='.((float) $cur_value[1]);
+									break;
+								} elseif ($cur_value[0] == 'mdate') {
+									$query_made = true;
+									if ( $cur_query )
+										$cur_query .= $type_is_or ? ' OR ' : ' AND ';
+									$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'e.`mdate`>='.((float) $cur_value[1]);
+									break;
+								}
+							}
+						case 'lt':
+						case '!lt':
+							if (!$query_made) {
+								if ($cur_value[0] == 'cdate') {
+									$query_made = true;
+									if ( $cur_query )
+										$cur_query .= $type_is_or ? ' OR ' : ' AND ';
+									$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'e.`cdate`<'.((float) $cur_value[1]);
+									break;
+								} elseif ($cur_value[0] == 'mdate') {
+									$query_made = true;
+									if ( $cur_query )
+										$cur_query .= $type_is_or ? ' OR ' : ' AND ';
+									$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'e.`mdate`<'.((float) $cur_value[1]);
+									break;
+								}
+							}
+						case 'lte':
+						case '!lte':
+							if (!$query_made) {
+								if ($cur_value[0] == 'cdate') {
+									$query_made = true;
+									if ( $cur_query )
+										$cur_query .= $type_is_or ? ' OR ' : ' AND ';
+									$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'e.`cdate`<='.((float) $cur_value[1]);
+									break;
+								} elseif ($cur_value[0] == 'mdate') {
+									$query_made = true;
+									if ( $cur_query )
+										$cur_query .= $type_is_or ? ' OR ' : ' AND ';
+									$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'e.`mdate`<='.((float) $cur_value[1]);
+									break;
+								}
+							}
+						case 'array':
+						case '!array':
+							if (!$query_made) {
+								$query_made = true;
+								if (!($type_is_not xor $clause_not)) {
+									if ( $cur_query )
+										$cur_query .= $type_is_or ? ' OR ' : ' AND ';
+									$cur_query .= 'LOCATE(\','.mysql_real_escape_string($cur_value[0], $this->link).',\', e.`varlist`)';
+								}
 							}
 							break;
 					}
@@ -522,11 +654,20 @@ class NymphDriverMySQL extends NymphDriver {
 				break;
 		}
 		if ($query_parts) {
-			$query = sprintf("SELECT e.`guid`, e.`tags`, e.`cdate`, e.`mdate`, d.`name`, d.`value`, e.`varlist` FROM `%sentities%s` e LEFT JOIN `%sdata%s` d ON e.`guid`=d.`guid` HAVING %s ORDER BY %s;",
+			if ($data_aliases) {
+				foreach ($data_aliases as &$cur_alias)
+					$cur_alias = '`'.$this->config->MySQL->prefix['value'].'data'.$etype.'` '.$cur_alias;
+				unset($cur_alias);
+				$data_part = ', '.implode(', ', $data_aliases);
+			} else {
+				$data_part = '';
+			}
+			$query = sprintf("SELECT e.`guid`, e.`tags`, e.`cdate`, e.`mdate`, d.`name`, d.`value`, e.`varlist` FROM `%sentities%s` e LEFT JOIN `%sdata%s` d ON e.`guid`=d.`guid`%s WHERE %s ORDER BY %s;",
 				$this->config->MySQL->prefix['value'],
 				$etype,
 				$this->config->MySQL->prefix['value'],
 				$etype,
+				$data_part,
 				'('.implode(') AND (', $query_parts).')',
 				(isset($options['reverse']) && $options['reverse']) ? $sort.' DESC' : $sort);
 		} else {
@@ -581,89 +722,68 @@ class NymphDriverMySQL extends NymphDriver {
 						continue;
 					}
 					$clause_not = $key[0] === '!';
-					// Check if it doesn't pass any for &, check if it
-					// passes any for |.
-					foreach ($value as $cur_value) {
-						if (($key === 'ref' || $key === '!ref') && isset($sdata[$cur_value[0]])) {
-							// If possible, do a quick entity reference check
-							// instead of unserializing all the data.
-							if ((array) $cur_value[1] === $cur_value[1]) {
-								foreach ($cur_value[1] as $cur_entity) {
-									if ((object) $cur_entity === $cur_entity) {
-										$pass = ((strpos($sdata[$cur_value[0]], "a:3:{i:0;s:22:\"nymph_entity_reference\";i:1;i:{$cur_entity->guid};") !== false) xor ($type_is_not xor $clause_not));
-										if (!($type_is_or xor $pass)) break;
-									} elseif ((array) $cur_entity === $cur_entity) {
-										$pass = ((strpos($sdata[$cur_value[0]], "a:3:{i:0;s:22:\"nymph_entity_reference\";i:1;i:{$cur_entity['guid']};") !== false) xor ($type_is_not xor $clause_not));
-										if (!($type_is_or xor $pass)) break;
-									} else {
-										$pass = ((strpos($sdata[$cur_value[0]], "a:3:{i:0;s:22:\"nymph_entity_reference\";i:1;i:{$cur_entity};") !== false) xor ($type_is_not xor $clause_not));
-										if (!($type_is_or xor $pass)) break;
-									}
-								}
-							} elseif ((object) $cur_value[1] === $cur_value[1]) {
-								$pass = ((strpos($sdata[$cur_value[0]], "a:3:{i:0;s:22:\"nymph_entity_reference\";i:1;i:{$cur_value[1]->guid};") !== false) xor ($type_is_not xor $clause_not));
-							} elseif ((array) $cur_value[1] === $cur_value[1]) {
-								$pass = ((strpos($sdata[$cur_value[0]], "a:3:{i:0;s:22:\"nymph_entity_reference\";i:1;i:{$cur_value[1]['guid']};") !== false) xor ($type_is_not xor $clause_not));
+					if ($key === 'ref' || $key === '!ref') {
+						// Handled by the query.
+						$pass = true;
+					} elseif ($key === 'guid' || $key === '!guid' || $key === 'tag' || $key === '!tag') {
+						// Handled by the query.
+						$pass = true;
+					} elseif ($key === 'isset' || $key === '!isset') {
+						// Handled by the query.
+						$pass = true;
+					} elseif ($key === 'strict' || $key === '!strict') {
+						// Handled by the query.
+						$pass = true;
+					} elseif ($key === 'like' || $key === '!like') {
+						// Handled by the query.
+						$pass = true;
+					} else {
+						// Check if it doesn't pass any for &, check if it
+						// passes any for |.
+						foreach ($value as $cur_value) {
+							if (($key === 'data' || $key === '!data') && ($cur_value[1] === true || $cur_value[1] === false || $cur_value[1] === 1 || $cur_value[1] === 0 || $cur_value[1] === -1 || $cur_value[1] === array())) {
+								// Handled by the query.
+								$pass = true;
 							} else {
-								$pass = ((strpos($sdata[$cur_value[0]], "a:3:{i:0;s:22:\"nymph_entity_reference\";i:1;i:{$cur_value[1]};") !== false) xor ($type_is_not xor $clause_not));
+								// Unserialize the data for this variable.
+								if (isset($sdata[$cur_value[0]])) {
+									$data[$cur_value[0]] = unserialize($sdata[$cur_value[0]]);
+									unset($sdata[$cur_value[0]]);
+								}
+								switch ($key) {
+									case 'data':
+									case '!data':
+										// If we get here, it's not one of those simple data values above.
+										$pass = (($data[$cur_value[0]] == $cur_value[1]) xor ($type_is_not xor $clause_not));
+										break;
+									case 'array':
+									case '!array':
+										$pass = (((array) $data[$cur_value[0]] === $data[$cur_value[0]] && in_array($cur_value[1], $data[$cur_value[0]])) xor ($type_is_not xor $clause_not));
+										break;
+									case 'match':
+									case '!match':
+										$pass = ((isset($data[$cur_value[0]]) && preg_match($cur_value[1], $data[$cur_value[0]])) xor ($type_is_not xor $clause_not));
+										break;
+									case 'gt':
+									case '!gt':
+										$pass = (($data[$cur_value[0]] > $cur_value[1]) xor ($type_is_not xor $clause_not));
+										break;
+									case 'gte':
+									case '!gte':
+										$pass = (($data[$cur_value[0]] >= $cur_value[1]) xor ($type_is_not xor $clause_not));
+										break;
+									case 'lt':
+									case '!lt':
+										$pass = (($data[$cur_value[0]] < $cur_value[1]) xor ($type_is_not xor $clause_not));
+										break;
+									case 'lte':
+									case '!lte':
+										$pass = (($data[$cur_value[0]] <= $cur_value[1]) xor ($type_is_not xor $clause_not));
+										break;
+								}
 							}
-						} else {
-							// Unserialize the data for this variable.
-							if (isset($sdata[$cur_value[0]])) {
-								$data[$cur_value[0]] = unserialize($sdata[$cur_value[0]]);
-								unset($sdata[$cur_value[0]]);
-							}
-							switch ($key) {
-								case 'guid':
-								case '!guid':
-								case 'tag':
-								case '!tag':
-									// These are handled by the query.
-									$pass = true;
-									break;
-								case 'isset':
-								case '!isset':
-									$pass = (isset($data[$cur_value[0]]) xor ($type_is_not xor $clause_not));
-									break;
-								case 'data':
-								case '!data':
-									$pass = (($data[$cur_value[0]] == $cur_value[1]) xor ($type_is_not xor $clause_not));
-									break;
-								case 'strict':
-								case '!strict':
-									$pass = (($data[$cur_value[0]] === $cur_value[1]) xor ($type_is_not xor $clause_not));
-									break;
-								case 'array':
-								case '!array':
-									$pass = (((array) $data[$cur_value[0]] === $data[$cur_value[0]] && in_array($cur_value[1], $data[$cur_value[0]])) xor ($type_is_not xor $clause_not));
-									break;
-								case 'match':
-								case '!match':
-									$pass = ((isset($data[$cur_value[0]]) && preg_match($cur_value[1], $data[$cur_value[0]])) xor ($type_is_not xor $clause_not));
-									break;
-								case 'gt':
-								case '!gt':
-									$pass = (($data[$cur_value[0]] > $cur_value[1]) xor ($type_is_not xor $clause_not));
-									break;
-								case 'gte':
-								case '!gte':
-									$pass = (($data[$cur_value[0]] >= $cur_value[1]) xor ($type_is_not xor $clause_not));
-									break;
-								case 'lt':
-								case '!lt':
-									$pass = (($data[$cur_value[0]] < $cur_value[1]) xor ($type_is_not xor $clause_not));
-									break;
-								case 'lte':
-								case '!lte':
-									$pass = (($data[$cur_value[0]] <= $cur_value[1]) xor ($type_is_not xor $clause_not));
-									break;
-								case 'ref':
-								case '!ref':
-									$pass = ((isset($data[$cur_value[0]]) && (array) $data[$cur_value[0]] === $data[$cur_value[0]] && $this->entityReferenceSearch($data[$cur_value[0]], $cur_value[1])) xor ($type_is_not xor $clause_not));
-									break;
-							}
+							if (!($type_is_or xor $pass)) break;
 						}
-						if (!($type_is_or xor $pass)) break;
 					}
 					if (!($type_is_or xor $pass)) break;
 				}
@@ -790,25 +910,25 @@ class NymphDriverMySQL extends NymphDriver {
 					}
 					unset($data['cdate'], $data['mdate']);
 					if ($data) {
-						$query = "INSERT INTO `{$this->config->MySQL->prefix['value']}data_{$etype}` (`guid`, `name`, `value`) VALUES ";
+						$query = "INSERT INTO `{$this->config->MySQL->prefix['value']}data_{$etype}` (`guid`, `name`, `value`,`references`,`compare_true`, `compare_one`, `compare_zero`, `compare_negone`, `compare_emptyarray`, `compare_string`) VALUES ";
 						foreach ($data as $name => $value) {
-							$query .= sprintf("(%u, '%s', '%s'),",
+							preg_match_all('/a:3:\{i:0;s:22:"nymph_entity_reference";i:1;i:(\d+);/', $value, $references, PREG_PATTERN_ORDER);
+							$uvalue = unserialize($value);
+							$query .= sprintf("(%u, '%s', '%s', '%s', %s, %s, %s, %s, %s, %s),",
 								$guid,
 								mysql_real_escape_string($name, $this->link),
-								mysql_real_escape_string($value, $this->link));
+								mysql_real_escape_string($value, $this->link),
+								mysql_real_escape_string(','.implode(',', $references[1]).',', $this->link),
+								$uvalue == true ? 'TRUE' : 'FALSE',
+								$uvalue == 1 ? 'TRUE' : 'FALSE',
+								$uvalue == 0 ? 'TRUE' : 'FALSE',
+								$uvalue == -1 ? 'TRUE' : 'FALSE',
+								$uvalue == array() ? 'TRUE' : 'FALSE',
+								is_string($uvalue) ? '\''.mysql_real_escape_string($uvalue, $this->link).'\'' : 'NULL');
 						}
 						$query = substr($query, 0, -1).';';
 						if ( !(mysql_query($query, $this->link))  ) {
-							// If the tables don't exist yet, create them.
-							if (mysql_errno() == 1146 && $this->createTables()) {
-								if (isset($etype))
-									$this->createTables($etype);
-								if ( !(mysql_query($query, $this->link)) ) {
-									throw new NymphQueryFailedException('Query failed: ' . mysql_errno() . ': ' . mysql_error(), 0, null, $query);
-								}
-							} else {
-								throw new NymphQueryFailedException('Query failed: ' . mysql_errno() . ': ' . mysql_error(), 0, null, $query);
-							}
+							throw new NymphQueryFailedException('Query failed: ' . mysql_errno() . ': ' . mysql_error(), 0, null, $query);
 						}
 					}
 					$guid = null;
@@ -896,27 +1016,27 @@ class NymphDriverMySQL extends NymphDriver {
 					throw new NymphQueryFailedException('Query failed: ' . mysql_errno() . ': ' . mysql_error(), 0, null, $query);
 				}
 			}
+			unset($data['cdate'], $data['mdate']);
 			if ($data) {
-				$query = "INSERT INTO `{$this->config->MySQL->prefix['value']}data_{$etype}` (`guid`, `name`, `value`) VALUES ";
-				unset($data['cdate'], $data['mdate']);
+				$query = "INSERT INTO `{$this->config->MySQL->prefix['value']}data_{$etype}` (`guid`, `name`, `value`,`references`,`compare_true`, `compare_one`, `compare_zero`, `compare_negone`, `compare_emptyarray`, `compare_string`) VALUES ";
 				foreach ($data as $name => $value) {
-					$query .= sprintf("(%u, '%s', '%s'),",
+					preg_match_all('/a:3:\{i:0;s:22:"nymph_entity_reference";i:1;i:(\d+);/', $value, $references, PREG_PATTERN_ORDER);
+					$uvalue = unserialize($value);
+					$query .= sprintf("(%u, '%s', '%s', '%s', %s, %s, %s, %s, %s, %s),",
 						$guid,
 						mysql_real_escape_string($name, $this->link),
-						mysql_real_escape_string($value, $this->link));
+						mysql_real_escape_string($value, $this->link),
+						mysql_real_escape_string(','.implode(',', $references[1]).',', $this->link),
+						$uvalue == true ? 'TRUE' : 'FALSE',
+						$uvalue == 1 ? 'TRUE' : 'FALSE',
+						$uvalue == 0 ? 'TRUE' : 'FALSE',
+						$uvalue == -1 ? 'TRUE' : 'FALSE',
+						$uvalue == array() ? 'TRUE' : 'FALSE',
+						is_string($uvalue) ? '\''.mysql_real_escape_string($uvalue, $this->link).'\'' : 'NULL');
 				}
 				$query = substr($query, 0, -1).';';
 				if ( !(mysql_query($query, $this->link))  ) {
-					// If the tables don't exist yet, create them.
-					if (mysql_errno() == 1146 && $this->createTables()) {
-						if (isset($etype))
-							$this->createTables($etype);
-						if ( !(mysql_query($query, $this->link)) ) {
-							throw new NymphQueryFailedException('Query failed: ' . mysql_errno() . ': ' . mysql_error(), 0, null, $query);
-						}
-					} else {
-						throw new NymphQueryFailedException('Query failed: ' . mysql_errno() . ': ' . mysql_error(), 0, null, $query);
-					}
+					throw new NymphQueryFailedException('Query failed: ' . mysql_errno() . ': ' . mysql_error(), 0, null, $query);
 				}
 			}
 		}
@@ -1039,21 +1159,39 @@ class NymphDriverMySQL extends NymphDriver {
 			unset($data['cdate'], $data['mdate']);
 			$values = array();
 			foreach ($data as $name => $value) {
-				$values[] = sprintf('(%u, \'%s\', \'%s\')',
+				$svalue = serialize($value);
+				preg_match_all('/a:3:\{i:0;s:22:"nymph_entity_reference";i:1;i:(\d+);/', $svalue, $references, PREG_PATTERN_ORDER);
+				$values[] = sprintf('(%u, \'%s\', \'%s\', \'%s\', %s, %s, %s, %s, %s, %s)',
 					$entity->guid,
 					mysql_real_escape_string($name, $this->link),
-					mysql_real_escape_string(serialize($value), $this->link));
+					mysql_real_escape_string($svalue, $this->link),
+					mysql_real_escape_string(','.implode(',', $references[1]).',', $this->link),
+					$value == true ? 'TRUE' : 'FALSE',
+					$value == 1 ? 'TRUE' : 'FALSE',
+					$value == 0 ? 'TRUE' : 'FALSE',
+					$value == -1 ? 'TRUE' : 'FALSE',
+					$value == array() ? 'TRUE' : 'FALSE',
+					is_string($value) ? '\''.mysql_real_escape_string($value, $this->link).'\'' : 'NULL');
 			}
 			foreach ($sdata as $name => $value) {
-				$values[] = sprintf('(%u, \'%s\', \'%s\')',
+				preg_match_all('/a:3:\{i:0;s:22:"nymph_entity_reference";i:1;i:(\d+);/', $value, $references, PREG_PATTERN_ORDER);
+				$uvalue = unserialize($value);
+				$values[] = sprintf('(%u, \'%s\', \'%s\', \'%s\', %s, %s, %s, %s, %s, %s)',
 					$entity->guid,
 					mysql_real_escape_string($name, $this->link),
-					mysql_real_escape_string($value, $this->link));
+					mysql_real_escape_string($value, $this->link),
+					mysql_real_escape_string(','.implode(',', $references[1]).',', $this->link),
+					$uvalue == true ? 'TRUE' : 'FALSE',
+					$uvalue == 1 ? 'TRUE' : 'FALSE',
+					$uvalue == 0 ? 'TRUE' : 'FALSE',
+					$uvalue == -1 ? 'TRUE' : 'FALSE',
+					$uvalue == array() ? 'TRUE' : 'FALSE',
+					is_string($uvalue) ? '\''.mysql_real_escape_string($uvalue, $this->link).'\'' : 'NULL');
 			}
-			$query = sprintf("INSERT INTO `%sdata%s` (`guid`, `name`, `value`) VALUES %s;",
+			$query = sprintf('INSERT INTO `%sdata%s` (`guid`, `name`, `value`, `references`, `compare_true`, `compare_one`, `compare_zero`, `compare_negone`, `compare_emptyarray`, `compare_string`) VALUES ',
 				$this->config->MySQL->prefix['value'],
-				$etype,
-				implode(',', $values));
+				$etype);
+			$query .= implode(',', $values).';';
 			if ( !(mysql_query($query, $this->link)) ) {
 				throw new NymphQueryFailedException('Query failed: ' . mysql_errno() . ': ' . mysql_error(), 0, null, $query);
 			}
@@ -1081,21 +1219,39 @@ class NymphDriverMySQL extends NymphDriver {
 			unset($data['cdate'], $data['mdate']);
 			$values = array();
 			foreach ($data as $name => $value) {
-				$values[] = sprintf('(%u, \'%s\', \'%s\')',
+				$svalue = serialize($value);
+				preg_match_all('/a:3:\{i:0;s:22:"nymph_entity_reference";i:1;i:(\d+);/', $svalue, $references, PREG_PATTERN_ORDER);
+				$values[] = sprintf('(%u, \'%s\', \'%s\', \'%s\', %s, %s, %s, %s, %s, %s)',
 					(int) $entity->guid,
 					mysql_real_escape_string($name, $this->link),
-					mysql_real_escape_string(serialize($value), $this->link));
+					mysql_real_escape_string($svalue, $this->link),
+					mysql_real_escape_string(','.implode(',', $references[1]).',', $this->link),
+					$value == true ? 'TRUE' : 'FALSE',
+					$value == 1 ? 'TRUE' : 'FALSE',
+					$value == 0 ? 'TRUE' : 'FALSE',
+					$value == -1 ? 'TRUE' : 'FALSE',
+					$value == array() ? 'TRUE' : 'FALSE',
+					is_string($value) ? '\''.mysql_real_escape_string($value, $this->link).'\'' : 'NULL');
 			}
 			foreach ($sdata as $name => $value) {
-				$values[] = sprintf('(%u, \'%s\', \'%s\')',
-					(int) $entity->guid,
+				preg_match_all('/a:3:\{i:0;s:22:"nymph_entity_reference";i:1;i:(\d+);/', $value, $references, PREG_PATTERN_ORDER);
+				$uvalue = unserialize($value);
+				$values[] = sprintf('(%u, \'%s\', \'%s\', \'%s\', %s, %s, %s, %s, %s, %s)',
+					$new_id,
 					mysql_real_escape_string($name, $this->link),
-					mysql_real_escape_string($value, $this->link));
+					mysql_real_escape_string($value, $this->link),
+					mysql_real_escape_string(','.implode(',', $references[1]).',', $this->link),
+					$uvalue == true ? 'TRUE' : 'FALSE',
+					$uvalue == 1 ? 'TRUE' : 'FALSE',
+					$uvalue == 0 ? 'TRUE' : 'FALSE',
+					$uvalue == -1 ? 'TRUE' : 'FALSE',
+					$uvalue == array() ? 'TRUE' : 'FALSE',
+					is_string($uvalue) ? '\''.mysql_real_escape_string($uvalue, $this->link).'\'' : 'NULL');
 			}
-			$query = sprintf("INSERT INTO `%sdata%s` (`guid`, `name`, `value`) VALUES %s;",
+			$query = sprintf('INSERT INTO `%sdata%s` (`guid`, `name`, `value`, `references`, `compare_true`, `compare_one`, `compare_zero`, `compare_negone`, `compare_emptyarray`, `compare_string`) VALUES ',
 				$this->config->MySQL->prefix['value'],
-				$etype,
-				implode(',', $values));
+				$etype);
+			$query .= implode(',', $values).';';
 			if ( !(mysql_query($query, $this->link)) ) {
 				throw new NymphQueryFailedException('Query failed: ' . mysql_errno() . ': ' . mysql_error(), 0, null, $query);
 			}
@@ -1123,5 +1279,13 @@ class NymphDriverMySQL extends NymphDriver {
 			throw new NymphQueryFailedException('Query failed: ' . mysql_errno() . ': ' . mysql_error(), 0, null, $query);
 		}
 		return true;
+	}
+
+	private function addDataAlias(&$data_aliases) {
+		do {
+			$new_alias = 'd'.rand(1, 9999999999);
+		} while (in_array($new_alias, $data_aliases));
+		$data_aliases[] = $new_alias;
+		return $new_alias;
 	}
 }
