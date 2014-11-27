@@ -26,6 +26,8 @@ class NymphQueryFailedException extends Exception {
 
 class NymphInvalidParametersException extends Exception {}
 
+class EntityCorruptedException extends Exception {}
+
 class EntityInvalidDataException extends Exception {
 	private $fields = array();
 

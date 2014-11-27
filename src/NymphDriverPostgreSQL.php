@@ -622,7 +622,6 @@ class NymphDriverPostgreSQL extends NymphDriver {
 							} else {
 								if ( $cur_query )
 									$cur_query .= ($type_is_or ? ' OR ' : ' AND ');
-								$alias = $this->addDataAlias($data_aliases);
 								$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'e."guid" IN (SELECT "guid" FROM "'.$this->config->PostgreSQL->prefix['value'].'data'.$etype.'" WHERE "name"=\''.pg_escape_string($this->link, $cur_value[0]).'\' AND "compare_string" ILIKE \''.pg_escape_string($this->link, $cur_value[1]).'\')';
 							}
 							break;
@@ -641,7 +640,6 @@ class NymphDriverPostgreSQL extends NymphDriver {
 							} else {
 								if ( $cur_query )
 									$cur_query .= ($type_is_or ? ' OR ' : ' AND ');
-								$alias = $this->addDataAlias($data_aliases);
 								$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'e."guid" IN (SELECT "guid" FROM "'.$this->config->PostgreSQL->prefix['value'].'data'.$etype.'" WHERE "name"=\''.pg_escape_string($this->link, $cur_value[0]).'\' AND "compare_string" ~ \''.pg_escape_string($this->link, $cur_value[1]).'\')';
 							}
 							break;
@@ -908,6 +906,9 @@ class NymphDriverPostgreSQL extends NymphDriver {
 						// Handled by the query.
 						$pass = true;
 					} elseif ($key === 'like' || $key === '!like') {
+						// Handled by the query.
+						$pass = true;
+					} elseif ($key === 'pmatch' || $key === '!pmatch') {
 						// Handled by the query.
 						$pass = true;
 					} elseif (($key === 'match' || $key === '!match') && $this->usePLPerl) {

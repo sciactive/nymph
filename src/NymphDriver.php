@@ -139,8 +139,8 @@ class NymphDriver implements NymphDriverInterface {
 		$args = func_get_args();
 		if (!$args)
 			$args = array(array());
-		if ((array) $args[0] !== $args[0])
-			$args = array(array(), array('&', 'guid' => (int) $args[0]));
+		if ((array) $args[0] === $args[0] && ((int) $args[1] === $args[1] || is_numeric($args[1])))
+			$args = array($args[0], array('&', 'guid' => (int) $args[1]));
 		$args[0]['limit'] = 1;
 		$entities = call_user_func_array(array($this, 'getEntities'), $args);
 		if (!$entities)

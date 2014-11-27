@@ -200,7 +200,7 @@ interface NymphDriverInterface {
 	 * </pre>
 	 *
 	 * @param array $options The options.
-	 * @param array $selectors,... The optional selectors to search for. If none are given, all entities are retrieved.
+	 * @param array $selectors,... The optional selectors to search for. If none are given, all entities are retrieved for the given options.
 	 * @return array|null An array of entities, or null on failure.
 	 * @todo An option to place a total count in a var.
 	 * @todo Use an asterisk to specify any variable.
@@ -215,8 +215,8 @@ interface NymphDriverInterface {
 	 * getEntities(), except that it will return null if no entity is found.
 	 * getEntities() would return an empty array.
 	 *
-	 * @param mixed $options The options to search for, or just a GUID.
-	 * @param mixed $selectors,... The optional selectors to search for, or nothing if $options is a GUID.
+	 * @param array $options The options to search for.
+	 * @param mixed $selectors,... The selectors to search for, or just a GUID.
 	 * @return Entity|null An entity, or null on failure and nothing found.
 	 */
 	public function getEntity();

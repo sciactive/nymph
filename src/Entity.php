@@ -148,7 +148,7 @@ class Entity implements EntityInterface {
 	 */
 	public function __construct($id = 0) {
 		if ($id > 0) {
-			$entity = RPHP::_('Nymph')->getEntity(array('class' => get_class($this)), array('&', 'guid' => $id, 'tag' => $this->tags));
+			$entity = RPHP::_('Nymph')->getEntity(array('class' => get_class($this)), array('&', 'guid' => $id));
 			if (isset($entity)) {
 				$this->guid = $entity->guid;
 				$this->tags = $entity->tags;
@@ -226,10 +226,7 @@ class Entity implements EntityInterface {
 				}
 				return $this->entityCache[$name];
 			} else {
-				if (function_exists('pines_error'))
-					pines_error("Corrupted entity data found on entity with GUID {$this->guid}.");
-				if (function_exists('pines_log'))
-					pines_log("Corrupted entity data found on entity with GUID {$this->guid}.", 'fatal');
+				throw new EntityCorruptedException("Corrupted entity data found on entity with GUID {$this->guid}.");
 			}
 		}
 		// If it's not an entity, return the regular value.

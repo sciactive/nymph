@@ -444,7 +444,7 @@ class NymphDriverMySQL extends NymphDriver {
 								if ( $cur_query )
 									$cur_query .= $type_is_or ? ' OR ' : ' AND ';
 								$alias = $this->addDataAlias($data_aliases);
-								$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'(e.`guid`='.$alias.'.`guid` AND '.$alias.'.`name`=\''.mysql_real_escape_string($cur_value[0], $this->link).'\' AND LOCATE(\','.mysql_real_escape_string($cur_qguid, $this->link).',\', '.$alias.'.`references`))';
+								$cur_query .= '('.(($type_is_not xor $clause_not) ? 'NOT LOCATE(\','.mysql_real_escape_string($cur_value[0], $this->link).',\', e.`varlist`) OR ' : '' ).'(e.`guid`='.$alias.'.`guid` AND '.$alias.'.`name`=\''.mysql_real_escape_string($cur_value[0], $this->link).'\' AND '.(($type_is_not xor $clause_not) ? 'NOT ' : '' ).'LOCATE(\','.mysql_real_escape_string($cur_qguid, $this->link).',\', '.$alias.'.`references`)))';
 							}
 							break;
 						case 'strict':
@@ -467,7 +467,7 @@ class NymphDriverMySQL extends NymphDriver {
 								else
 									$svalue = serialize($cur_value[1]);
 								$alias = $this->addDataAlias($data_aliases);
-								$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'(e.`guid`='.$alias.'.`guid` AND '.$alias.'.`name`=\''.mysql_real_escape_string($cur_value[0], $this->link).'\' AND '.$alias.'.`value`=\''.mysql_real_escape_string($svalue, $this->link).'\')';
+								$cur_query .= '('.(($type_is_not xor $clause_not) ? 'NOT LOCATE(\','.mysql_real_escape_string($cur_value[0], $this->link).',\', e.`varlist`) OR ' : '' ).'(e.`guid`='.$alias.'.`guid` AND '.$alias.'.`name`=\''.mysql_real_escape_string($cur_value[0], $this->link).'\' AND '.(($type_is_not xor $clause_not) ? 'NOT ' : '' ).$alias.'.`value`=\''.mysql_real_escape_string($svalue, $this->link).'\'))';
 							}
 							break;
 						case 'like':
@@ -486,7 +486,7 @@ class NymphDriverMySQL extends NymphDriver {
 								if ( $cur_query )
 									$cur_query .= ($type_is_or ? ' OR ' : ' AND ');
 								$alias = $this->addDataAlias($data_aliases);
-								$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'(e.`guid`='.$alias.'.`guid` AND '.$alias.'.`name`=\''.mysql_real_escape_string($cur_value[0], $this->link).'\' AND '.$alias.'.`compare_string` LIKE \''.mysql_real_escape_string($cur_value[1], $this->link).'\')';
+								$cur_query .= '('.(($type_is_not xor $clause_not) ? 'NOT LOCATE(\','.mysql_real_escape_string($cur_value[0], $this->link).',\', e.`varlist`) OR ' : '' ).'(e.`guid`='.$alias.'.`guid` AND '.$alias.'.`name`=\''.mysql_real_escape_string($cur_value[0], $this->link).'\' AND '.(($type_is_not xor $clause_not) ? 'NOT ' : '' ).$alias.'.`compare_string` LIKE \''.mysql_real_escape_string($cur_value[1], $this->link).'\'))';
 							}
 							break;
 						case 'pmatch':
@@ -505,7 +505,7 @@ class NymphDriverMySQL extends NymphDriver {
 								if ( $cur_query )
 									$cur_query .= ($type_is_or ? ' OR ' : ' AND ');
 								$alias = $this->addDataAlias($data_aliases);
-								$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'(e.`guid`='.$alias.'.`guid` AND '.$alias.'.`name`=\''.mysql_real_escape_string($cur_value[0], $this->link).'\' AND '.$alias.'.`compare_string` REGEXP \''.mysql_real_escape_string($cur_value[1], $this->link).'\')';
+								$cur_query .= '('.(($type_is_not xor $clause_not) ? 'NOT LOCATE(\','.mysql_real_escape_string($cur_value[0], $this->link).',\', e.`varlist`) OR ' : '' ).'(e.`guid`='.$alias.'.`guid` AND '.$alias.'.`name`=\''.mysql_real_escape_string($cur_value[0], $this->link).'\' AND '.(($type_is_not xor $clause_not) ? 'NOT ' : '' ).$alias.'.`compare_string` REGEXP \''.mysql_real_escape_string($cur_value[1], $this->link).'\'))';
 							}
 							break;
 						case 'match':
@@ -513,7 +513,7 @@ class NymphDriverMySQL extends NymphDriver {
 							if (!($type_is_not xor $clause_not)) {
 								if ( $cur_query )
 									$cur_query .= $type_is_or ? ' OR ' : ' AND ';
-								$cur_query .= 'LOCATE(\','.mysql_real_escape_string($cur_var, $this->link).',\', e.`varlist`)';
+								$cur_query .= 'LOCATE(\','.mysql_real_escape_string($cur_value[0], $this->link).',\', e.`varlist`)';
 							}
 							break;
 						case 'data':
@@ -536,35 +536,35 @@ class NymphDriverMySQL extends NymphDriver {
 									if ( $cur_query )
 										$cur_query .= ($type_is_or ? ' OR ' : ' AND ');
 									$alias = $this->addDataAlias($data_aliases);
-									$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'(e.`guid`='.$alias.'.`guid` AND '.$alias.'.`name`=\''.mysql_real_escape_string($cur_value[0], $this->link).'\' AND '.$alias.'.`compare_true`='.($cur_value[1] ? 'TRUE' : 'FALSE').')';
+									$cur_query .= '('.(($type_is_not xor $clause_not) ? 'NOT LOCATE(\','.mysql_real_escape_string($cur_value[0], $this->link).',\', e.`varlist`) OR ' : '' ).'(e.`guid`='.$alias.'.`guid` AND '.$alias.'.`name`=\''.mysql_real_escape_string($cur_value[0], $this->link).'\' AND '.(($type_is_not xor $clause_not) ? 'NOT ' : '' ).$alias.'.`compare_true`='.($cur_value[1] ? 'TRUE' : 'FALSE').'))';
 									break;
 								} elseif ($cur_value[1] === 1) {
 									$query_made = true;
 									if ( $cur_query )
 										$cur_query .= ($type_is_or ? ' OR ' : ' AND ');
 									$alias = $this->addDataAlias($data_aliases);
-									$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'(e.`guid`='.$alias.'.`guid` AND '.$alias.'.`name`=\''.mysql_real_escape_string($cur_value[0], $this->link).'\' AND '.$alias.'.`compare_one`=TRUE)';
+									$cur_query .= '('.(($type_is_not xor $clause_not) ? 'NOT LOCATE(\','.mysql_real_escape_string($cur_value[0], $this->link).',\', e.`varlist`) OR ' : '' ).'(e.`guid`='.$alias.'.`guid` AND '.$alias.'.`name`=\''.mysql_real_escape_string($cur_value[0], $this->link).'\' AND '.(($type_is_not xor $clause_not) ? 'NOT ' : '' ).$alias.'.`compare_one`=TRUE))';
 									break;
 								} elseif ($cur_value[1] === 0) {
 									$query_made = true;
 									if ( $cur_query )
 										$cur_query .= ($type_is_or ? ' OR ' : ' AND ');
 									$alias = $this->addDataAlias($data_aliases);
-									$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'(e.`guid`='.$alias.'.`guid` AND '.$alias.'.`name`=\''.mysql_real_escape_string($cur_value[0], $this->link).'\' AND '.$alias.'.`compare_zero`=TRUE)';
+									$cur_query .= '('.(($type_is_not xor $clause_not) ? 'NOT LOCATE(\','.mysql_real_escape_string($cur_value[0], $this->link).',\', e.`varlist`) OR ' : '' ).'(e.`guid`='.$alias.'.`guid` AND '.$alias.'.`name`=\''.mysql_real_escape_string($cur_value[0], $this->link).'\' AND '.(($type_is_not xor $clause_not) ? 'NOT ' : '' ).$alias.'.`compare_zero`=TRUE))';
 									break;
 								} elseif ($cur_value[1] === -1) {
 									$query_made = true;
 									if ( $cur_query )
 										$cur_query .= ($type_is_or ? ' OR ' : ' AND ');
 									$alias = $this->addDataAlias($data_aliases);
-									$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'(e.`guid`='.$alias.'.`guid` AND '.$alias.'.`name`=\''.mysql_real_escape_string($cur_value[0], $this->link).'\' AND '.$alias.'.`compare_negone`=TRUE)';
+									$cur_query .= '('.(($type_is_not xor $clause_not) ? 'NOT LOCATE(\','.mysql_real_escape_string($cur_value[0], $this->link).',\', e.`varlist`) OR ' : '' ).'(e.`guid`='.$alias.'.`guid` AND '.$alias.'.`name`=\''.mysql_real_escape_string($cur_value[0], $this->link).'\' AND '.(($type_is_not xor $clause_not) ? 'NOT ' : '' ).$alias.'.`compare_negone`=TRUE))';
 									break;
 								} elseif ($cur_value[1] === array()) {
 									$query_made = true;
 									if ( $cur_query )
 										$cur_query .= ($type_is_or ? ' OR ' : ' AND ');
 									$alias = $this->addDataAlias($data_aliases);
-									$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'(e.`guid`='.$alias.'.`guid` AND '.$alias.'.`name`=\''.mysql_real_escape_string($cur_value[0], $this->link).'\' AND '.$alias.'.`compare_emptyarray`=TRUE)';
+									$cur_query .= '('.(($type_is_not xor $clause_not) ? 'NOT LOCATE(\','.mysql_real_escape_string($cur_value[0], $this->link).',\', e.`varlist`) OR ' : '' ).'(e.`guid`='.$alias.'.`guid` AND '.$alias.'.`name`=\''.mysql_real_escape_string($cur_value[0], $this->link).'\' AND '.(($type_is_not xor $clause_not) ? 'NOT ' : '' ).$alias.'.`compare_emptyarray`=TRUE))';
 									break;
 								}
 							}
