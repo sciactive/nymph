@@ -76,7 +76,8 @@ class NymphDriverMySQL extends NymphDriver {
 	 */
 	public function disconnect() {
 		if ($this->connected) {
-			mysql_close($this->link);
+			if (is_resource($this->link))
+				mysql_close($this->link);
 			$this->connected = false;
 		}
 		return $this->connected;

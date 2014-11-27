@@ -25,6 +25,7 @@
 		"node_modules",
 		"bower_components",
 		"examples",
+		"testing",
 		"lib",
 		"vendor",
 		"composer.json"

@@ -17,8 +17,8 @@ return (object) array(
 	),
 	'use_plperl' => array(
 		'cname' => 'Use PL/Perl Functions',
-		'description' => '(Postgres only) This speeds up regular expression matching a lot, but requires the Perl Procedural Language to be installed on your Postgres server.',
-		'value' => true,
+		'description' => '(Postgres only) This speeds up PCRE regular expression matching ("match" criteria type) a lot, but requires the Perl Procedural Language to be installed on your Postgres server.',
+		'value' => false,
 	),
 	'cache' => array(
 		'cname' => 'Cache Entities',

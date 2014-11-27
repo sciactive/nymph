@@ -34,8 +34,8 @@ class NymphDriverPostgreSQL extends NymphDriver {
 	 * Load the entity manager.
 	 */
 	public function __construct($NymphConfig) {
-		$this->usePLPerl = $this->config->use_plperl['value'];
 		parent::__construct($NymphConfig);
+		$this->usePLPerl = $this->config->use_plperl['value'];
 	}
 
 	/**
@@ -92,7 +92,8 @@ class NymphDriverPostgreSQL extends NymphDriver {
 	 */
 	public function disconnect() {
 		if ($this->connected) {
-			pg_close($this->link);
+			if (is_resource($this->link))
+				pg_close($this->link);
 			$this->connected = false;
 		}
 		return $this->connected;

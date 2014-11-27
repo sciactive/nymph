@@ -1,0 +1,6 @@
+#!/bin/bash
+
+./run-mysql
+echo -e "\n\n"
+./run-postgresql
+
