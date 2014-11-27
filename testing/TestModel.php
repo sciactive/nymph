@@ -2,8 +2,15 @@
 // This file is a test class that extends the Entity class.
 
 /**
- * @property string $string A string value
- * @property bool $done Whether it's done.
+ * @property string $name A string.
+ * @property null $null A null.
+ * @property string $string A string.
+ * @property array $array An string.
+ * @property string $match A string.
+ * @property integer $number A number.
+ * @property bool $boolean A boolean.
+ * @property TestModel $reference A TestModel.
+ * @property array $ref_array An array.
  */
 class TestModel extends Entity {
 	const etype = 'test_model';
