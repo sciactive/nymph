@@ -100,6 +100,29 @@ class EntityClassTest extends PHPUnit_Framework_TestCase {
 	/**
 	 * @depends testAssignment
 	 */
+	public function testRefresh($arr) {
+		$testEntity = $arr['entity'];
+
+		$testEntity->null = true;
+		$this->assertTrue($testEntity->null);
+		$this->assertTrue($testEntity->refresh());
+		$this->assertNull($testEntity->null);
+	}
+
+	/**
+	 * @depends testAssignment
+	 */
+	public function testToReference($arr) {
+		$testEntity = $arr['entity'];
+
+		$reference = $testEntity->toReference();
+
+		$this->assertEquals(array('nymph_entity_reference', $testEntity->guid, 'TestModel'), $reference);
+	}
+
+	/**
+	 * @depends testAssignment
+	 */
 	public function testTags($arr) {
 		$testEntity = $arr['entity'];
 
