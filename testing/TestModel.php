@@ -14,9 +14,10 @@
  */
 class TestModel extends Entity {
 	const etype = 'test_model';
-	protected $whitelistData = array('string', 'boolean');
-	protected $protectedTags = array('test');
-	protected $whitelistTags = array();
+	protected $privateData = array('boolean');
+	protected $whitelistData = array('string', 'array', 'mdate');
+	protected $protectedTags = array('test', 'notag');
+	protected $whitelistTags = array('newtag');
 
 	public function __construct($id = 0) {
 		$this->addTag('test');
@@ -32,5 +33,10 @@ class TestModel extends Entity {
 		elseif ($type == 'types')
 			return 'tests';
 		return null;
+	}
+
+	public function useProtectedData() {
+		$this->whitelistData = false;
+		$this->protectedData = array('number');
 	}
 }

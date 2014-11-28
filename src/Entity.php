@@ -550,13 +550,13 @@ class Entity implements EntityInterface {
 		if ($this->info('image'))
 			$object->info['image'] = $this->info('image');
 		$object->data = array();
-		foreach ($this->data as $key => $val) {
+		foreach ($this->getData() as $key => $val) {
 			if ($key !== 'cdate' && $key !== 'mdate' && !in_array($key, $this->privateData))
 				$object->data[$key] = $val;
 		}
 		foreach ($this->sdata as $key => $val) {
 			if ($key !== 'cdate' && $key !== 'mdate' && !in_array($key, $this->privateData))
-				$object->data[$key] = $this->$key;
+				$object->data[$key] = unserialize($val);
 		}
 		$object->class = get_class($this);
 		return $object;

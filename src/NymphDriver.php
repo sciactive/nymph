@@ -176,6 +176,8 @@ class NymphDriver implements NymphDriverInterface {
 						// This makes entities go to the end of the child list.
 						$cur_ancestor = $cur_entity->$parentProperty;
 						while (isset($cur_ancestor)) {
+							if (!isset($child_counter[$cur_ancestor->guid]))
+								$child_counter[$cur_ancestor->guid] = 0;
 							$child_counter[$cur_ancestor->guid]++;
 							$cur_ancestor = $cur_ancestor->$parentProperty;
 						}
