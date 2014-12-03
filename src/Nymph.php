@@ -3,7 +3,7 @@
  * Nymph
  *
  * An object relational mapper with PHP and JavaScript interfaces. Written by
- * Hunter Perrin for 2be.io.
+ * Hunter Perrin for SciActive.
  *
  * @package Nymph
  * @license http://www.gnu.org/licenses/lgpl.html

@@ -43,6 +43,6 @@ The technical documentation on the wiki is accessible through the [Technical Doc
 
 There are several ways to contact the Nymph developers with your questions, concerns, comments, bug reports, or feature requests.
 
-- Nymph is part of [2be on Twitter](http://twitter.com/2be_io).
+- Nymph is part of [SciActive on Twitter](http://twitter.com/SciActive).
 - Bug reports, questions, and feature requests can be filed at the [issues page](https://github.com/sciactive/nymph/issues).
 - You can directly [email Hunter Perrin](mailto:hunter@sciactive.com), the creator of Nymph.
