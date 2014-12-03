@@ -104,12 +104,39 @@ This one's zip code is 92064.";
 		// Retrieving entity by GUID and tags...
 		$resultEntity = $nymph->getEntity(
 				array('class' => 'TestModel'),
-				array('&',
-					'guid' => $testEntity->guid,
-					'tag' => 'test'
-				)
+				array('&', 'guid' => $testEntity->guid, 'tag' => 'test')
 			);
 		$this->assertTrue($testEntity->is($resultEntity));
+	}
+
+	/**
+	 * @depends testCreateEntity
+	 */
+	public function testOrSelector($arr) {
+		$nymph = $arr['nymph'];
+		$testEntity = $arr['entity'];
+
+		// Retrieving entity by GUID and tags...
+		$resultEntity = $nymph->getEntity(
+				array('class' => 'TestModel'),
+				array('|', 'guid' => array($testEntity->guid, $testEntity->guid % 1000 + 1))
+			);
+		$this->assertTrue($testEntity->is($resultEntity));
+	}
+
+	/**
+	 * @depends testCreateEntity
+	 */
+	public function testWrongOrSelector($arr) {
+		$nymph = $arr['nymph'];
+		$testEntity = $arr['entity'];
+
+		// Retrieving entity by GUID and tags...
+		$resultEntity = $nymph->getEntity(
+				array('class' => 'TestModel'),
+				array('|', 'guid' => array($testEntity->guid % 1000 + 1, $testEntity->guid % 1000 + 2))
+			);
+		$this->assertFalse($testEntity->is($resultEntity));
 	}
 
 	/**
@@ -122,10 +149,7 @@ This one's zip code is 92064.";
 		// Retrieving entity by !GUID...
 		$resultEntity = $nymph->getEntities(
 				array('class' => 'TestModel'),
-				array('&',
-					'!guid' => ($testEntity->guid + 1),
-					'tag' => 'test'
-				)
+				array('&', '!guid' => ($testEntity->guid + 1), 'tag' => 'test')
 			);
 		$this->assertTrue($testEntity->inArray($resultEntity));
 	}
@@ -140,10 +164,7 @@ This one's zip code is 92064.";
 		// Retrieving entity by !tags...
 		$resultEntity = $nymph->getEntities(
 				array('class' => 'TestModel'),
-				array('&',
-					'guid' => $testEntity->guid,
-					'!tag' => array('barbecue', 'pickles')
-				)
+				array('&', 'guid' => $testEntity->guid, '!tag' => array('barbecue', 'pickles'))
 			);
 		$this->assertTrue($testEntity->inArray($resultEntity));
 	}
@@ -158,10 +179,7 @@ This one's zip code is 92064.";
 		// Testing GUID and wrong tags...
 		$resultEntity = $nymph->getEntity(
 				array('class' => 'TestModel'),
-				array('&',
-					'guid' => $testEntity->guid,
-					'tag' => array('pickles')
-				)
+				array('&', 'guid' => $testEntity->guid, 'tag' => array('pickles'))
 			);
 		$this->assertEmpty($resultEntity);
 	}
@@ -176,9 +194,7 @@ This one's zip code is 92064.";
 		// Retrieving entity by tags...
 		$resultEntity = $nymph->getEntities(
 				array('class' => 'TestModel'),
-				array('&',
-					'tag' => 'test'
-				)
+				array('&', 'tag' => 'test')
 			);
 		$this->assertTrue($testEntity->inArray($resultEntity));
 	}
@@ -193,9 +209,7 @@ This one's zip code is 92064.";
 		// Testing wrong tags...
 		$resultEntity = $nymph->getEntities(
 				array('class' => 'TestModel'),
-				array('&',
-					'tag' => 'pickles'
-				)
+				array('&', 'tag' => 'pickles')
 			);
 		$this->assertFalse($testEntity->inArray($resultEntity));
 	}
@@ -210,9 +224,7 @@ This one's zip code is 92064.";
 		// Retrieving entity by tags inclusively...
 		$resultEntity = $nymph->getEntities(
 				array('class' => 'TestModel'),
-				array('|',
-					'tag' => array('pickles', 'test', 'barbecue')
-				)
+				array('|', 'tag' => array('pickles', 'test', 'barbecue'))
 			);
 		$this->assertTrue($testEntity->inArray($resultEntity));
 	}
