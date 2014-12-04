@@ -1,5 +1,5 @@
-Nymph Sudoku
-============
+Nymph Sudoku Example App
+========================
 
 A Sudoku game, using Angular for UI and Nymph to save games.
 

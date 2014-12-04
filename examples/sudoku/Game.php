@@ -46,28 +46,6 @@ class Game extends Entity {
 		return null;
 	}
 
-	public function save() {
-		// Do some validation.
-		$this->tags = array('game');
-		$allVars = array_merge(array_keys($this->data), array_keys($this->sdata));
-		$allowedVars = array(
-			'name',
-			'cdate',
-			'mdate',
-			'difficulty',
-			'board',
-			'solvedBoard',
-			'playBoard',
-			'time',
-			'done',
-		);
-		$diff = array_diff($allVars, $allowedVars);
-		if ($diff) {
-			throw new EntityInvalidDataException();
-		}
-		return parent::save();
-	}
-
 	public function generateBoard() {
 		// Since we know there's nothing on the board, we can at least fill in
 		// one row randomly.
