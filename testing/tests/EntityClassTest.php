@@ -112,6 +112,27 @@ class EntityClassTest extends PHPUnit_Framework_TestCase {
 	/**
 	 * @depends testAssignment
 	 */
+	public function testUpdateRefresh($arr) {
+		$testEntity = $arr['entity'];
+
+		$this->assertSame('test', $testEntity->string);
+		$testEntity->string = 'updated';
+		$this->assertTrue($testEntity->save());
+		$testEntity->refresh();
+		$this->assertTrue($testEntity->save());
+
+		$retrieve = TestModel::factory($testEntity->guid);
+		$this->assertSame('updated', $retrieve->string);
+		$testEntity->string = 'test';
+		$this->assertTrue($testEntity->save());
+
+		$testEntity->refresh();
+		$this->assertSame('test', $testEntity->string);
+	}
+
+	/**
+	 * @depends testAssignment
+	 */
 	public function testToReference($arr) {
 		$testEntity = $arr['entity'];
 

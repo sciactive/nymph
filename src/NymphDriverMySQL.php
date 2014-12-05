@@ -1260,7 +1260,7 @@ class NymphDriverMySQL extends NymphDriver {
 				preg_match_all('/a:3:\{i:0;s:22:"nymph_entity_reference";i:1;i:(\d+);/', $value, $references, PREG_PATTERN_ORDER);
 				$uvalue = unserialize($value);
 				$values[] = sprintf('(%u, \'%s\', \'%s\', \'%s\', %s, %s, %s, %s, %s, %s)',
-					$new_id,
+					(int) $entity->guid,
 					mysql_real_escape_string($name, $this->link),
 					mysql_real_escape_string($value, $this->link),
 					mysql_real_escape_string(','.implode(',', $references[1]).',', $this->link),
