@@ -4,20 +4,20 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "14727ec4314b8cb321d2812c5aec8806",
+    "hash": "ea6defb3fe421da35ab465b9f25229be",
     "packages": [
         {
             "name": "sciactive/requirephp",
-            "version": "1.1.1",
+            "version": "1.1.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sciactive/requirephp.git",
-                "reference": "21f8c2c4f4cfa4b58afb0d153845a30e3449897a"
+                "reference": "04f4f6ff46afe04e197a0430d6968c8dfb2c5ae2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sciactive/requirephp/zipball/21f8c2c4f4cfa4b58afb0d153845a30e3449897a",
-                "reference": "21f8c2c4f4cfa4b58afb0d153845a30e3449897a",
+                "url": "https://api.github.com/repos/sciactive/requirephp/zipball/04f4f6ff46afe04e197a0430d6968c8dfb2c5ae2",
+                "reference": "04f4f6ff46afe04e197a0430d6968c8dfb2c5ae2",
                 "shasum": ""
             },
             "type": "library",
