@@ -714,6 +714,7 @@ class Entity implements EntityInterface {
 		$refresh = RPHP::_('Nymph')->getEntity(array('class' => get_class($this)), array('&', 'guid' => $this->guid));
 		if (!isset($refresh))
 			return 0;
+		$this->clearCache();
 		$this->tags = $refresh->tags;
 		$this->putData($refresh->getData(), $refresh->getSData());
 		return true;
