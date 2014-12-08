@@ -12,6 +12,8 @@ The pain of binding your models to your HTML was relieved with frontend librarie
 
 Nymph also frees you from lots of database maintenance. There's no need to run a migration script every time you add a property to one of your objects. Nymph is flexible and automatic with object data. Never switching out of an Object Oriented context makes coding a lot easier and a lot more fun. Less time spent crafting databases means more time spent building useful applications.
 
+Nymph's query language is a ["BTSQL" language](http://nymph.io/#better-than-sql).
+
 ## History
 
 Nymph started in 2009, as part of the Pines PHP framework. After years of only residing in that project, in August 2014, it was ripped out and made into its own project. To make it more useful, the JavaScript half was written. Now Nymph is a mature, well tested product.
