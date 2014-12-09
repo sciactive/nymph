@@ -41,9 +41,9 @@ For a step by step guide to setting up Nymph on your own server, visit the [Setu
 
 The technical documentation on the wiki is accessible through the [Technical Documentation Index](https://github.com/sciactive/nymph/wiki/Technical-Documentation).
 
-## Contacting the Developers
+## Contacting the Developer
 
-There are several ways to contact the Nymph developers with your questions, concerns, comments, bug reports, or feature requests.
+There are several ways to contact Nymph's developer with your questions, concerns, comments, bug reports, or feature requests.
 
 - Nymph is part of [SciActive on Twitter](http://twitter.com/SciActive).
 - Bug reports, questions, and feature requests can be filed at the [issues page](https://github.com/sciactive/nymph/issues).
