@@ -73,9 +73,8 @@ angular.module('todoApp', []).controller('TodoController', ['$scope', function($
 		Nymph.deleteEntities(todos).then(function(){
 			$scope.getTodos(false);
 		}, function(errObj){
-			$scope.todos = [];
-			$scope.$apply();
-			alert("Error: "+errObj.textStatus+"\nCouldn't delete.");
+			$scope.getTodos(true);
+			alert("Error: "+errObj.textStatus+"\nCouldn't delete all todos.");
 		});
 	};
 }]);
