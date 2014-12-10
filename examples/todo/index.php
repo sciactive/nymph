@@ -38,20 +38,35 @@ require '../../lib/require.php';
 			<div class="row">
 				<div class="col-lg-8">
 					<div class="page-header">
-						<h2>Todo</h2>
+						<h2>Todo List</h2>
 					</div>
 					<div class="row">
 						<div class="col-sm-8">
 							<div class="list-group" style="clear: both;">
 								<label ng-repeat="todo in todos" class="list-group-item list-group-item-{{todo.data.done ? 'success' : 'warning'}}">
-									<input type="checkbox" ng-model="todo.data.done" ng-change="save(todo)">
+									<input ng-if="!showArchived" type="checkbox" ng-model="todo.data.done" ng-change="save(todo)">
 									<span class="done-{{todo.data.done}}">{{todo.data.name}}</span>
 								</label>
 							</div>
 						</div>
-						<div ng-show="todos.length > 0" class="col-sm-4" style="text-align: center; margin-bottom: 1em;">
-							<small class="alert alert-info" style="display: block;">{{remaining()}} of {{todos.length}} remaining [ <a href="" ng-click="archive()">archive</a> ]</small>
-							<div ng-show="todos.length > 1" style="text-align: left;">
+						<div class="col-sm-4" style="text-align: center; margin-bottom: 1em;">
+							<small class="alert alert-info" style="display: block;">
+								<span ng-if="!showArchived">
+									<span ng-if="todos.length > 0">{{remaining()}} of {{todos.length}} remaining</span>
+									<span ng-if="todos.length == 0">0 todos</span>
+								</span>
+								<span ng-if="showArchived">{{todos.length}} archived todos</span>
+								<span ng-if="todos.length > 0">
+									[
+									<a href="javascript:void()" ng-if="!showArchived" ng-click="archive()">archive</a>
+									<a href="javascript:void()" ng-if="showArchived" ng-click="delete()">delete</a>
+									]
+								</span>
+								<br>
+								<a href="javascript:void()" ng-click="getTodos(true);" ng-if="!showArchived">show archived</a>
+								<a href="javascript:void()" ng-click="getTodos(false);" ng-if="showArchived">show current</a>
+							</small>
+							<div ng-if="todos.length > 1" style="text-align: left;">
 								Sort: <br>
 								<label style="font-weight: normal;">
 									<input type="radio" ng-model="sort" ng-change="sortTodos()" name="sort" value="name"> Alpha</label>

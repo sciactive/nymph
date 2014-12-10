@@ -1,15 +1,21 @@
 angular.module('todoApp', []).controller('TodoController', ['$scope', function($scope) {
 	$scope.todos = [];
 	$scope.sort = 'name';
-	Nymph.getEntities({"class": 'Todo'}, {"type": '&', "tag": 'todo', "!tag": 'archived'}).then(function(todos){
-		if (todos && todos.length) {
-			Nymph.sort(todos, $scope.sort);
-			$scope.todos = todos;
-			$scope.$apply();
-		}
-	});
+	$scope.showArchived = false;
 
-	$scope.addTodo = function() {
+	$scope.getTodos = function(archived){
+		Nymph.getEntities({"class": 'Todo'}, {"type": archived ? '&' : '!&', "tag": 'archived'}).then(function(todos){
+			$scope.showArchived = archived;
+			if (todos) {
+				Nymph.sort(todos, $scope.sort);
+				$scope.todos = todos;
+			}
+			$scope.$apply();
+		});
+	};
+	$scope.getTodos(false);
+
+	$scope.addTodo = function(){
 		if (typeof $scope.todoText === 'undefined' || $scope.todoText === '')
 			return;
 		var todo = new Todo();
@@ -24,29 +30,29 @@ angular.module('todoApp', []).controller('TodoController', ['$scope', function($
 		});
 	};
 
-	$scope.sortTodos = function() {
+	$scope.sortTodos = function(){
 		$scope.todos = Nymph.sort($scope.todos, $scope.sort);
 		$scope.$apply();
 	};
 
-	$scope.save = function(todo) {
+	$scope.save = function(todo){
 		todo.save().then(null, function(errObj){
 			alert('Error: '+errObj.textStatus);
 		});
 	};
 
-	$scope.remaining = function() {
+	$scope.remaining = function(){
 		var count = 0;
-		angular.forEach($scope.todos, function(todo) {
+		angular.forEach($scope.todos, function(todo){
 			count += todo.get('done') ? 0 : 1;
 		});
 		return count;
 	};
 
-	$scope.archive = function() {
+	$scope.archive = function(){
 		var oldTodos = $scope.todos;
 		$scope.todos = [];
-		angular.forEach(oldTodos, function(todo) {
+		angular.forEach(oldTodos, function(todo){
 			if (todo.get('done')) {
 				todo.archive().then(function(success){
 					if (!success)
@@ -58,5 +64,18 @@ angular.module('todoApp', []).controller('TodoController', ['$scope', function($
 				$scope.todos.push(todo);
 			}
 		});
+	};
+
+	$scope.delete = function(){
+		var todos = $scope.todos;
+		$scope.todos = [];
+		Nymph.deleteEntities(todos).then(function(){
+			$scope.getTodos(false);
+		}, function(errObj){
+			$scope.todos = [];
+			$scope.$apply();
+			alert("Error: "+errObj.textStatus+"\nCouldn't delete.");
+		});
+		$scope.$apply();
 	};
 }]);

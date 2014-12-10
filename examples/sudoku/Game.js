@@ -10,7 +10,6 @@
 }(function(Entity){
 	Game = function(id){
 		this.constructor.call(this, id);
-		this.addTag('game');
 		this.data.difficulty = 1;
 		this.data.board = [
 			[], [], [], [], [], [], [], [], []

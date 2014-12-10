@@ -9,11 +9,10 @@ class Todo extends Entity {
 	const etype = 'todo';
 	protected $clientEnabledMethods = array('archive');
 	protected $whitelistData = array('name', 'done');
-	protected $protectedTags = array('todo', 'archived');
+	protected $protectedTags = array('archived');
 	protected $whitelistTags = array();
 
 	public function __construct($id = 0) {
-		$this->addTag('todo');
 		$this->done = false;
 		parent::__construct($id);
 	}

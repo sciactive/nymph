@@ -19,7 +19,7 @@ angular.module('sudokuApp', []).controller('SudokuController', ['$scope', '$inte
 		return (new Date(time*1000)).toLocaleString();
 	};
 
-	Nymph.getEntities({"class": 'Game'}, {"type": '&', "tag": 'game'}).then(function(games){
+	Nymph.getEntities({"class": 'Game'}).then(function(games){
 		if (games && games.length) {
 			Nymph.sort(games, $scope.uiState.sort);
 			$scope.uiState.games = games;

@@ -10,13 +10,11 @@
  */
 class Game extends Entity {
 	const etype = 'game';
-	protected $protectedTags = array('game');
 	protected $whitelistTags = array();
 	protected $whitelistData = array('name', 'difficulty', 'board', 'solvedBoard', 'playBoard', 'time', 'done');
 	protected $clientEnabledMethods = array('generateBoard', 'makeItFun');
 
 	public function __construct($id = 0) {
-		$this->addTag('game');
 		$this->difficulty = 1;
 		// In the board, if a value is an integer, that means it was preset by
 		// the game. If it's a string, that means it was provided by the user.

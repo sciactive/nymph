@@ -11,7 +11,6 @@
 }(function(Entity){
 	Todo = function(id){
 		this.constructor.call(this, id);
-		this.addTag('todo');
 		this.data.done = false;
 	};
 	Todo.prototype = new Entity();
