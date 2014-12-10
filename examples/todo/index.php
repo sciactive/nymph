@@ -58,13 +58,13 @@ require '../../lib/require.php';
 								<span ng-if="uiState.showArchived">{{todos.length}} archived todos</span>
 								<span ng-if="todos.length > 0">
 									[
-									<a href="javascript:void()" ng-if="!uiState.showArchived" ng-click="archive()">archive</a>
-									<a href="javascript:void()" ng-if="uiState.showArchived" ng-click="delete()">delete</a>
+									<a href="javascript:void(0)" ng-if="!uiState.showArchived" ng-click="archive()">archive</a>
+									<a href="javascript:void(0)" ng-if="uiState.showArchived" ng-click="delete()">delete</a>
 									]
 								</span>
 								<br>
-								<a href="javascript:void()" ng-click="getTodos(true);" ng-if="!uiState.showArchived">show archived</a>
-								<a href="javascript:void()" ng-click="getTodos(false);" ng-if="uiState.showArchived">show current</a>
+								<a href="javascript:void(0)" ng-click="getTodos(true);" ng-if="!uiState.showArchived">show archived</a>
+								<a href="javascript:void(0)" ng-click="getTodos(false);" ng-if="uiState.showArchived">show current</a>
 							</small>
 							<div ng-if="todos.length > 1" style="text-align: left;">
 								Sort: <br>
