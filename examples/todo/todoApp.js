@@ -1,13 +1,15 @@
 angular.module('todoApp', []).controller('TodoController', ['$scope', function($scope) {
 	$scope.todos = [];
-	$scope.sort = 'name';
-	$scope.showArchived = false;
+	$scope.uiState = {
+		'sort': 'name',
+		'showArchived': false
+	};
 
 	$scope.getTodos = function(archived){
 		Nymph.getEntities({"class": 'Todo'}, {"type": archived ? '&' : '!&', "tag": 'archived'}).then(function(todos){
-			$scope.showArchived = archived;
+			$scope.uiState.showArchived = archived;
 			if (todos) {
-				Nymph.sort(todos, $scope.sort);
+				Nymph.sort(todos, $scope.uiState.sort);
 				$scope.todos = todos;
 			}
 			$scope.$apply();
@@ -23,7 +25,7 @@ angular.module('todoApp', []).controller('TodoController', ['$scope', function($
 		todo.save().then(function(todo){
 			$scope.todos.push(todo);
 			$scope.todoText = '';
-			$scope.todos = Nymph.sort($scope.todos, $scope.sort);
+			$scope.todos = Nymph.sort($scope.todos, $scope.uiState.sort);
 			$scope.$apply();
 		}, function(errObj){
 			alert("Error: "+errObj.textStatus);
@@ -31,8 +33,7 @@ angular.module('todoApp', []).controller('TodoController', ['$scope', function($
 	};
 
 	$scope.sortTodos = function(){
-		$scope.todos = Nymph.sort($scope.todos, $scope.sort);
-		$scope.$apply();
+		$scope.todos = Nymph.sort($scope.todos, $scope.uiState.sort);
 	};
 
 	$scope.save = function(todo){
@@ -76,6 +77,5 @@ angular.module('todoApp', []).controller('TodoController', ['$scope', function($
 			$scope.$apply();
 			alert("Error: "+errObj.textStatus+"\nCouldn't delete.");
 		});
-		$scope.$apply();
 	};
 }]);
