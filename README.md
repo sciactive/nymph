@@ -89,6 +89,10 @@ For a step by step guide to setting up Nymph on your own server, visit the [Setu
 
 The technical documentation on the wiki is accessible through the [Technical Documentation Index](https://github.com/sciactive/nymph/wiki/Technical-Documentation).
 
+## What's Next
+
+Up next are two projects. The first is a user access control system for Nymph. It will allow you to restrict what entities a user, or group of users, has access to. It will include a user and group entity class, and have methods for managing these. It will soon be available at [tilmeld.org](http://tilmeld.org/). The second is a set of Angular directives you can use to easily create forms for Nymph entities. It has already been started, and can be found at [https://github.com/sciactive/nymph-directives](https://github.com/sciactive/nymph-directives).
+
 ## Contacting the Developer
 
 There are several ways to contact Nymph's developer with your questions, concerns, comments, bug reports, or feature requests.
