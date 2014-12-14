@@ -2,9 +2,7 @@
 
 Nymph is an ORM that is simple to use in both JavaScript and PHP.
 
-## Nymph Query Language is BTSQL
-
-I like to think of [Nymph's query language](https://github.com/sciactive/nymph/wiki/Entity-Querying) as a BTSQL (Better Than SQL) language, but you can decide for yourself:
+## Nymph Query Language vs Just SQL
 
 #### Nymph Query from Frontend
 
