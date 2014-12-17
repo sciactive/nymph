@@ -1292,8 +1292,23 @@ class NymphDriverPostgreSQL extends NymphDriver {
 				$query = sprintf("SELECT \"guid\" FROM \"%sguids\" WHERE \"guid\"=%u;",
 					$this->config->PostgreSQL->prefix['value'],
 					$new_id);
-				if ( !($result = pg_query($this->link, $query)) ) {
+				if ( !(@pg_send_query($this->link, $query)) ) {
 					throw new NymphQueryFailedException('Query failed: ' . pg_last_error(), 0, null, $query);
+				}
+				if ( !($result = @pg_get_result($this->link)) ) {
+					throw new NymphQueryFailedException('Query failed: ' . pg_last_error(), 0, null, $query);
+				}
+				if ($error = pg_result_error_field($result, PGSQL_DIAG_SQLSTATE)) {
+					// If the tables don't exist yet, create them.
+					if ($error == '42P01' && $this->createTables()) {
+						if (isset($etype_dirty))
+							$this->createTables($etype_dirty);
+						if ( !($result = @pg_query($this->link, $query)) ) {
+							throw new NymphQueryFailedException('Query failed: ' . pg_last_error(), 0, null, $query);
+						}
+					} else {
+						throw new NymphQueryFailedException('Query failed: ' . pg_last_error(), 0, null, $query);
+					}
 				}
 				$row = pg_fetch_row($result);
 				pg_free_result($result);
