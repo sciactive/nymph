@@ -1,5 +1,7 @@
 # <img alt="logo" src="https://raw.githubusercontent.com/sciactive/2be-extras/master/logo/product-icon-40-bw.png" align="top" /> Nymph - a PHP and JS ORM
 
+[![Build Status](https://travis-ci.org/sciactive/nymph.svg?branch=master)](http://travis-ci.org/sciactive/nymph)
+
 Nymph is an ORM that is simple to use in both JavaScript and PHP.
 
 ## Nymph Query Language vs Just SQL

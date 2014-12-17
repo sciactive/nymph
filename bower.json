@@ -22,6 +22,7 @@
 	"license": "LGPL",
 	"ignore": [
 		"**/.*",
+		".travis.yml",
 		"node_modules",
 		"bower_components",
 		"examples",
