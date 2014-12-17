@@ -1144,8 +1144,17 @@ class NymphDriverMySQL extends NymphDriver {
 				$query = sprintf("SELECT `guid` FROM `%sguids` WHERE `guid`='%u';",
 					$this->config->MySQL->prefix['value'],
 					$new_id);
-				if ( !($result = mysql_query($query, $this->link)) ) {
-					throw new NymphQueryFailedException('Query failed: ' . mysql_errno() . ': ' . mysql_error(), 0, null, $query);
+				if ( !($result = @mysql_query($query, $this->link)) ) {
+					// If the tables don't exist yet, create them.
+					if (mysql_errno() == 1146 && $this->createTables()) {
+						if (isset($etype_dirty))
+							$this->createTables($etype_dirty);
+						if ( !($result = @mysql_query($query, $this->link)) ) {
+							throw new NymphQueryFailedException('Query failed: ' . mysql_errno() . ': ' . mysql_error(), 0, null, $query);
+						}
+					} else {
+						throw new NymphQueryFailedException('Query failed: ' . mysql_errno() . ': ' . mysql_error(), 0, null, $query);
+					}
 				}
 				$row = mysql_fetch_row($result);
 				mysql_free_result($result);
