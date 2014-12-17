@@ -13,7 +13,7 @@ env:
 matrix:
   exclude:
     - php: hhvm
-      env: DB=pgsql
+      env: DB=pgsql DATABASE_URL=postgres://postgres@localhost:5432/nymph_testing
 
 mysql:
   database: nymph_testing
