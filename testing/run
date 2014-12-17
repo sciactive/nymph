@@ -4,7 +4,13 @@ set -e
 
 cd $(dirname $0)
 
-./run-mysql
-echo -e "\n\n"
-./run-postgresql
+if [[ "$DB" == "" || "$DB" == "mysql" ]]; then
+	./run-mysql
+fi
+if [[ "$DB" == "" ]]; then
+	echo -e "\n\n"
+fi
+if [[ "$DB" == "" || "$DB" == "pgsql" ]]; then
+	./run-postgresql
+fi
 
