@@ -10,6 +10,11 @@ env:
   - DB=mysql DATABASE_URL=mysql://root@localhost:3306/nymph_testing
   - DB=pgsql DATABASE_URL=postgres://postgres@localhost:5432/nymph_testing
 
+matrix:
+  exclude:
+    - php: hhvm
+      env: DB=pgsql
+
 mysql:
   database: nymph_testing
   user: nymph_testing
