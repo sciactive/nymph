@@ -23,6 +23,7 @@ before_script:
   - if [[ "$DB" == "pgsql" ]]; then psql -c "CREATE USER nymph_testing WITH PASSWORD 'password';" -U postgres; fi
   - if [[ "$DB" == "pgsql" ]]; then psql -c "CREATE DATABASE nymph_testing WITH OWNER=nymph_testing;" -U postgres; fi
   - if [[ "$DB" == "mysql" ]]; then mysql -e "DROP DATABASE IF EXISTS nymph_testing;" -uroot; fi
+  - if [[ "$DB" == "mysql" ]]; then mysql -e "GRANT USAGE ON *.* TO 'nymph_testing'@'localhost';" -uroot; fi
   - if [[ "$DB" == "mysql" ]]; then mysql -e "DROP USER 'nymph_testing'@'localhost';" -uroot; fi
   - if [[ "$DB" == "mysql" ]]; then mysql -e "CREATE USER 'nymph_testing'@'localhost' IDENTIFIED BY 'password';" -uroot; fi
   - if [[ "$DB" == "mysql" ]]; then mysql -e "CREATE DATABASE nymph_testing;" -uroot; fi
