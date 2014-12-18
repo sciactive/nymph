@@ -4,4 +4,4 @@ echo "##########################################################################
 echo "#                         Running tests for PostgreSQL                         #"
 echo -e "################################################################################\n"
 
-phpunit --bootstrap bootstrapPostgreSQL.php tests
+phpunit --bootstrap bootstrapPostgreSQL.php

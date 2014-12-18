@@ -73,10 +73,11 @@ This one's zip code is 92064.";
 
 		// Testing wrong GUID...
 		$resultEntity = $nymph->getEntity(array('class' => 'TestModel'), $testEntity->guid + 1);
-		if (!empty($resultEntity))
+		if (!empty($resultEntity)) {
 			$this->assertTrue(!$testEntity->is($resultEntity));
-		else
+		} else {
 			$this->assertNull($resultEntity);
+		}
 	}
 
 	/**
@@ -827,7 +828,6 @@ This one's zip code is 92064.";
 	 * @depends testCreateEntity
 	 */
 	public function testReferences($arr) {
-		$nymph = $arr['nymph'];
 		$testEntity = $arr['entity'];
 
 		// Testing referenced entities...
@@ -1007,7 +1007,6 @@ This one's zip code is 92064.";
 	 * @depends testCreateEntity
 	 */
 	public function testDeleteReference($arr) {
-		$nymph = $arr['nymph'];
 		$testEntity = $arr['entity'];
 
 		// Deleting referenced entities...
@@ -1022,8 +1021,14 @@ This one's zip code is 92064.";
 		$nymph = $arr['nymph'];
 		$testEntity = $arr['entity'];
 
+		$guid = $testEntity->guid;
+
 		// Deleting entity...
 		$this->assertTrue($testEntity->delete());
 		$this->assertNull($testEntity->guid);
+
+		$entity = $nymph->getEntity(array('class' => 'TestModel'), array('&', 'guid' => $guid));
+
+		$this->assertNull($entity);
 	}
 }

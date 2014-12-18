@@ -12,21 +12,19 @@
  * @link http://sciactive.com/
  */
 
-define('NYMPH_VERSION', '1.0.0');
-
 RPHP::_('Nymph', array('NymphConfig'), function($NymphConfig){
-	require(dirname(__FILE__).DIRECTORY_SEPARATOR.'Interfaces.php');
-	require(dirname(__FILE__).DIRECTORY_SEPARATOR.'Exceptions.php');
-	require(dirname(__FILE__).DIRECTORY_SEPARATOR.'Entity.php');
-	require(dirname(__FILE__).DIRECTORY_SEPARATOR.'NymphDriver.php');
+	require_once(dirname(__FILE__).DIRECTORY_SEPARATOR.'Interfaces.php');
+	require_once(dirname(__FILE__).DIRECTORY_SEPARATOR.'Exceptions.php');
+	require_once(dirname(__FILE__).DIRECTORY_SEPARATOR.'Entity.php');
+	require_once(dirname(__FILE__).DIRECTORY_SEPARATOR.'NymphDriver.php');
 	$class = 'NymphDriver'.$NymphConfig->driver['value'];
-	require(dirname(__FILE__).DIRECTORY_SEPARATOR.$class.'.php');
+	require_once(dirname(__FILE__).DIRECTORY_SEPARATOR.$class.'.php');
 
 	$Nymph = new $class($NymphConfig);
 	return $Nymph;
 });
 RPHP::_('NymphREST', array('Nymph'), function($Nymph){
-	require(dirname(__FILE__).DIRECTORY_SEPARATOR.'NymphREST.php');
+	require_once(dirname(__FILE__).DIRECTORY_SEPARATOR.'NymphREST.php');
 
 	$NymphREST = new NymphREST();
 	return $NymphREST;

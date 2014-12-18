@@ -43,5 +43,8 @@
 	},
 	"require": {
 		"sciactive/requirephp": "~1.1"
+	},
+	"require-dev": {
+		"codeclimate/php-test-reporter": "dev-master"
 	}
 }

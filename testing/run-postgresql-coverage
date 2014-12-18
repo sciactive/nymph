@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo "################################################################################"
-echo "#                           Running tests for MySQL                            #"
+echo "#                         Running tests for PostgreSQL                         #"
 echo -e "################################################################################\n"
 
-phpunit --bootstrap bootstrapMySQL.php
+phpunit --coverage-clover logs/clover-pgsql.xml --bootstrap bootstrapPostgreSQL.php -c phpunit-pgsql.xml

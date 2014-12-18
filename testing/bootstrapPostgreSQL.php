@@ -1,8 +1,12 @@
 <?php
 
-require '../lib/require.php';
+require_once '../lib/require.php';
 
-require '../src/Nymph.php';
+RPHP::undef('NymphConfig');
+RPHP::undef('Nymph');
+
+include '../src/Nymph.php';
+
 RPHP::_('NymphConfig', array(), function(){
 	// Nymph's configuration.
 
@@ -27,4 +31,4 @@ RPHP::_('NymphConfig', array(), function(){
 
 $Nymph = RPHP::_('Nymph');
 
-require 'TestModel.php';
+require_once 'TestModel.php';

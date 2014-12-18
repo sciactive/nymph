@@ -2,15 +2,25 @@
 
 set -e
 
+echo "Running Nymph Testing"
+echo "Use \`run coverage\` to build coverage clover."
+echo
+
+if [[ "$1" == "coverage" ]]; then
+	CVG="-coverage"
+else
+	CVG=""
+fi
+
 cd $(dirname $0)
 
 if [[ "$DB" == "" || "$DB" == "mysql" ]]; then
-	./run-mysql
+	./run-mysql$CVG
 fi
 if [[ "$DB" == "" ]]; then
 	echo -e "\n\n"
 fi
 if [[ "$DB" == "" || "$DB" == "pgsql" ]]; then
-	./run-postgresql
+	./run-postgresql$CVG
 fi
 

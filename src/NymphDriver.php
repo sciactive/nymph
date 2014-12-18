@@ -17,6 +17,8 @@
  * @package Nymph
  */
 class NymphDriver implements NymphDriverInterface {
+	const VERSION = '1.0.0';
+
 	/**
 	 * Whether this instance is currently connected to a database.
 	 *
@@ -94,8 +96,9 @@ class NymphDriver implements NymphDriverInterface {
 	public function deleteEntity(&$entity) {
 		$class = get_class($entity);
 		$return = $this->deleteEntityByID($entity->guid, $class::etype);
-		if ( $return )
+		if ( $return ) {
 			$entity->guid = null;
+		}
 		return $return;
 	}
 
@@ -108,13 +111,15 @@ class NymphDriver implements NymphDriverInterface {
 	 * @access protected
 	 */
 	protected function entityReferenceSearch($value, $entity) {
-		if ((array) $value !== $value || !isset($entity))
+		if ((array) $value !== $value || !isset($entity)) {
 			throw new NymphInvalidParametersException();
+		}
 		// Get the GUID, if the passed $entity is an object.
 		if ((array) $entity === $entity) {
 			foreach($entity as &$cur_entity) {
-				if ((object) $cur_entity === $cur_entity)
+				if ((object) $cur_entity === $cur_entity) {
 					$cur_entity = $cur_entity->guid;
+				}
 			}
 			unset($cur_entity);
 		} elseif ((object) $entity === $entity) {
@@ -127,8 +132,9 @@ class NymphDriver implements NymphDriverInterface {
 		} else {
 			// Search through multidimensional arrays looking for the reference.
 			foreach ($value as $cur_value) {
-				if ($this->entityReferenceSearch($cur_value, $entity))
+				if ($this->entityReferenceSearch($cur_value, $entity)) {
 					return true;
+				}
 			}
 		}
 		return false;
@@ -137,22 +143,26 @@ class NymphDriver implements NymphDriverInterface {
 	public function getEntity() {
 		// Set up options and selectors.
 		$args = func_get_args();
-		if (!$args)
+		if (!$args) {
 			$args = array(array());
-		if ((array) $args[0] === $args[0] && ((int) $args[1] === $args[1] || is_numeric($args[1])))
+		}
+		if ((array) $args[0] === $args[0] && ((int) $args[1] === $args[1] || is_numeric($args[1]))) {
 			$args = array($args[0], array('&', 'guid' => (int) $args[1]));
+		}
 		$args[0]['limit'] = 1;
 		$entities = call_user_func_array(array($this, 'getEntities'), $args);
-		if (!$entities)
+		if (!$entities) {
 			return null;
+		}
 		return $entities[0];
 	}
 
 	public function hsort(&$array, $property = null, $parentProperty = null, $caseSensitive = false, $reverse = false) {
 		// First sort by the requested property.
 		$this->sort($array, $property, $caseSensitive, $reverse);
-		if (!isset($parentProperty))
+		if (!isset($parentProperty)) {
 			return;
+		}
 		// Now sort by children.
 		$new_array = array();
 		// Count the children.
@@ -176,8 +186,9 @@ class NymphDriver implements NymphDriverInterface {
 						// This makes entities go to the end of the child list.
 						$cur_ancestor = $cur_entity->$parentProperty;
 						while (isset($cur_ancestor)) {
-							if (!isset($child_counter[$cur_ancestor->guid]))
+							if (!isset($child_counter[$cur_ancestor->guid])) {
 								$child_counter[$cur_ancestor->guid] = 0;
+							}
 							$child_counter[$cur_ancestor->guid]++;
 							$cur_ancestor = $cur_ancestor->$parentProperty;
 						}
@@ -214,10 +225,11 @@ class NymphDriver implements NymphDriverInterface {
 			$this->sortProperty = $property;
 			$this->sortParent = $parentProperty;
 			$this->sortCaseSensitive = $caseSensitive;
-			@usort($array, array($this, 'sortProperty'));
+			\usort($array, array($this, 'sortProperty'));
 		}
-		if ($reverse)
+		if ($reverse) {
 			$array = array_reverse($array);
+		}
 	}
 
 	/**
@@ -230,11 +242,13 @@ class NymphDriver implements NymphDriverInterface {
 	 */
 	protected function pull_cache($guid, $class) {
 		// Increment the entity access count.
-		if (!isset($this->entityCount[$guid]))
+		if (!isset($this->entityCount[$guid])) {
 			$this->entityCount[$guid] = 0;
+		}
 		$this->entityCount[$guid]++;
-		if (isset($this->entityCache[$guid][$class]))
+		if (isset($this->entityCache[$guid][$class])) {
 			return (clone $this->entityCache[$guid][$class]);
+		}
 		return null;
 	}
 
@@ -246,15 +260,18 @@ class NymphDriver implements NymphDriverInterface {
 	 * @access protected
 	 */
 	protected function pushCache(&$entity, $class) {
-		if (!isset($entity->guid))
+		if (!isset($entity->guid)) {
 			return;
+		}
 		// Increment the entity access count.
-		if (!isset($this->entityCount[$entity->guid]))
+		if (!isset($this->entityCount[$entity->guid])) {
 			$this->entityCount[$entity->guid] = 0;
+		}
 		$this->entityCount[$entity->guid]++;
 		// Check the threshold.
-		if ($this->entityCount[$entity->guid] < $this->config->cache_threshold['value'])
+		if ($this->entityCount[$entity->guid] < $this->config->cache_threshold['value']) {
 			return;
+		}
 		// Cache the entity.
 		if ((array) $this->entityCache[$entity->guid] === $this->entityCache[$entity->guid]) {
 			$this->entityCache[$entity->guid][$class] = clone $entity;
@@ -263,12 +280,14 @@ class NymphDriver implements NymphDriverInterface {
 				// Find which entity has been accessed the least.
 				asort($this->entityCount);
 				foreach ($this->entityCount as $key => $val) {
-					if (isset($this->entityCache[$key]))
+					if (isset($this->entityCache[$key])) {
 						break;
+					}
 				}
 				// Remove it.
-				if (isset($this->entityCache[$key]))
+				if (isset($this->entityCache[$key])) {
 					unset($this->entityCache[$key]);
+				}
 			}
 			$this->entityCache[$entity->guid] = array($class => (clone $entity));
 		}
@@ -281,10 +300,11 @@ class NymphDriver implements NymphDriverInterface {
 			$this->sortProperty = $property;
 			$this->sortParent = null;
 			$this->sortCaseSensitive = $caseSensitive;
-			@usort($array, array($this, 'sortProperty'));
+			\usort($array, array($this, 'sortProperty'));
 		}
-		if ($reverse)
+		if ($reverse) {
 			$array = array_reverse($array);
+		}
 	}
 
 	/**
@@ -302,30 +322,38 @@ class NymphDriver implements NymphDriverInterface {
 			if (!$this->sortCaseSensitive && is_string($a->$parent->$property) && is_string($b->$parent->$property)) {
 				$aprop = strtoupper($a->$parent->$property);
 				$bprop = strtoupper($b->$parent->$property);
-				if ($aprop > $bprop)
+				if ($aprop > $bprop) {
 					return 1;
-				if ($aprop < $bprop)
+				}
+				if ($aprop < $bprop) {
 					return -1;
+				}
 			} else {
-				if ($a->$parent->$property > $b->$parent->$property)
+				if ($a->$parent->$property > $b->$parent->$property) {
 					return 1;
-				if ($a->$parent->$property < $b->$parent->$property)
+				}
+				if ($a->$parent->$property < $b->$parent->$property) {
 					return -1;
+				}
 			}
 		}
 		// If they have the same parent, order them by their own property.
 		if (!$this->sortCaseSensitive && is_string($a->$property) && is_string($b->$property)) {
 			$aprop = strtoupper($a->$property);
 			$bprop = strtoupper($b->$property);
-			if ($aprop > $bprop)
+			if ($aprop > $bprop) {
 				return 1;
-			if ($aprop < $bprop)
+			}
+			if ($aprop < $bprop) {
 				return -1;
+			}
 		} else {
-			if ($a->$property > $b->$property)
+			if ($a->$property > $b->$property) {
 				return 1;
-			if ($a->$property < $b->$property)
+			}
+			if ($a->$property < $b->$property) {
 				return -1;
+			}
 		}
 		return 0;
 	}

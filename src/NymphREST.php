@@ -44,8 +44,9 @@ class NymphREST {
 		ob_start();
 		if (in_array($action, array('entity', 'entities'))) {
 			$ents = json_decode($data, true);
-			if ($action === 'entity')
+			if ($action === 'entity') {
 				$ents = array($ents);
+			}
 			$deleted = array();
 			$failures = false;
 			foreach ($ents as $delEnt) {
@@ -62,15 +63,17 @@ class NymphREST {
 				}
 			}
 			if (empty($deleted)) {
-				if ($failures)
+				if ($failures) {
 					return $this->httpError(400, "Bad Request");
-				else
+				} else {
 					return $this->httpError(500, "Internal Server Error");
+				}
 			}
-			if ($action === 'entity')
+			if ($action === 'entity') {
 				echo json_encode($deleted[0]);
-			else
+			} else {
 				echo json_encode($deleted);
+			}
 			header("HTTP/1.1 200 OK", true, 200);
 		} else {
 			if (!RPHP::_('Nymph')->deleteUID("$data")) {
@@ -89,8 +92,9 @@ class NymphREST {
 		ob_start();
 		if (in_array($action, array('entity', 'entities'))) {
 			$ents = json_decode($data, true);
-			if ($action === 'entity')
+			if ($action === 'entity') {
 				$ents = array($ents);
+			}
 			$created = array();
 			$invalidData = false;
 			foreach ($ents as $newEnt) {
@@ -112,15 +116,17 @@ class NymphREST {
 				}
 			}
 			if (empty($created)) {
-				if ($invalidData)
+				if ($invalidData) {
 					return $this->httpError(400, "Bad Request");
-				else
+				} else {
 					return $this->httpError(500, "Internal Server Error");
+				}
 			}
-			if ($action === 'entity')
+			if ($action === 'entity') {
 				echo json_encode($created[0]);
-			else
+			} else {
 				echo json_encode($created);
+			}
 		} else {
 			$result = RPHP::_('Nymph')->newUID("$data");
 			if (empty($result)) {
@@ -142,10 +148,12 @@ class NymphREST {
 			$args = json_decode($data, true);
 			array_walk($args['params'], array($this, 'referenceToEntity'));
 			$entity = $this->loadEntity($args['entity']);
-			if (!in_array($args['method'], $entity->clientEnabledMethods()))
+			if (!in_array($args['method'], $entity->clientEnabledMethods())) {
 				return $this->httpError(403, "Forbidden");
-			if (!$entity || ((int)$args['entity']['guid'] > 0 && !$entity->guid) || !is_callable(array($entity, $args['method'])))
+			}
+			if (!$entity || ((int)$args['entity']['guid'] > 0 && !$entity->guid) || !is_callable(array($entity, $args['method']))) {
 				return $this->httpError(400, "Bad Request");
+			}
 			try {
 				$return = call_user_func_array(array($entity, $args['method']), $args['params']);
 				echo json_encode(array('entity' => $entity, 'return' => $return));
@@ -154,8 +162,9 @@ class NymphREST {
 			}
 		} else {
 			$ents = json_decode($data, true);
-			if ($action === 'entity')
+			if ($action === 'entity') {
 				$ents = array($ents);
+			}
 			$saved = array();
 			$invalidData = false;
 			$notfound = false;
@@ -178,17 +187,19 @@ class NymphREST {
 				}
 			}
 			if (empty($saved)) {
-				if ($invalidData)
+				if ($invalidData) {
 					return $this->httpError(400, "Bad Request");
-				elseif ($notfound)
+				} elseif ($notfound) {
 					return $this->httpError(404, "Not Found");
-				else
+				} else {
 					return $this->httpError(500, "Internal Server Error");
+				}
 			}
-			if ($action === 'entity')
+			if ($action === 'entity') {
 				echo json_encode($saved[0]);
-			else
+			} else {
 				echo json_encode($saved);
+			}
 		}
 		header("HTTP/1.1 200 OK", true, 200);
 		ob_end_flush();
@@ -216,6 +227,7 @@ class NymphREST {
 						if (!isset($args[$i]['type'])) {
 							return $this->httpError(400, "Bad Request");
 						}
+						// Translate JS {type: '&', ...} to PHP array('&', ...)
 						$newArg = array($args[$i]['type']);
 						unset($args[$i]['type']);
 						$newArg = array_merge($newArg, $args[$i]);
@@ -244,8 +256,9 @@ class NymphREST {
 	}
 
 	protected function loadEntity($entityData) {
-		if (!class_exists($entityData['class']))
+		if (!class_exists($entityData['class'])) {
 			return false;
+		}
 		if ((int)$entityData['guid'] > 0) {
 			$entity = RPHP::_('Nymph')->getEntity(
 					array('class' => $entityData['class']),
@@ -253,16 +266,19 @@ class NymphREST {
 						'guid' => (int)$entityData['guid']
 					)
 				);
-			if ($entity === null)
+			if ($entity === null) {
 				return false;
+			}
 		} else {
 			$entity = new $entityData['class'];
 		}
 		$entity->jsonAcceptTags($entityData['tags']);
-		if (isset($entityData['cdate']))
+		if (isset($entityData['cdate'])) {
 			$entityData['data']['cdate'] = $entityData['cdate'];
-		if (isset($entityData['mdate']))
+		}
+		if (isset($entityData['mdate'])) {
 			$entityData['data']['mdate'] = $entityData['mdate'];
+		}
 		$entity->jsonAcceptData($entityData['data']);
 		return $entity;
 	}
@@ -293,16 +309,18 @@ class NymphREST {
 	private function referenceToEntity(&$item, $key) {
 		if ((array) $item === $item) {
 			if (isset($item[0]) && $item[0] === 'nymph_entity_reference') {
-				if (!isset($this->entityCache["reference_guid: {$item[1]}"]))
+				if (!isset($this->entityCache["reference_guid: {$item[1]}"])) {
 					$this->entityCache["reference_guid: {$item[1]}"] = call_user_func(array($item[2], 'factoryReference'), $item);
+				}
 				$item = $this->entityCache["reference_guid: {$item[1]}"];
 			} else {
 				array_walk($item, array($this, 'referenceToEntity'));
 			}
 		} elseif ((object) $item === $item && !(((is_a($item, 'Entity') || is_a($item, 'hook_override'))) && is_callable(array($item, 'toReference')))) {
 			// Only do this for non-entity objects.
-			foreach ($item as &$cur_property)
+			foreach ($item as &$cur_property) {
 				$this->referenceToEntity($cur_property, null);
+			}
 			unset($cur_property);
 		}
 	}
