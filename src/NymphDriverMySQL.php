@@ -44,25 +44,17 @@ class NymphDriverMySQL extends NymphDriver {
 		$user = $this->config->MySQL->user['value'];
 		$password = $this->config->MySQL->password['value'];
 		$database = $this->config->MySQL->database['value'];
+		$port = $this->config->MySQL->port['value'];
 		// Connecting, selecting database
 		if (!$this->connected) {
-			if ( $this->link = @mysql_connect($host, $user, $password) ) {
-				if ( @mysql_select_db($database, $this->link) ) {
-					$this->connected = true;
-				} else {
-					$this->connected = false;
-					if ($host == 'localhost' && $user == 'nymph' && $password == 'password' && $database == 'nymph') {
-						throw new NymphNotConfiguredException();
-					} else {
-						throw new NymphUnableToConnectException('Could not select database: ' . mysql_error());
-					}
-				}
+			if ( $this->link = mysqli_connect($host,  $user,  $password, $database, $port) ) {
+				$this->connected = true;
 			} else {
 				$this->connected = false;
 				if ($host == 'localhost' && $user == 'nymph' && $password == 'password' && $database == 'nymph') {
 					throw new NymphNotConfiguredException();
 				} else {
-					throw new NymphUnableToConnectException('Could not connect: ' . mysql_error());
+					throw new NymphUnableToConnectException('Could not connect: ' . mysqli_error($this->link));
 				}
 			}
 		}
@@ -76,8 +68,9 @@ class NymphDriverMySQL extends NymphDriver {
 	 */
 	public function disconnect() {
 		if ($this->connected) {
-			if (is_resource($this->link))
-				mysql_close($this->link);
+			if (is_a($this->link, 'mysqli'))
+				unset($this->link);
+			$this->link = null;
 			$this->connected = false;
 		}
 		return $this->connected;
@@ -90,58 +83,58 @@ class NymphDriverMySQL extends NymphDriver {
 	 * @return bool True on success, false on failure.
 	 */
 	private function createTables($etype = null) {
-		if ( !(mysql_query('SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";', $this->link)) ) {
-			throw new NymphQueryFailedException('Query failed: ' . mysql_errno() . ': ' . mysql_error(), 0, null, 'SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";');
+		if ( !(mysqli_query($this->link, 'SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";')) ) {
+			throw new NymphQueryFailedException('Query failed: ' . mysqli_errno($this->link) . ': ' . mysqli_error($this->link), 0, null, 'SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";');
 		}
 		if (isset($etype)) {
-			$etype =  '_'.mysql_real_escape_string($etype, $this->link);
+			$etype =  '_'.mysqli_real_escape_string($this->link, $etype);
 			// Create the entity table.
 			$query = sprintf("CREATE TABLE IF NOT EXISTS `%sentities%s` (`guid` bigint(20) unsigned NOT NULL, `tags` text, `varlist` text, `cdate` decimal(18,6) NOT NULL, `mdate` decimal(18,6) NOT NULL, PRIMARY KEY (`guid`), KEY `id_tags` (`tags`(1000)), KEY `id_varlist` (`varlist`(1000))) DEFAULT CHARSET=utf8;",
 				$this->config->MySQL->prefix['value'],
 				$etype);
-			if ( !(mysql_query($query, $this->link)) ) {
-				throw new NymphQueryFailedException('Query failed: ' . mysql_errno() . ': ' . mysql_error(), 0, null, $query);
+			if ( !(mysqli_query($this->link, $query)) ) {
+				throw new NymphQueryFailedException('Query failed: ' . mysqli_errno($this->link) . ': ' . mysqli_error($this->link), 0, null, $query);
 			}
 			// Create the data table.
 			$query = sprintf("CREATE TABLE IF NOT EXISTS `%sdata%s` (`guid` bigint(20) unsigned NOT NULL, `name` text NOT NULL, `value` longtext NOT NULL, `references` longtext, `compare_true` boolean, `compare_one` boolean, `compare_zero` boolean, `compare_negone` boolean, `compare_emptyarray` boolean, `compare_string` longtext, PRIMARY KEY (`guid`,`name`(255))) DEFAULT CHARSET=utf8;",
 				$this->config->MySQL->prefix['value'],
 				$etype);
-			if ( !(mysql_query($query, $this->link)) ) {
-				throw new NymphQueryFailedException('Query failed: ' . mysql_errno() . ': ' . mysql_error(), 0, null, $query);
+			if ( !(mysqli_query($this->link, $query)) ) {
+				throw new NymphQueryFailedException('Query failed: ' . mysqli_errno($this->link) . ': ' . mysqli_error($this->link), 0, null, $query);
 			}
 		} else {
 			// Create the GUID table.
 			$query = sprintf("CREATE TABLE IF NOT EXISTS `%sguids` (`guid` bigint(20) unsigned NOT NULL, PRIMARY KEY (`guid`)) DEFAULT CHARSET=utf8;",
 				$this->config->MySQL->prefix['value']);
-			if ( !(mysql_query($query, $this->link)) ) {
-				throw new NymphQueryFailedException('Query failed: ' . mysql_errno() . ': ' . mysql_error(), 0, null, $query);
+			if ( !(mysqli_query($this->link, $query)) ) {
+				throw new NymphQueryFailedException('Query failed: ' . mysqli_errno($this->link) . ': ' . mysqli_error($this->link), 0, null, $query);
 			}
 			// Create the UID table.
 			$query = sprintf("CREATE TABLE IF NOT EXISTS `%suids` (`name` text NOT NULL, `cur_uid` bigint(20) unsigned NOT NULL, PRIMARY KEY (`name`(100))) DEFAULT CHARSET=utf8;",
 				$this->config->MySQL->prefix['value']);
-			if ( !(mysql_query($query, $this->link)) ) {
-				throw new NymphQueryFailedException('Query failed: ' . mysql_errno() . ': ' . mysql_error(), 0, null, $query);
+			if ( !(mysqli_query($this->link, $query)) ) {
+				throw new NymphQueryFailedException('Query failed: ' . mysqli_errno($this->link) . ': ' . mysqli_error($this->link), 0, null, $query);
 			}
 		}
 		return true;
 	}
 
 	public function deleteEntityByID($guid, $etype = null) {
-		$etype = isset($etype) ? '_'.mysql_real_escape_string($etype, $this->link) : '';
+		$etype = isset($etype) ? '_'.mysqli_real_escape_string($this->link, $etype) : '';
 		$query = sprintf("DELETE e, d FROM `%sentities%s` e LEFT JOIN `%sdata%s` d ON e.`guid`=d.`guid` WHERE e.`guid`='%u';",
 			$this->config->MySQL->prefix['value'],
 			$etype,
 			$this->config->MySQL->prefix['value'],
 			$etype,
 			(int) $guid);
-		if ( !(mysql_query($query, $this->link)) ) {
-			throw new NymphQueryFailedException('Query failed: ' . mysql_errno() . ': ' . mysql_error(), 0, null, $query);
+		if ( !(mysqli_query($this->link, $query)) ) {
+			throw new NymphQueryFailedException('Query failed: ' . mysqli_errno($this->link) . ': ' . mysqli_error($this->link), 0, null, $query);
 		}
 		$query = sprintf("DELETE FROM `%sguids` WHERE `guid`='%u';",
 			$this->config->MySQL->prefix['value'],
 			(int) $guid);
-		if ( !(mysql_query($query, $this->link)) ) {
-			throw new NymphQueryFailedException('Query failed: ' . mysql_errno() . ': ' . mysql_error(), 0, null, $query);
+		if ( !(mysqli_query($this->link, $query)) ) {
+			throw new NymphQueryFailedException('Query failed: ' . mysqli_errno($this->link) . ': ' . mysqli_error($this->link), 0, null, $query);
 		}
 		// Removed any cached versions of this entity.
 		if ($this->config->cache['value'])
@@ -154,9 +147,9 @@ class NymphDriverMySQL extends NymphDriver {
 			return false;
 		$query = sprintf("DELETE FROM `%suids` WHERE `name`='%s';",
 			$this->config->MySQL->prefix['value'],
-			mysql_real_escape_string($name, $this->link));
-		if ( !(mysql_query($query, $this->link)) ) {
-			throw new NymphQueryFailedException('Query failed: ' . mysql_errno() . ': ' . mysql_error(), 0, null, $query);
+			mysqli_real_escape_string($this->link, $name));
+		if ( !(mysqli_query($this->link, $query)) ) {
+			throw new NymphQueryFailedException('Query failed: ' . mysqli_errno($this->link) . ': ' . mysqli_error($this->link), 0, null, $query);
 		}
 		return true;
 	}
@@ -178,16 +171,16 @@ class NymphDriverMySQL extends NymphDriver {
 		// Export UIDs.
 		$query = sprintf("SELECT * FROM `%suids`;",
 			$this->config->MySQL->prefix['value']);
-		if ( !($result = mysql_query($query, $this->link)) ) {
-			throw new NymphQueryFailedException('Query failed: ' . mysql_errno() . ': ' . mysql_error(), 0, null, $query);
+		if ( !($result = mysqli_query($this->link, $query)) ) {
+			throw new NymphQueryFailedException('Query failed: ' . mysqli_errno($this->link) . ': ' . mysqli_error($this->link), 0, null, $query);
 		}
-		$row = mysql_fetch_assoc($result);
+		$row = mysqli_fetch_assoc($result);
 		while ($row) {
 			$row['name'];
 			$row['cur_uid'];
 			fwrite($fhandle, "<{$row['name']}>[{$row['cur_uid']}]\n");
 			// Make sure that $row is incremented :)
-			$row = mysql_fetch_assoc($result);
+			$row = mysqli_fetch_assoc($result);
 		}
 
 		fwrite($fhandle, "\n#\n");
@@ -196,15 +189,15 @@ class NymphDriverMySQL extends NymphDriver {
 
 		// Get the etypes.
 		$query = sprintf("SHOW TABLES;");
-		if ( !($result = mysql_query($query, $this->link)) ) {
-			throw new NymphQueryFailedException('Query failed: ' . mysql_errno() . ': ' . mysql_error(), 0, null, $query);
+		if ( !($result = mysqli_query($this->link, $query)) ) {
+			throw new NymphQueryFailedException('Query failed: ' . mysqli_errno($this->link) . ': ' . mysqli_error($this->link), 0, null, $query);
 		}
 		$etypes = array();
-		$row = mysql_fetch_row($result);
+		$row = mysqli_fetch_row($result);
 		while ($row) {
 			if (strpos($row[0], $this->config->MySQL->prefix['value'].'entities_') === 0)
 				$etypes[] = substr($row[0], strlen($this->config->MySQL->prefix['value'].'entities_'));
-			$row = mysql_fetch_row($result);
+			$row = mysqli_fetch_row($result);
 		}
 
 		foreach ($etypes as $etype) {
@@ -214,10 +207,10 @@ class NymphDriverMySQL extends NymphDriver {
 				$etype,
 				$this->config->MySQL->prefix['value'],
 				$etype);
-			if ( !($result = mysql_query($query, $this->link)) ) {
-				throw new NymphQueryFailedException('Query failed: ' . mysql_errno() . ': ' . mysql_error(), 0, null, $query);
+			if ( !($result = mysqli_query($this->link, $query)) ) {
+				throw new NymphQueryFailedException('Query failed: ' . mysqli_errno($this->link) . ': ' . mysqli_error($this->link), 0, null, $query);
 			}
-			$row = mysql_fetch_assoc($result);
+			$row = mysqli_fetch_assoc($result);
 			while ($row) {
 				$guid = (int) $row['guid'];
 				$tags = $row['tags'] === ',,' ? array() : explode(',', trim($row['tags'], ','));
@@ -231,11 +224,11 @@ class NymphDriverMySQL extends NymphDriver {
 					// next entity is reached. $row will end on the next entity.
 					do {
 						fwrite($fhandle, "\t{$row['dname']}=".json_encode($row['dvalue'])."\n");
-						$row = mysql_fetch_assoc($result);
+						$row = mysqli_fetch_assoc($result);
 					} while ((int) $row['guid'] === $guid);
 				} else {
 					// Make sure that $row is incremented :)
-					$row = mysql_fetch_assoc($result);
+					$row = mysqli_fetch_assoc($result);
 				}
 			}
 		}
@@ -246,7 +239,7 @@ class NymphDriverMySQL extends NymphDriver {
 		header('Content-Type: application/octet-stream');
 		header('Content-Disposition: attachment; filename=entities.nex;');
 		// End all output buffering.
-		while (@ob_end_clean());
+		while (ob_end_clean());
 		echo "# Nymph Entity Exchange\n";
 		echo "# Nymph Version ".NYMPH_VERSION."\n";
 		echo "# sciactive.com\n";
@@ -260,16 +253,16 @@ class NymphDriverMySQL extends NymphDriver {
 		// Export UIDs.
 		$query = sprintf("SELECT * FROM `%suids`;",
 			$this->config->MySQL->prefix['value']);
-		if ( !($result = mysql_query($query, $this->link)) ) {
-			throw new NymphQueryFailedException('Query failed: ' . mysql_errno() . ': ' . mysql_error(), 0, null, $query);
+		if ( !($result = mysqli_query($this->link, $query)) ) {
+			throw new NymphQueryFailedException('Query failed: ' . mysqli_errno($this->link) . ': ' . mysqli_error($this->link), 0, null, $query);
 		}
-		$row = mysql_fetch_assoc($result);
+		$row = mysqli_fetch_assoc($result);
 		while ($row) {
 			$row['name'];
 			$row['cur_uid'];
 			echo "<{$row['name']}>[{$row['cur_uid']}]\n";
 			// Make sure that $row is incremented :)
-			$row = mysql_fetch_assoc($result);
+			$row = mysqli_fetch_assoc($result);
 		}
 
 		echo "\n#\n";
@@ -278,15 +271,15 @@ class NymphDriverMySQL extends NymphDriver {
 
 		// Get the etypes.
 		$query = sprintf("SHOW TABLES;");
-		if ( !($result = mysql_query($query, $this->link)) ) {
-			throw new NymphQueryFailedException('Query failed: ' . mysql_errno() . ': ' . mysql_error(), 0, null, $query);
+		if ( !($result = mysqli_query($this->link, $query)) ) {
+			throw new NymphQueryFailedException('Query failed: ' . mysqli_errno($this->link) . ': ' . mysqli_error($this->link), 0, null, $query);
 		}
 		$etypes = array();
-		$row = mysql_fetch_row($result);
+		$row = mysqli_fetch_row($result);
 		while ($row) {
 			if (strpos($row[0], $this->config->MySQL->prefix['value'].'entities_') === 0)
 				$etypes[] = substr($row[0], strlen($this->config->MySQL->prefix['value'].'entities_'));
-			$row = mysql_fetch_row($result);
+			$row = mysqli_fetch_row($result);
 		}
 
 		foreach ($etypes as $etype) {
@@ -296,10 +289,10 @@ class NymphDriverMySQL extends NymphDriver {
 				$etype,
 				$this->config->MySQL->prefix['value'],
 				$etype);
-			if ( !($result = mysql_query($query, $this->link)) ) {
-				throw new NymphQueryFailedException('Query failed: ' . mysql_errno() . ': ' . mysql_error(), 0, null, $query);
+			if ( !($result = mysqli_query($this->link, $query)) ) {
+				throw new NymphQueryFailedException('Query failed: ' . mysqli_errno($this->link) . ': ' . mysqli_error($this->link), 0, null, $query);
 			}
-			$row = mysql_fetch_assoc($result);
+			$row = mysqli_fetch_assoc($result);
 			while ($row) {
 				$guid = (int) $row['guid'];
 				$tags = $row['tags'] === ',,' ? array() : explode(',', trim($row['tags'], ','));
@@ -313,11 +306,11 @@ class NymphDriverMySQL extends NymphDriver {
 					// next entity is reached. $row will end on the next entity.
 					do {
 						echo "\t{$row['dname']}=".json_encode($row['dvalue'])."\n";
-						$row = mysql_fetch_assoc($result);
+						$row = mysqli_fetch_assoc($result);
 					} while ((int) $row['guid'] === $guid);
 				} else {
 					// Make sure that $row is incremented :)
-					$row = mysql_fetch_assoc($result);
+					$row = mysqli_fetch_assoc($result);
 				}
 			}
 		}
@@ -344,10 +337,10 @@ class NymphDriverMySQL extends NymphDriver {
 		$class = isset($options['class']) ? $options['class'] : Entity;
 		if (isset($options['etype'])) {
 			$etype_dirty = $options['etype'];
-			$etype = '_'.mysql_real_escape_string($etype_dirty, $this->link);
+			$etype = '_'.mysqli_real_escape_string($this->link, $etype_dirty);
 		} else {
 			$etype_dirty = $class::etype;
-			$etype = '_'.mysql_real_escape_string($etype_dirty, $this->link);
+			$etype = '_'.mysqli_real_escape_string($this->link, $etype_dirty);
 		}
 		$sort = isset($options['sort']) ? $options['sort'] : 'cdate';
 		$count = $ocount = 0;
@@ -406,7 +399,7 @@ class NymphDriverMySQL extends NymphDriver {
 							foreach ($cur_value as $cur_tag) {
 								if ( $cur_query )
 									$cur_query .= $type_is_or ? ' OR ' : ' AND ';
-								$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'LOCATE(\','.mysql_real_escape_string($cur_tag, $this->link).',\', e.`tags`)';
+								$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'LOCATE(\','.mysqli_real_escape_string($this->link, $cur_tag).',\', e.`tags`)';
 							}
 							break;
 						case 'isset':
@@ -414,10 +407,10 @@ class NymphDriverMySQL extends NymphDriver {
 							foreach ($cur_value as $cur_var) {
 								if ( $cur_query )
 									$cur_query .= $type_is_or ? ' OR ' : ' AND ';
-								$cur_query .= '('.(($type_is_not xor $clause_not) ? 'NOT ' : '' ).'LOCATE(\','.mysql_real_escape_string($cur_var, $this->link).',\', e.`varlist`)';
+								$cur_query .= '('.(($type_is_not xor $clause_not) ? 'NOT ' : '' ).'LOCATE(\','.mysqli_real_escape_string($this->link, $cur_var).',\', e.`varlist`)';
 								if ($type_is_not xor $clause_not) {
 									$alias = $this->addDataAlias($data_aliases);
-									$cur_query .= ' OR (e.`guid`='.$alias.'.`guid` AND '.$alias.'.`name`=\''.mysql_real_escape_string($cur_var, $this->link).'\' AND '.$alias.'.`value`=\'N;\')';
+									$cur_query .= ' OR (e.`guid`='.$alias.'.`guid` AND '.$alias.'.`name`=\''.mysqli_real_escape_string($this->link, $cur_var).'\' AND '.$alias.'.`value`=\'N;\')';
 								}
 								$cur_query .= ')';
 							}
@@ -444,7 +437,7 @@ class NymphDriverMySQL extends NymphDriver {
 								if ( $cur_query )
 									$cur_query .= $type_is_or ? ' OR ' : ' AND ';
 								$alias = $this->addDataAlias($data_aliases);
-								$cur_query .= '('.(($type_is_not xor $clause_not) ? 'NOT LOCATE(\','.mysql_real_escape_string($cur_value[0], $this->link).',\', e.`varlist`) OR ' : '' ).'(e.`guid`='.$alias.'.`guid` AND '.$alias.'.`name`=\''.mysql_real_escape_string($cur_value[0], $this->link).'\' AND '.(($type_is_not xor $clause_not) ? 'NOT ' : '' ).'LOCATE(\','.mysql_real_escape_string($cur_qguid, $this->link).',\', '.$alias.'.`references`)))';
+								$cur_query .= '('.(($type_is_not xor $clause_not) ? 'NOT LOCATE(\','.mysqli_real_escape_string($this->link, $cur_value[0]).',\', e.`varlist`) OR ' : '' ).'(e.`guid`='.$alias.'.`guid` AND '.$alias.'.`name`=\''.mysqli_real_escape_string($this->link, $cur_value[0]).'\' AND '.(($type_is_not xor $clause_not) ? 'NOT ' : '' ).'LOCATE(\','.mysqli_real_escape_string($this->link, $cur_qguid).',\', '.$alias.'.`references`)))';
 							}
 							break;
 						case 'strict':
@@ -467,7 +460,7 @@ class NymphDriverMySQL extends NymphDriver {
 								else
 									$svalue = serialize($cur_value[1]);
 								$alias = $this->addDataAlias($data_aliases);
-								$cur_query .= '('.(($type_is_not xor $clause_not) ? 'NOT LOCATE(\','.mysql_real_escape_string($cur_value[0], $this->link).',\', e.`varlist`) OR ' : '' ).'(e.`guid`='.$alias.'.`guid` AND '.$alias.'.`name`=\''.mysql_real_escape_string($cur_value[0], $this->link).'\' AND '.(($type_is_not xor $clause_not) ? 'NOT ' : '' ).$alias.'.`value`=\''.mysql_real_escape_string($svalue, $this->link).'\'))';
+								$cur_query .= '('.(($type_is_not xor $clause_not) ? 'NOT LOCATE(\','.mysqli_real_escape_string($this->link, $cur_value[0]).',\', e.`varlist`) OR ' : '' ).'(e.`guid`='.$alias.'.`guid` AND '.$alias.'.`name`=\''.mysqli_real_escape_string($this->link, $cur_value[0]).'\' AND '.(($type_is_not xor $clause_not) ? 'NOT ' : '' ).$alias.'.`value`=\''.mysqli_real_escape_string($this->link, $svalue).'\'))';
 							}
 							break;
 						case 'like':
@@ -475,18 +468,18 @@ class NymphDriverMySQL extends NymphDriver {
 							if ($cur_value[0] == 'cdate') {
 								if ( $cur_query )
 									$cur_query .= $type_is_or ? ' OR ' : ' AND ';
-								$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'(e.`cdate` LIKE \''.mysql_real_escape_string($cur_value[1], $this->link).'\')';
+								$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'(e.`cdate` LIKE \''.mysqli_real_escape_string($this->link, $cur_value[1]).'\')';
 								break;
 							} elseif ($cur_value[0] == 'mdate') {
 								if ( $cur_query )
 									$cur_query .= $type_is_or ? ' OR ' : ' AND ';
-								$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'(e.`mdate` LIKE \''.mysql_real_escape_string($cur_value[1], $this->link).'\')';
+								$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'(e.`mdate` LIKE \''.mysqli_real_escape_string($this->link, $cur_value[1]).'\')';
 								break;
 							} else {
 								if ( $cur_query )
 									$cur_query .= ($type_is_or ? ' OR ' : ' AND ');
 								$alias = $this->addDataAlias($data_aliases);
-								$cur_query .= '('.(($type_is_not xor $clause_not) ? 'NOT LOCATE(\','.mysql_real_escape_string($cur_value[0], $this->link).',\', e.`varlist`) OR ' : '' ).'(e.`guid`='.$alias.'.`guid` AND '.$alias.'.`name`=\''.mysql_real_escape_string($cur_value[0], $this->link).'\' AND '.(($type_is_not xor $clause_not) ? 'NOT ' : '' ).$alias.'.`compare_string` LIKE \''.mysql_real_escape_string($cur_value[1], $this->link).'\'))';
+								$cur_query .= '('.(($type_is_not xor $clause_not) ? 'NOT LOCATE(\','.mysqli_real_escape_string($this->link, $cur_value[0]).',\', e.`varlist`) OR ' : '' ).'(e.`guid`='.$alias.'.`guid` AND '.$alias.'.`name`=\''.mysqli_real_escape_string($this->link, $cur_value[0]).'\' AND '.(($type_is_not xor $clause_not) ? 'NOT ' : '' ).$alias.'.`compare_string` LIKE \''.mysqli_real_escape_string($this->link, $cur_value[1]).'\'))';
 							}
 							break;
 						case 'pmatch':
@@ -494,18 +487,18 @@ class NymphDriverMySQL extends NymphDriver {
 							if ($cur_value[0] == 'cdate') {
 								if ( $cur_query )
 									$cur_query .= $type_is_or ? ' OR ' : ' AND ';
-								$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'(e.`cdate` REGEXP \''.mysql_real_escape_string($cur_value[1], $this->link).'\')';
+								$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'(e.`cdate` REGEXP \''.mysqli_real_escape_string($this->link, $cur_value[1]).'\')';
 								break;
 							} elseif ($cur_value[0] == 'mdate') {
 								if ( $cur_query )
 									$cur_query .= $type_is_or ? ' OR ' : ' AND ';
-								$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'(e.`mdate` REGEXP \''.mysql_real_escape_string($cur_value[1], $this->link).'\')';
+								$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'(e.`mdate` REGEXP \''.mysqli_real_escape_string($this->link, $cur_value[1]).'\')';
 								break;
 							} else {
 								if ( $cur_query )
 									$cur_query .= ($type_is_or ? ' OR ' : ' AND ');
 								$alias = $this->addDataAlias($data_aliases);
-								$cur_query .= '('.(($type_is_not xor $clause_not) ? 'NOT LOCATE(\','.mysql_real_escape_string($cur_value[0], $this->link).',\', e.`varlist`) OR ' : '' ).'(e.`guid`='.$alias.'.`guid` AND '.$alias.'.`name`=\''.mysql_real_escape_string($cur_value[0], $this->link).'\' AND '.(($type_is_not xor $clause_not) ? 'NOT ' : '' ).$alias.'.`compare_string` REGEXP \''.mysql_real_escape_string($cur_value[1], $this->link).'\'))';
+								$cur_query .= '('.(($type_is_not xor $clause_not) ? 'NOT LOCATE(\','.mysqli_real_escape_string($this->link, $cur_value[0]).',\', e.`varlist`) OR ' : '' ).'(e.`guid`='.$alias.'.`guid` AND '.$alias.'.`name`=\''.mysqli_real_escape_string($this->link, $cur_value[0]).'\' AND '.(($type_is_not xor $clause_not) ? 'NOT ' : '' ).$alias.'.`compare_string` REGEXP \''.mysqli_real_escape_string($this->link, $cur_value[1]).'\'))';
 							}
 							break;
 						case 'match':
@@ -513,7 +506,7 @@ class NymphDriverMySQL extends NymphDriver {
 							if (!($type_is_not xor $clause_not)) {
 								if ( $cur_query )
 									$cur_query .= $type_is_or ? ' OR ' : ' AND ';
-								$cur_query .= 'LOCATE(\','.mysql_real_escape_string($cur_value[0], $this->link).',\', e.`varlist`)';
+								$cur_query .= 'LOCATE(\','.mysqli_real_escape_string($this->link, $cur_value[0]).',\', e.`varlist`)';
 							}
 							break;
 						case 'data':
@@ -536,35 +529,35 @@ class NymphDriverMySQL extends NymphDriver {
 									if ( $cur_query )
 										$cur_query .= ($type_is_or ? ' OR ' : ' AND ');
 									$alias = $this->addDataAlias($data_aliases);
-									$cur_query .= '('.(($type_is_not xor $clause_not) ? 'NOT LOCATE(\','.mysql_real_escape_string($cur_value[0], $this->link).',\', e.`varlist`) OR ' : '' ).'(e.`guid`='.$alias.'.`guid` AND '.$alias.'.`name`=\''.mysql_real_escape_string($cur_value[0], $this->link).'\' AND '.(($type_is_not xor $clause_not) ? 'NOT ' : '' ).$alias.'.`compare_true`='.($cur_value[1] ? 'TRUE' : 'FALSE').'))';
+									$cur_query .= '('.(($type_is_not xor $clause_not) ? 'NOT LOCATE(\','.mysqli_real_escape_string($this->link, $cur_value[0]).',\', e.`varlist`) OR ' : '' ).'(e.`guid`='.$alias.'.`guid` AND '.$alias.'.`name`=\''.mysqli_real_escape_string($this->link, $cur_value[0]).'\' AND '.(($type_is_not xor $clause_not) ? 'NOT ' : '' ).$alias.'.`compare_true`='.($cur_value[1] ? 'TRUE' : 'FALSE').'))';
 									break;
 								} elseif ($cur_value[1] === 1) {
 									$query_made = true;
 									if ( $cur_query )
 										$cur_query .= ($type_is_or ? ' OR ' : ' AND ');
 									$alias = $this->addDataAlias($data_aliases);
-									$cur_query .= '('.(($type_is_not xor $clause_not) ? 'NOT LOCATE(\','.mysql_real_escape_string($cur_value[0], $this->link).',\', e.`varlist`) OR ' : '' ).'(e.`guid`='.$alias.'.`guid` AND '.$alias.'.`name`=\''.mysql_real_escape_string($cur_value[0], $this->link).'\' AND '.(($type_is_not xor $clause_not) ? 'NOT ' : '' ).$alias.'.`compare_one`=TRUE))';
+									$cur_query .= '('.(($type_is_not xor $clause_not) ? 'NOT LOCATE(\','.mysqli_real_escape_string($this->link, $cur_value[0]).',\', e.`varlist`) OR ' : '' ).'(e.`guid`='.$alias.'.`guid` AND '.$alias.'.`name`=\''.mysqli_real_escape_string($this->link, $cur_value[0]).'\' AND '.(($type_is_not xor $clause_not) ? 'NOT ' : '' ).$alias.'.`compare_one`=TRUE))';
 									break;
 								} elseif ($cur_value[1] === 0) {
 									$query_made = true;
 									if ( $cur_query )
 										$cur_query .= ($type_is_or ? ' OR ' : ' AND ');
 									$alias = $this->addDataAlias($data_aliases);
-									$cur_query .= '('.(($type_is_not xor $clause_not) ? 'NOT LOCATE(\','.mysql_real_escape_string($cur_value[0], $this->link).',\', e.`varlist`) OR ' : '' ).'(e.`guid`='.$alias.'.`guid` AND '.$alias.'.`name`=\''.mysql_real_escape_string($cur_value[0], $this->link).'\' AND '.(($type_is_not xor $clause_not) ? 'NOT ' : '' ).$alias.'.`compare_zero`=TRUE))';
+									$cur_query .= '('.(($type_is_not xor $clause_not) ? 'NOT LOCATE(\','.mysqli_real_escape_string($this->link, $cur_value[0]).',\', e.`varlist`) OR ' : '' ).'(e.`guid`='.$alias.'.`guid` AND '.$alias.'.`name`=\''.mysqli_real_escape_string($this->link, $cur_value[0]).'\' AND '.(($type_is_not xor $clause_not) ? 'NOT ' : '' ).$alias.'.`compare_zero`=TRUE))';
 									break;
 								} elseif ($cur_value[1] === -1) {
 									$query_made = true;
 									if ( $cur_query )
 										$cur_query .= ($type_is_or ? ' OR ' : ' AND ');
 									$alias = $this->addDataAlias($data_aliases);
-									$cur_query .= '('.(($type_is_not xor $clause_not) ? 'NOT LOCATE(\','.mysql_real_escape_string($cur_value[0], $this->link).',\', e.`varlist`) OR ' : '' ).'(e.`guid`='.$alias.'.`guid` AND '.$alias.'.`name`=\''.mysql_real_escape_string($cur_value[0], $this->link).'\' AND '.(($type_is_not xor $clause_not) ? 'NOT ' : '' ).$alias.'.`compare_negone`=TRUE))';
+									$cur_query .= '('.(($type_is_not xor $clause_not) ? 'NOT LOCATE(\','.mysqli_real_escape_string($this->link, $cur_value[0]).',\', e.`varlist`) OR ' : '' ).'(e.`guid`='.$alias.'.`guid` AND '.$alias.'.`name`=\''.mysqli_real_escape_string($this->link, $cur_value[0]).'\' AND '.(($type_is_not xor $clause_not) ? 'NOT ' : '' ).$alias.'.`compare_negone`=TRUE))';
 									break;
 								} elseif ($cur_value[1] === array()) {
 									$query_made = true;
 									if ( $cur_query )
 										$cur_query .= ($type_is_or ? ' OR ' : ' AND ');
 									$alias = $this->addDataAlias($data_aliases);
-									$cur_query .= '('.(($type_is_not xor $clause_not) ? 'NOT LOCATE(\','.mysql_real_escape_string($cur_value[0], $this->link).',\', e.`varlist`) OR ' : '' ).'(e.`guid`='.$alias.'.`guid` AND '.$alias.'.`name`=\''.mysql_real_escape_string($cur_value[0], $this->link).'\' AND '.(($type_is_not xor $clause_not) ? 'NOT ' : '' ).$alias.'.`compare_emptyarray`=TRUE))';
+									$cur_query .= '('.(($type_is_not xor $clause_not) ? 'NOT LOCATE(\','.mysqli_real_escape_string($this->link, $cur_value[0]).',\', e.`varlist`) OR ' : '' ).'(e.`guid`='.$alias.'.`guid` AND '.$alias.'.`name`=\''.mysqli_real_escape_string($this->link, $cur_value[0]).'\' AND '.(($type_is_not xor $clause_not) ? 'NOT ' : '' ).$alias.'.`compare_emptyarray`=TRUE))';
 									break;
 								}
 							}
@@ -643,7 +636,7 @@ class NymphDriverMySQL extends NymphDriver {
 								if (!($type_is_not xor $clause_not)) {
 									if ( $cur_query )
 										$cur_query .= $type_is_or ? ' OR ' : ' AND ';
-									$cur_query .= 'LOCATE(\','.mysql_real_escape_string($cur_value[0], $this->link).',\', e.`varlist`)';
+									$cur_query .= 'LOCATE(\','.mysqli_real_escape_string($this->link, $cur_value[0]).',\', e.`varlist`)';
 								}
 							}
 							break;
@@ -698,20 +691,20 @@ class NymphDriverMySQL extends NymphDriver {
 				$etype,
 				(isset($options['reverse']) && $options['reverse']) ? $sort.' DESC' : $sort);
 		}
-		if ( !($result = @mysql_query($query, $this->link)) ) {
+		if ( !($result = mysqli_query($this->link, $query)) ) {
 			// If the tables don't exist yet, create them.
-			if (mysql_errno() == 1146 && $this->createTables()) {
+			if (mysqli_errno($this->link) == 1146 && $this->createTables()) {
 				if (isset($etype_dirty))
 					$this->createTables($etype_dirty);
-				if ( !($result = @mysql_query($query, $this->link)) ) {
-					throw new NymphQueryFailedException('Query failed: ' . mysql_errno() . ': ' . mysql_error(), 0, null, $query);
+				if ( !($result = mysqli_query($this->link, $query)) ) {
+					throw new NymphQueryFailedException('Query failed: ' . mysqli_errno($this->link) . ': ' . mysqli_error($this->link), 0, null, $query);
 				}
 			} else {
-				throw new NymphQueryFailedException('Query failed: ' . mysql_errno() . ': ' . mysql_error(), 0, null, $query);
+				throw new NymphQueryFailedException('Query failed: ' . mysqli_errno($this->link) . ': ' . mysqli_error($this->link), 0, null, $query);
 			}
 		}
 
-		$row = mysql_fetch_row($result);
+		$row = mysqli_fetch_row($result);
 		while ($row) {
 			$guid = (int) $row[0];
 			$tags = $row[1];
@@ -723,11 +716,11 @@ class NymphDriverMySQL extends NymphDriver {
 				// next entity is reached. $row will end on the next entity.
 				do {
 					$sdata[$row[4]] = $row[5];
-					$row = mysql_fetch_row($result);
+					$row = mysqli_fetch_row($result);
 				} while ((int) $row[0] === $guid);
 			} else {
 				// Make sure that $row is incremented :)
-				$row = mysql_fetch_row($result);
+				$row = mysqli_fetch_row($result);
 			}
 			// Check all conditions.
 			$pass_all = true;
@@ -846,7 +839,7 @@ class NymphDriverMySQL extends NymphDriver {
 			}
 		}
 
-		mysql_free_result($result);
+		((mysqli_free_result($result) || (is_object($result) && (get_class($result) == "mysqli_result"))) ? true : false);
 
 		return $entities;
 	}
@@ -856,12 +849,12 @@ class NymphDriverMySQL extends NymphDriver {
 			throw new NymphInvalidParametersException('Name not given for UID');
 		$query = sprintf("SELECT `cur_uid` FROM `%suids` WHERE `name`='%s';",
 			$this->config->MySQL->prefix['value'],
-			mysql_real_escape_string($name, $this->link));
-		if ( !($result = mysql_query($query, $this->link)) ) {
-			throw new NymphQueryFailedException('Query failed: ' . mysql_errno() . ': ' . mysql_error(), 0, null, $query);
+			mysqli_real_escape_string($this->link, $name));
+		if ( !($result = mysqli_query($this->link, $query)) ) {
+			throw new NymphQueryFailedException('Query failed: ' . mysqli_errno($this->link) . ': ' . mysqli_error($this->link), 0, null, $query);
 		}
-		$row = mysql_fetch_row($result);
-		mysql_free_result($result);
+		$row = mysqli_fetch_row($result);
+		((mysqli_free_result($result) || (is_object($result) && (get_class($result) == "mysqli_result"))) ? true : false);
 		return isset($row[0]) ? (int) $row[0] : null;
 	}
 
@@ -885,50 +878,50 @@ class NymphDriverMySQL extends NymphDriver {
 					$query = sprintf("REPLACE INTO `%sguids` (`guid`) VALUES (%u);",
 						$this->config->MySQL->prefix['value'],
 						$guid);
-					if ( !(mysql_query($query, $this->link))  ) {
+					if ( !(mysqli_query($this->link, $query))  ) {
 						// If the tables don't exist yet, create them.
-						if (mysql_errno() == 1146 && $this->createTables()) {
-							if ( !(mysql_query($query, $this->link)) ) {
-								throw new NymphQueryFailedException('Query failed: ' . mysql_errno() . ': ' . mysql_error(), 0, null, $query);
+						if (mysqli_errno($this->link) == 1146 && $this->createTables()) {
+							if ( !(mysqli_query($this->link, $query)) ) {
+								throw new NymphQueryFailedException('Query failed: ' . mysqli_errno($this->link) . ': ' . mysqli_error($this->link), 0, null, $query);
 							}
 						} else {
-							throw new NymphQueryFailedException('Query failed: ' . mysql_errno() . ': ' . mysql_error(), 0, null, $query);
+							throw new NymphQueryFailedException('Query failed: ' . mysqli_errno($this->link) . ': ' . mysqli_error($this->link), 0, null, $query);
 						}
 					}
 					$query = sprintf("REPLACE INTO `%sentities_%s` (`guid`, `tags`, `varlist`, `cdate`, `mdate`) VALUES (%u, '%s', '%s', %F, %F);",
 						$this->config->MySQL->prefix['value'],
 						$etype,
 						$guid,
-						mysql_real_escape_string(','.$tags.',', $this->link),
-						mysql_real_escape_string(','.implode(',', array_keys($data)).',', $this->link),
+						mysqli_real_escape_string($this->link, ','.$tags.','),
+						mysqli_real_escape_string($this->link, ','.implode(',', array_keys($data)).','),
 						unserialize($data['cdate']),
 						unserialize($data['mdate']));
-					if ( !(mysql_query($query, $this->link))  ) {
+					if ( !(mysqli_query($this->link, $query))  ) {
 						// If the tables don't exist yet, create them.
-						if (mysql_errno() == 1146 && $this->createTables()) {
+						if (mysqli_errno($this->link) == 1146 && $this->createTables()) {
 							if (isset($etype))
 								$this->createTables($etype);
-							if ( !(mysql_query($query, $this->link)) ) {
-								throw new NymphQueryFailedException('Query failed: ' . mysql_errno() . ': ' . mysql_error(), 0, null, $query);
+							if ( !(mysqli_query($this->link, $query)) ) {
+								throw new NymphQueryFailedException('Query failed: ' . mysqli_errno($this->link) . ': ' . mysqli_error($this->link), 0, null, $query);
 							}
 						} else {
-							throw new NymphQueryFailedException('Query failed: ' . mysql_errno() . ': ' . mysql_error(), 0, null, $query);
+							throw new NymphQueryFailedException('Query failed: ' . mysqli_errno($this->link) . ': ' . mysqli_error($this->link), 0, null, $query);
 						}
 					}
 					$query = sprintf("DELETE FROM `%sdata_%s` WHERE `guid`='%u';",
 						$this->config->MySQL->prefix['value'],
 						$etype,
 						$guid);
-					if ( !(mysql_query($query, $this->link))  ) {
+					if ( !(mysqli_query($this->link, $query))  ) {
 						// If the tables don't exist yet, create them.
-						if (mysql_errno() == 1146 && $this->createTables()) {
+						if (mysqli_errno($this->link) == 1146 && $this->createTables()) {
 							if (isset($etype))
 								$this->createTables($etype);
-							if ( !(mysql_query($query, $this->link)) ) {
-								throw new NymphQueryFailedException('Query failed: ' . mysql_errno() . ': ' . mysql_error(), 0, null, $query);
+							if ( !(mysqli_query($this->link, $query)) ) {
+								throw new NymphQueryFailedException('Query failed: ' . mysqli_errno($this->link) . ': ' . mysqli_error($this->link), 0, null, $query);
 							}
 						} else {
-							throw new NymphQueryFailedException('Query failed: ' . mysql_errno() . ': ' . mysql_error(), 0, null, $query);
+							throw new NymphQueryFailedException('Query failed: ' . mysqli_errno($this->link) . ': ' . mysqli_error($this->link), 0, null, $query);
 						}
 					}
 					unset($data['cdate'], $data['mdate']);
@@ -939,19 +932,19 @@ class NymphDriverMySQL extends NymphDriver {
 							$uvalue = unserialize($value);
 							$query .= sprintf("(%u, '%s', '%s', '%s', %s, %s, %s, %s, %s, %s),",
 								$guid,
-								mysql_real_escape_string($name, $this->link),
-								mysql_real_escape_string($value, $this->link),
-								mysql_real_escape_string(','.implode(',', $references[1]).',', $this->link),
+								mysqli_real_escape_string($this->link, $name),
+								mysqli_real_escape_string($this->link, $value),
+								mysqli_real_escape_string($this->link, ','.implode(',', $references[1]).','),
 								$uvalue == true ? 'TRUE' : 'FALSE',
 								$uvalue == 1 ? 'TRUE' : 'FALSE',
 								$uvalue == 0 ? 'TRUE' : 'FALSE',
 								$uvalue == -1 ? 'TRUE' : 'FALSE',
 								$uvalue == array() ? 'TRUE' : 'FALSE',
-								is_string($uvalue) ? '\''.mysql_real_escape_string($uvalue, $this->link).'\'' : 'NULL');
+								is_string($uvalue) ? '\''.mysqli_real_escape_string($this->link, $uvalue).'\'' : 'NULL');
 						}
 						$query = substr($query, 0, -1).';';
-						if ( !(mysql_query($query, $this->link))  ) {
-							throw new NymphQueryFailedException('Query failed: ' . mysql_errno() . ': ' . mysql_error(), 0, null, $query);
+						if ( !(mysqli_query($this->link, $query))  ) {
+							throw new NymphQueryFailedException('Query failed: ' . mysqli_errno($this->link) . ': ' . mysqli_error($this->link), 0, null, $query);
 						}
 					}
 					$guid = null;
@@ -970,17 +963,17 @@ class NymphDriverMySQL extends NymphDriver {
 				// Add the UID.
 				$query = sprintf("INSERT INTO `%suids` (`name`, `cur_uid`) VALUES ('%s', %u) ON DUPLICATE KEY UPDATE `cur_uid`=%u;",
 					$this->config->MySQL->prefix['value'],
-					mysql_real_escape_string($matches[1], $this->link),
+					mysqli_real_escape_string($this->link, $matches[1]),
 					(int) $matches[2],
 					(int) $matches[2]);
-				if ( !(mysql_query($query, $this->link))  ) {
+				if ( !(mysqli_query($this->link, $query))  ) {
 					// If the tables don't exist yet, create them.
-					if (mysql_errno() == 1146 && $this->createTables()) {
-						if ( !(mysql_query($query, $this->link)) ) {
-							throw new NymphQueryFailedException('Query failed: ' . mysql_errno() . ': ' . mysql_error(), 0, null, $query);
+					if (mysqli_errno($this->link) == 1146 && $this->createTables()) {
+						if ( !(mysqli_query($this->link, $query)) ) {
+							throw new NymphQueryFailedException('Query failed: ' . mysqli_errno($this->link) . ': ' . mysqli_error($this->link), 0, null, $query);
 						}
 					} else {
-						throw new NymphQueryFailedException('Query failed: ' . mysql_errno() . ': ' . mysql_error(), 0, null, $query);
+						throw new NymphQueryFailedException('Query failed: ' . mysqli_errno($this->link) . ': ' . mysqli_error($this->link), 0, null, $query);
 					}
 				}
 			}
@@ -993,50 +986,50 @@ class NymphDriverMySQL extends NymphDriver {
 			$query = sprintf("REPLACE INTO `%sguids` (`guid`) VALUES (%u);",
 				$this->config->MySQL->prefix['value'],
 				$guid);
-			if ( !(mysql_query($query, $this->link))  ) {
+			if ( !(mysqli_query($this->link, $query))  ) {
 				// If the tables don't exist yet, create them.
-				if (mysql_errno() == 1146 && $this->createTables()) {
-					if ( !(mysql_query($query, $this->link)) ) {
-						throw new NymphQueryFailedException('Query failed: ' . mysql_errno() . ': ' . mysql_error(), 0, null, $query);
+				if (mysqli_errno($this->link) == 1146 && $this->createTables()) {
+					if ( !(mysqli_query($this->link, $query)) ) {
+						throw new NymphQueryFailedException('Query failed: ' . mysqli_errno($this->link) . ': ' . mysqli_error($this->link), 0, null, $query);
 					}
 				} else {
-					throw new NymphQueryFailedException('Query failed: ' . mysql_errno() . ': ' . mysql_error(), 0, null, $query);
+					throw new NymphQueryFailedException('Query failed: ' . mysqli_errno($this->link) . ': ' . mysqli_error($this->link), 0, null, $query);
 				}
 			}
 			$query = sprintf("REPLACE INTO `%sentities_%s` (`guid`, `tags`, `varlist`, `cdate`, `mdate`) VALUES (%u, '%s', '%s', %F, %F);",
 				$this->config->MySQL->prefix['value'],
 				$etype,
 				$guid,
-				mysql_real_escape_string(','.$tags.',', $this->link),
-				mysql_real_escape_string(','.implode(',', array_keys($data)).',', $this->link),
+				mysqli_real_escape_string($this->link, ','.$tags.','),
+				mysqli_real_escape_string($this->link, ','.implode(',', array_keys($data)).','),
 				unserialize($data['cdate']),
 				unserialize($data['mdate']));
-			if ( !(mysql_query($query, $this->link))  ) {
+			if ( !(mysqli_query($this->link, $query))  ) {
 				// If the tables don't exist yet, create them.
-				if (mysql_errno() == 1146 && $this->createTables()) {
+				if (mysqli_errno($this->link) == 1146 && $this->createTables()) {
 					if (isset($etype))
 						$this->createTables($etype);
-					if ( !(mysql_query($query, $this->link)) ) {
-						throw new NymphQueryFailedException('Query failed: ' . mysql_errno() . ': ' . mysql_error(), 0, null, $query);
+					if ( !(mysqli_query($this->link, $query)) ) {
+						throw new NymphQueryFailedException('Query failed: ' . mysqli_errno($this->link) . ': ' . mysqli_error($this->link), 0, null, $query);
 					}
 				} else {
-					throw new NymphQueryFailedException('Query failed: ' . mysql_errno() . ': ' . mysql_error(), 0, null, $query);
+					throw new NymphQueryFailedException('Query failed: ' . mysqli_errno($this->link) . ': ' . mysqli_error($this->link), 0, null, $query);
 				}
 			}
 			$query = sprintf("DELETE FROM `%sdata_%s` WHERE `guid`='%u';",
 				$this->config->MySQL->prefix['value'],
 				$etype,
 				$guid);
-			if ( !(mysql_query($query, $this->link))  ) {
+			if ( !(mysqli_query($this->link, $query))  ) {
 				// If the tables don't exist yet, create them.
-				if (mysql_errno() == 1146 && $this->createTables()) {
+				if (mysqli_errno($this->link) == 1146 && $this->createTables()) {
 					if (isset($etype))
 						$this->createTables($etype);
-					if ( !(mysql_query($query, $this->link)) ) {
-						throw new NymphQueryFailedException('Query failed: ' . mysql_errno() . ': ' . mysql_error(), 0, null, $query);
+					if ( !(mysqli_query($this->link, $query)) ) {
+						throw new NymphQueryFailedException('Query failed: ' . mysqli_errno($this->link) . ': ' . mysqli_error($this->link), 0, null, $query);
 					}
 				} else {
-					throw new NymphQueryFailedException('Query failed: ' . mysql_errno() . ': ' . mysql_error(), 0, null, $query);
+					throw new NymphQueryFailedException('Query failed: ' . mysqli_errno($this->link) . ': ' . mysqli_error($this->link), 0, null, $query);
 				}
 			}
 			unset($data['cdate'], $data['mdate']);
@@ -1047,19 +1040,19 @@ class NymphDriverMySQL extends NymphDriver {
 					$uvalue = unserialize($value);
 					$query .= sprintf("(%u, '%s', '%s', '%s', %s, %s, %s, %s, %s, %s),",
 						$guid,
-						mysql_real_escape_string($name, $this->link),
-						mysql_real_escape_string($value, $this->link),
-						mysql_real_escape_string(','.implode(',', $references[1]).',', $this->link),
+						mysqli_real_escape_string($this->link, $name),
+						mysqli_real_escape_string($this->link, $value),
+						mysqli_real_escape_string($this->link, ','.implode(',', $references[1]).','),
 						$uvalue == true ? 'TRUE' : 'FALSE',
 						$uvalue == 1 ? 'TRUE' : 'FALSE',
 						$uvalue == 0 ? 'TRUE' : 'FALSE',
 						$uvalue == -1 ? 'TRUE' : 'FALSE',
 						$uvalue == array() ? 'TRUE' : 'FALSE',
-						is_string($uvalue) ? '\''.mysql_real_escape_string($uvalue, $this->link).'\'' : 'NULL');
+						is_string($uvalue) ? '\''.mysqli_real_escape_string($this->link, $uvalue).'\'' : 'NULL');
 				}
 				$query = substr($query, 0, -1).';';
-				if ( !(mysql_query($query, $this->link))  ) {
-					throw new NymphQueryFailedException('Query failed: ' . mysql_errno() . ': ' . mysql_error(), 0, null, $query);
+				if ( !(mysqli_query($this->link, $query))  ) {
+					throw new NymphQueryFailedException('Query failed: ' . mysqli_errno($this->link) . ': ' . mysqli_error($this->link), 0, null, $query);
 				}
 			}
 		}
@@ -1071,38 +1064,38 @@ class NymphDriverMySQL extends NymphDriver {
 			throw new NymphInvalidParametersException('Name not given for UID');
 		$query = sprintf("SELECT GET_LOCK('%suids_%s', 10);",
 			$this->config->MySQL->prefix['value'],
-			mysql_real_escape_string($name, $this->link));
-		if ( !(mysql_query($query, $this->link)) ) {
-			throw new NymphQueryFailedException('Query failed: ' . mysql_errno() . ': ' . mysql_error(), 0, null, $query);
+			mysqli_real_escape_string($this->link, $name));
+		if ( !(mysqli_query($this->link, $query)) ) {
+			throw new NymphQueryFailedException('Query failed: ' . mysqli_errno($this->link) . ': ' . mysqli_error($this->link), 0, null, $query);
 		}
 		$query = sprintf("INSERT INTO `%suids` (`name`, `cur_uid`) VALUES ('%s', 1) ON DUPLICATE KEY UPDATE `cur_uid`=`cur_uid`+1;",
 			$this->config->MySQL->prefix['value'],
-			mysql_real_escape_string($name, $this->link));
-		if ( !(mysql_query($query, $this->link))  ) {
+			mysqli_real_escape_string($this->link, $name));
+		if ( !(mysqli_query($this->link, $query))  ) {
 			// If the tables don't exist yet, create them.
-			if (mysql_errno() == 1146 && $this->createTables()) {
+			if (mysqli_errno($this->link) == 1146 && $this->createTables()) {
 				if (isset($etype_dirty))
 					$this->createTables($etype_dirty);
-				if ( !(mysql_query($query, $this->link)) ) {
-					throw new NymphQueryFailedException('Query failed: ' . mysql_errno() . ': ' . mysql_error(), 0, null, $query);
+				if ( !(mysqli_query($this->link, $query)) ) {
+					throw new NymphQueryFailedException('Query failed: ' . mysqli_errno($this->link) . ': ' . mysqli_error($this->link), 0, null, $query);
 				}
 			} else {
-				throw new NymphQueryFailedException('Query failed: ' . mysql_errno() . ': ' . mysql_error(), 0, null, $query);
+				throw new NymphQueryFailedException('Query failed: ' . mysqli_errno($this->link) . ': ' . mysqli_error($this->link), 0, null, $query);
 			}
 		}
 		$query = sprintf("SELECT `cur_uid` FROM `%suids` WHERE `name`='%s';",
 			$this->config->MySQL->prefix['value'],
-			mysql_real_escape_string($name, $this->link));
-		if ( !($result = mysql_query($query, $this->link)) ) {
-			throw new NymphQueryFailedException('Query failed: ' . mysql_errno() . ': ' . mysql_error(), 0, null, $query);
+			mysqli_real_escape_string($this->link, $name));
+		if ( !($result = mysqli_query($this->link, $query)) ) {
+			throw new NymphQueryFailedException('Query failed: ' . mysqli_errno($this->link) . ': ' . mysqli_error($this->link), 0, null, $query);
 		}
-		$row = mysql_fetch_row($result);
-		mysql_free_result($result);
+		$row = mysqli_fetch_row($result);
+		((mysqli_free_result($result) || (is_object($result) && (get_class($result) == "mysqli_result"))) ? true : false);
 		$query = sprintf("SELECT RELEASE_LOCK('%suids_%s');",
 			$this->config->MySQL->prefix['value'],
-			mysql_real_escape_string($name, $this->link));
-		if ( !(mysql_query($query, $this->link)) ) {
-			throw new NymphQueryFailedException('Query failed: ' . mysql_errno() . ': ' . mysql_error(), 0, null, $query);
+			mysqli_real_escape_string($this->link, $name));
+		if ( !(mysqli_query($this->link, $query)) ) {
+			throw new NymphQueryFailedException('Query failed: ' . mysqli_errno($this->link) . ': ' . mysqli_error($this->link), 0, null, $query);
 		}
 		return isset($row[0]) ? (int) $row[0] : null;
 	}
@@ -1112,10 +1105,10 @@ class NymphDriverMySQL extends NymphDriver {
 			throw new NymphInvalidParametersException('Name not given for UID');
 		$query = sprintf("UPDATE `%suids` SET `name`='%s' WHERE `name`='%s';",
 			$this->config->MySQL->prefix['value'],
-			mysql_real_escape_string($new_name, $this->link),
-			mysql_real_escape_string($old_name, $this->link));
-		if ( !(mysql_query($query, $this->link)) ) {
-			throw new NymphQueryFailedException('Query failed: ' . mysql_errno() . ': ' . mysql_error(), 0, null, $query);
+			mysqli_real_escape_string($this->link, $new_name),
+			mysqli_real_escape_string($this->link, $old_name));
+		if ( !(mysqli_query($this->link, $query)) ) {
+			throw new NymphQueryFailedException('Query failed: ' . mysqli_errno($this->link) . ': ' . mysqli_error($this->link), 0, null, $query);
 		}
 		return true;
 	}
@@ -1134,30 +1127,30 @@ class NymphDriverMySQL extends NymphDriver {
 		$varlist = array_merge(array_keys($data), array_keys($sdata));
 		$class = get_class($entity);
 		$etype_dirty = $class::etype;
-		$etype = '_'.mysql_real_escape_string($etype_dirty, $this->link);
+		$etype = '_'.mysqli_real_escape_string($this->link, $etype_dirty);
 		if ( !isset($entity->guid) ) {
 			while (true) {
-				$new_id = @mt_rand(1, pow(2, 53)); // 2^53 is the maximum number in JavaScript (http://ecma262-5.com/ELS5_HTML.htm#Section_8.5)
+				$new_id = mt_rand(1, pow(2, 53)); // 2^53 is the maximum number in JavaScript (http://ecma262-5.com/ELS5_HTML.htm#Section_8.5)
 				// That number might be too big on some machines. :(
 				if ($new_id < 1)
 					$new_id = rand(1, 0x7FFFFFFF);
 				$query = sprintf("SELECT `guid` FROM `%sguids` WHERE `guid`='%u';",
 					$this->config->MySQL->prefix['value'],
 					$new_id);
-				if ( !($result = @mysql_query($query, $this->link)) ) {
+				if ( !($result = mysqli_query($this->link, $query)) ) {
 					// If the tables don't exist yet, create them.
-					if (mysql_errno() == 1146 && $this->createTables()) {
+					if (mysqli_errno($this->link) == 1146 && $this->createTables()) {
 						if (isset($etype_dirty))
 							$this->createTables($etype_dirty);
-						if ( !($result = @mysql_query($query, $this->link)) ) {
-							throw new NymphQueryFailedException('Query failed: ' . mysql_errno() . ': ' . mysql_error(), 0, null, $query);
+						if ( !($result = mysqli_query($this->link, $query)) ) {
+							throw new NymphQueryFailedException('Query failed: ' . mysqli_errno($this->link) . ': ' . mysqli_error($this->link), 0, null, $query);
 						}
 					} else {
-						throw new NymphQueryFailedException('Query failed: ' . mysql_errno() . ': ' . mysql_error(), 0, null, $query);
+						throw new NymphQueryFailedException('Query failed: ' . mysqli_errno($this->link) . ': ' . mysqli_error($this->link), 0, null, $query);
 					}
 				}
-				$row = mysql_fetch_row($result);
-				mysql_free_result($result);
+				$row = mysqli_fetch_row($result);
+				((mysqli_free_result($result) || (is_object($result) && (get_class($result) == "mysqli_result"))) ? true : false);
 				if (!isset($row[0]))
 					break;
 			}
@@ -1165,27 +1158,27 @@ class NymphDriverMySQL extends NymphDriver {
 			$query = sprintf("INSERT INTO `%sguids` (`guid`) VALUES (%u);",
 				$this->config->MySQL->prefix['value'],
 				$entity->guid);
-			if ( !(mysql_query($query, $this->link)) ) {
-				throw new NymphQueryFailedException('Query failed: ' . mysql_errno() . ': ' . mysql_error(), 0, null, $query);
+			if ( !(mysqli_query($this->link, $query)) ) {
+				throw new NymphQueryFailedException('Query failed: ' . mysqli_errno($this->link) . ': ' . mysqli_error($this->link), 0, null, $query);
 			}
 			$query = sprintf("INSERT INTO `%sentities%s` (`guid`, `tags`, `varlist`, `cdate`, `mdate`) VALUES (%u, '%s', '%s', %F, %F);",
 				$this->config->MySQL->prefix['value'],
 				$etype,
 				$entity->guid,
-				mysql_real_escape_string(','.implode(',', array_diff($entity->tags, array(''))).',', $this->link),
-				mysql_real_escape_string(','.implode(',', $varlist).',', $this->link),
+				mysqli_real_escape_string($this->link, ','.implode(',', array_diff($entity->tags, array(''))).','),
+				mysqli_real_escape_string($this->link, ','.implode(',', $varlist).','),
 				(float) $data['cdate'],
 				(float) $data['mdate']);
-			if ( !(mysql_query($query, $this->link))  ) {
+			if ( !(mysqli_query($this->link, $query))  ) {
 				// If the tables don't exist yet, create them.
-				if (mysql_errno() == 1146 && $this->createTables()) {
+				if (mysqli_errno($this->link) == 1146 && $this->createTables()) {
 					if (isset($etype_dirty))
 						$this->createTables($etype_dirty);
-					if ( !(mysql_query($query, $this->link)) ) {
-						throw new NymphQueryFailedException('Query failed: ' . mysql_errno() . ': ' . mysql_error(), 0, null, $query);
+					if ( !(mysqli_query($this->link, $query)) ) {
+						throw new NymphQueryFailedException('Query failed: ' . mysqli_errno($this->link) . ': ' . mysqli_error($this->link), 0, null, $query);
 					}
 				} else {
-					throw new NymphQueryFailedException('Query failed: ' . mysql_errno() . ': ' . mysql_error(), 0, null, $query);
+					throw new NymphQueryFailedException('Query failed: ' . mysqli_errno($this->link) . ': ' . mysqli_error($this->link), 0, null, $query);
 				}
 			}
 			unset($data['cdate'], $data['mdate']);
@@ -1195,37 +1188,37 @@ class NymphDriverMySQL extends NymphDriver {
 				preg_match_all('/a:3:\{i:0;s:22:"nymph_entity_reference";i:1;i:(\d+);/', $svalue, $references, PREG_PATTERN_ORDER);
 				$values[] = sprintf('(%u, \'%s\', \'%s\', \'%s\', %s, %s, %s, %s, %s, %s)',
 					$entity->guid,
-					mysql_real_escape_string($name, $this->link),
-					mysql_real_escape_string($svalue, $this->link),
-					mysql_real_escape_string(','.implode(',', $references[1]).',', $this->link),
+					mysqli_real_escape_string($this->link, $name),
+					mysqli_real_escape_string($this->link, $svalue),
+					mysqli_real_escape_string($this->link, ','.implode(',', $references[1]).','),
 					$value == true ? 'TRUE' : 'FALSE',
 					$value == 1 ? 'TRUE' : 'FALSE',
 					$value == 0 ? 'TRUE' : 'FALSE',
 					$value == -1 ? 'TRUE' : 'FALSE',
 					$value == array() ? 'TRUE' : 'FALSE',
-					is_string($value) ? '\''.mysql_real_escape_string($value, $this->link).'\'' : 'NULL');
+					is_string($value) ? '\''.mysqli_real_escape_string($this->link, $value).'\'' : 'NULL');
 			}
 			foreach ($sdata as $name => $value) {
 				preg_match_all('/a:3:\{i:0;s:22:"nymph_entity_reference";i:1;i:(\d+);/', $value, $references, PREG_PATTERN_ORDER);
 				$uvalue = unserialize($value);
 				$values[] = sprintf('(%u, \'%s\', \'%s\', \'%s\', %s, %s, %s, %s, %s, %s)',
 					$entity->guid,
-					mysql_real_escape_string($name, $this->link),
-					mysql_real_escape_string($value, $this->link),
-					mysql_real_escape_string(','.implode(',', $references[1]).',', $this->link),
+					mysqli_real_escape_string($this->link, $name),
+					mysqli_real_escape_string($this->link, $value),
+					mysqli_real_escape_string($this->link, ','.implode(',', $references[1]).','),
 					$uvalue == true ? 'TRUE' : 'FALSE',
 					$uvalue == 1 ? 'TRUE' : 'FALSE',
 					$uvalue == 0 ? 'TRUE' : 'FALSE',
 					$uvalue == -1 ? 'TRUE' : 'FALSE',
 					$uvalue == array() ? 'TRUE' : 'FALSE',
-					is_string($uvalue) ? '\''.mysql_real_escape_string($uvalue, $this->link).'\'' : 'NULL');
+					is_string($uvalue) ? '\''.mysqli_real_escape_string($this->link, $uvalue).'\'' : 'NULL');
 			}
 			$query = sprintf('INSERT INTO `%sdata%s` (`guid`, `name`, `value`, `references`, `compare_true`, `compare_one`, `compare_zero`, `compare_negone`, `compare_emptyarray`, `compare_string`) VALUES ',
 				$this->config->MySQL->prefix['value'],
 				$etype);
 			$query .= implode(',', $values).';';
-			if ( !(mysql_query($query, $this->link)) ) {
-				throw new NymphQueryFailedException('Query failed: ' . mysql_errno() . ': ' . mysql_error(), 0, null, $query);
+			if ( !(mysqli_query($this->link, $query)) ) {
+				throw new NymphQueryFailedException('Query failed: ' . mysqli_errno($this->link) . ': ' . mysqli_error($this->link), 0, null, $query);
 			}
 		} else {
 			// Removed any cached versions of this entity.
@@ -1234,19 +1227,19 @@ class NymphDriverMySQL extends NymphDriver {
 			$query = sprintf("UPDATE `%sentities%s` SET `tags`='%s', `varlist`='%s', `mdate`=%F WHERE `guid`='%u';",
 				$this->config->MySQL->prefix['value'],
 				$etype,
-				mysql_real_escape_string(','.implode(',', array_diff($entity->tags, array(''))).',', $this->link),
-				mysql_real_escape_string(','.implode(',', $varlist).',', $this->link),
+				mysqli_real_escape_string($this->link, ','.implode(',', array_diff($entity->tags, array(''))).','),
+				mysqli_real_escape_string($this->link, ','.implode(',', $varlist).','),
 				(float) $data['mdate'],
 				(int) $entity->guid);
-			if ( !(mysql_query($query, $this->link)) ) {
-				throw new NymphQueryFailedException('Query failed: ' . mysql_errno() . ': ' . mysql_error(), 0, null, $query);
+			if ( !(mysqli_query($this->link, $query)) ) {
+				throw new NymphQueryFailedException('Query failed: ' . mysqli_errno($this->link) . ': ' . mysqli_error($this->link), 0, null, $query);
 			}
 			$query = sprintf("DELETE FROM `%sdata%s` WHERE `guid`='%u';",
 				$this->config->MySQL->prefix['value'],
 				$etype,
 				(int) $entity->guid);
-			if ( !(mysql_query($query, $this->link)) ) {
-				throw new NymphQueryFailedException('Query failed: ' . mysql_errno() . ': ' . mysql_error(), 0, null, $query);
+			if ( !(mysqli_query($this->link, $query)) ) {
+				throw new NymphQueryFailedException('Query failed: ' . mysqli_errno($this->link) . ': ' . mysqli_error($this->link), 0, null, $query);
 			}
 			unset($data['cdate'], $data['mdate']);
 			$values = array();
@@ -1255,37 +1248,37 @@ class NymphDriverMySQL extends NymphDriver {
 				preg_match_all('/a:3:\{i:0;s:22:"nymph_entity_reference";i:1;i:(\d+);/', $svalue, $references, PREG_PATTERN_ORDER);
 				$values[] = sprintf('(%u, \'%s\', \'%s\', \'%s\', %s, %s, %s, %s, %s, %s)',
 					(int) $entity->guid,
-					mysql_real_escape_string($name, $this->link),
-					mysql_real_escape_string($svalue, $this->link),
-					mysql_real_escape_string(','.implode(',', $references[1]).',', $this->link),
+					mysqli_real_escape_string($this->link, $name),
+					mysqli_real_escape_string($this->link, $svalue),
+					mysqli_real_escape_string($this->link, ','.implode(',', $references[1]).','),
 					$value == true ? 'TRUE' : 'FALSE',
 					$value == 1 ? 'TRUE' : 'FALSE',
 					$value == 0 ? 'TRUE' : 'FALSE',
 					$value == -1 ? 'TRUE' : 'FALSE',
 					$value == array() ? 'TRUE' : 'FALSE',
-					is_string($value) ? '\''.mysql_real_escape_string($value, $this->link).'\'' : 'NULL');
+					is_string($value) ? '\''.mysqli_real_escape_string($this->link, $value).'\'' : 'NULL');
 			}
 			foreach ($sdata as $name => $value) {
 				preg_match_all('/a:3:\{i:0;s:22:"nymph_entity_reference";i:1;i:(\d+);/', $value, $references, PREG_PATTERN_ORDER);
 				$uvalue = unserialize($value);
 				$values[] = sprintf('(%u, \'%s\', \'%s\', \'%s\', %s, %s, %s, %s, %s, %s)',
 					(int) $entity->guid,
-					mysql_real_escape_string($name, $this->link),
-					mysql_real_escape_string($value, $this->link),
-					mysql_real_escape_string(','.implode(',', $references[1]).',', $this->link),
+					mysqli_real_escape_string($this->link, $name),
+					mysqli_real_escape_string($this->link, $value),
+					mysqli_real_escape_string($this->link, ','.implode(',', $references[1]).','),
 					$uvalue == true ? 'TRUE' : 'FALSE',
 					$uvalue == 1 ? 'TRUE' : 'FALSE',
 					$uvalue == 0 ? 'TRUE' : 'FALSE',
 					$uvalue == -1 ? 'TRUE' : 'FALSE',
 					$uvalue == array() ? 'TRUE' : 'FALSE',
-					is_string($uvalue) ? '\''.mysql_real_escape_string($uvalue, $this->link).'\'' : 'NULL');
+					is_string($uvalue) ? '\''.mysqli_real_escape_string($this->link, $uvalue).'\'' : 'NULL');
 			}
 			$query = sprintf('INSERT INTO `%sdata%s` (`guid`, `name`, `value`, `references`, `compare_true`, `compare_one`, `compare_zero`, `compare_negone`, `compare_emptyarray`, `compare_string`) VALUES ',
 				$this->config->MySQL->prefix['value'],
 				$etype);
 			$query .= implode(',', $values).';';
-			if ( !(mysql_query($query, $this->link)) ) {
-				throw new NymphQueryFailedException('Query failed: ' . mysql_errno() . ': ' . mysql_error(), 0, null, $query);
+			if ( !(mysqli_query($this->link, $query)) ) {
+				throw new NymphQueryFailedException('Query failed: ' . mysqli_errno($this->link) . ': ' . mysqli_error($this->link), 0, null, $query);
 			}
 		}
 		// Cache the entity.
@@ -1304,11 +1297,11 @@ class NymphDriverMySQL extends NymphDriver {
 			throw new NymphInvalidParametersException('Name not given for UID');
 		$query = sprintf("INSERT INTO `%suids` (`name`, `cur_uid`) VALUES ('%s', %u) ON DUPLICATE KEY UPDATE `cur_uid`=%u;",
 			$this->config->MySQL->prefix['value'],
-			mysql_real_escape_string($name, $this->link),
+			mysqli_real_escape_string($this->link, $name),
 			(int) $value,
 			(int) $value);
-		if ( !(mysql_query($query, $this->link)) ) {
-			throw new NymphQueryFailedException('Query failed: ' . mysql_errno() . ': ' . mysql_error(), 0, null, $query);
+		if ( !(mysqli_query($this->link, $query)) ) {
+			throw new NymphQueryFailedException('Query failed: ' . mysqli_errno($this->link) . ': ' . mysqli_error($this->link), 0, null, $query);
 		}
 		return true;
 	}

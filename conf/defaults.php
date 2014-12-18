@@ -46,6 +46,11 @@ return (object) array(
 			'description' => 'The host on which to connect to MySQL. Can include a port, like hostname:port.',
 			'value' => 'localhost',
 		),
+		'port' => array(
+			'cname' => 'Port',
+			'description' => 'The port on which to connect to MySQL.',
+			'value' => 3306,
+		),
 		'user' => array(
 			'cname' => 'User',
 			'description' => 'The MySQL user.',
