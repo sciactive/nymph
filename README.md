@@ -24,8 +24,8 @@ $.ajax({
   "url": "titlesearch.php",
   "data": {"title":"%not as easy%","deleted":"false"},
   "dataType": "JSON",
-  "success": function(data){
-    console.log(data);
+  "success": function(entities){
+    console.log(entities);
   },
   "error": function(){
     alert("Error");
@@ -35,20 +35,24 @@ $.ajax({
 ```php
 <?php
 // This file is the endpoint for searching for a BlogPost by title.
-$mysqllink = require('databasesetup.php');
+$mysqli = new mysqli();
 
-$title = mysql_real_escape_string($_GET['title'], $mysqllink);
+$title = $_GET['title'];
 $deleted = ($_GET['deleted'] == "true" ? 'TRUE' : 'FALSE');
-
-$result = mysql_query("SELECT * FROM BlogPosts WHERE title LIKE '$title' AND deleted=$deleted;", $mysqllink);
-
 $entities = array();
-while (($row = mysql_fetch_assoc($result)) !== false) {
-  $entities[] = $row;
+if ($stmt = $mysqli->prepare("SELECT * FROM BlogPosts WHERE title LIKE '?' AND deleted=?")) {
+  $stmt->bind_param("ss", $title, $deleted);
+  $stmt->execute();
+  $result = $stmt->get_result();
+  while ($row = $result->fetch_assoc()) {
+    $entities[] = $row;
+  }
+  $stmt->close();
 }
 
 header("Content-Type: application/json");
 echo json_encode($entities);
+$mysqli->close();
 ```
 *Without Nymph, every time you want a new type of query available on the frontend, you're going to need to either modify this endpoint or create a new one.*
 
