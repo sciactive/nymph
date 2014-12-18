@@ -201,7 +201,7 @@ license LGPL
 		},
 
 		getEntity: function(){
-			var that = this, args = arguments;
+			var that = this, args = Array.prototype.slice.call(arguments);
 			return new Promise(function(resolve, reject){
 				that.getEntityData.apply(that, args).then(function(data){
 					if (data != null) {
@@ -217,7 +217,7 @@ license LGPL
 
 		getEntityData: function(){
 			var that = this,
-				args = arguments;
+				args = Array.prototype.slice.call(arguments);
 			return new Promise(function(resolve, reject){
 				getAjax({
 					url: that.restURL,
@@ -239,7 +239,7 @@ license LGPL
 
 		getEntities: function(){
 			var that = this,
-				args = arguments;
+				args = Array.prototype.slice.call(arguments);
 			return new Promise(function(resolve, reject){
 				getAjax({
 					url: that.restURL,

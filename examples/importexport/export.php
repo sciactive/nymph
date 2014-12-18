@@ -10,14 +10,14 @@ if (getenv('DATABASE_URL')) {
 require '../../lib/require.php';
 
 require '../../src/Nymph.php';
-RPHP::_('NymphConfig', array(), function(){
+\RPHP::_('NymphConfig', array(), function(){
 	return include '../config.php';
 });
 
-RPHP::_(array('Nymph'), function(){
+\RPHP::_(array('Nymph'), function(){
 	require '../employee/Employee.php';
 	require '../sudoku/Game.php';
 	require '../todo/Todo.php';
 });
 
-RPHP::_('Nymph')->exportPrint();
+\RPHP::_('Nymph')->exportPrint();

@@ -5,20 +5,20 @@ if ($_REQUEST['action'] === 'export' && !getenv('DATABASE_URL')) {
 	require '../../lib/require.php';
 
 	require '../../src/Nymph.php';
-	RPHP::_('NymphConfig', array(), function(){
+	\RPHP::_('NymphConfig', array(), function(){
 		return include '../config.php';
 	});
 
-	RPHP::_(array('Nymph'), function(){
+	\RPHP::_(array('Nymph'), function(){
 		require 'Game.php';
 	});
 
-	RPHP::_('Nymph')->exportPrint();
+	\RPHP::_('Nymph')->exportPrint();
 	exit;
 }
 
 ?>
-<!doctype html>
+<!DOCTYPE html>
 <html>
 	<head>
 		<title>Nymph Sudoku</title>

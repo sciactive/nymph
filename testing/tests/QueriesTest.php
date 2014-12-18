@@ -2,8 +2,8 @@
 
 class QueriesTest extends PHPUnit_Framework_TestCase {
 	public function testDeleteOldTestData() {
-		$nymph = RPHP::_('Nymph');
-		$this->assertInstanceOf('NymphDriver', $nymph);
+		$nymph = \RPHP::_('Nymph');
+		$this->assertInstanceOf('\\Nymph\\Drivers\\DriverInterface', $nymph);
 
 		$all = $nymph->getEntities(array('class' => 'TestModel'));
 		$this->assertTrue((array)$all===$all);

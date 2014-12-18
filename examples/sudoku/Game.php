@@ -8,7 +8,7 @@
  * @property int $time The time the user has spent playing, in seconds.
  * @property bool $done Whether it's done.
  */
-class Game extends Entity {
+class Game extends \Nymph\Entity {
 	const etype = 'game';
 	protected $whitelistTags = array();
 	protected $whitelistData = array('name', 'difficulty', 'board', 'solvedBoard', 'playBoard', 'time', 'done');

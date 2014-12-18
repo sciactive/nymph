@@ -12,15 +12,15 @@ if ($_FILES) {
 		require '../../lib/require.php';
 
 		require '../../src/Nymph.php';
-		RPHP::_('NymphConfig', array(), function(){
+		\RPHP::_('NymphConfig', array(), function(){
 			return include '../config.php';
 		});
 
-		RPHP::_(array('Nymph'), function(){
+		\RPHP::_(array('Nymph'), function(){
 			require 'Game.php';
 		});
 
-		$result = RPHP::_('Nymph')->import($_FILES['games']['tmp_name']);
+		$result = \RPHP::_('Nymph')->import($_FILES['games']['tmp_name']);
 		if ($result) {
 			header("HTTP/1.1 302 Found", true, 302);
 			header("Location: index.php");

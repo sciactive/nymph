@@ -1,4 +1,4 @@
-<?php
+<?php namespace Nymph;
 /**
  * Entity class.
  *
@@ -148,7 +148,7 @@ class Entity implements EntityInterface {
 	 */
 	public function __construct($id = 0) {
 		if ($id > 0) {
-			$entity = RPHP::_('Nymph')->getEntity(array('class' => get_class($this)), array('&', 'guid' => $id));
+			$entity = \RPHP::_('Nymph')->getEntity(array('class' => get_class($this)), array('&', 'guid' => $id));
 			if (isset($entity)) {
 				$this->guid = $entity->guid;
 				$this->tags = $entity->tags;
@@ -167,7 +167,7 @@ class Entity implements EntityInterface {
 		global $_;
 		$class = get_called_class();
 		$args = func_get_args();
-		$reflector = new ReflectionClass($class);
+		$reflector = new \ReflectionClass($class);
 		$entity = $reflector->newInstanceArgs($args);
 		// Use hook functionality when in 2be.
 		if (isset($_) && isset($_->hook)) {
@@ -229,14 +229,14 @@ class Entity implements EntityInterface {
 				}
 				return $this->entityCache[$name];
 			} else {
-				throw new EntityCorruptedException("Corrupted entity data found on entity with GUID {$this->guid}.");
+				throw new Exceptions\EntityCorruptedException("Corrupted entity data found on entity with GUID {$this->guid}.");
 			}
 		}
 		// If it's not an entity, return the regular value.
 		if ((array) $this->data[$name] === $this->data[$name]) {
 			// But, if it's an array, check all the values for entity references, and change them.
 			array_walk($this->data[$name], array($this, 'referenceToEntity'));
-		} elseif ((object) $this->data[$name] === $this->data[$name] && !(((is_a($this->data[$name], 'Entity') || is_a($this->data[$name], 'hook_override'))) && is_callable(array($this->data[$name], 'toReference')))) {
+		} elseif ((object) $this->data[$name] === $this->data[$name] && !(((is_a($this->data[$name], '\\Nymph\\Entity') || is_a($this->data[$name], 'hook_override'))) && is_callable(array($this->data[$name], 'toReference')))) {
 			// Only do this for non-entity objects.
 			foreach ($this->data[$name] as &$cur_property) {
 				$this->referenceToEntity($cur_property, null);
@@ -299,7 +299,7 @@ class Entity implements EntityInterface {
 		if (isset($this->sdata[$name])) {
 			unset($this->sdata[$name]);
 		}
-		if ((is_a($value, 'Entity') || is_a($value, 'hook_override')) && is_callable(array($value, 'toReference'))) {
+		if ((is_a($value, '\\Nymph\\Entity') || is_a($value, 'hook_override')) && is_callable(array($value, 'toReference'))) {
 			// Store a reference to the entity (its GUID and the class it was loaded as).
 			// We don't want to manipulate $value itself, because it could be a variable that the program is still using.
 			$save_value = $value->toReference();
@@ -420,7 +420,7 @@ class Entity implements EntityInterface {
 		if ($this->isASleepingReference) {
 			$this->referenceWake();
 		}
-		return RPHP::_('Nymph')->deleteEntity($this);
+		return \RPHP::_('Nymph')->deleteEntity($this);
 	}
 
 	/**
@@ -434,7 +434,7 @@ class Entity implements EntityInterface {
 		if ($this->isASleepingReference) {
 			$this->referenceWake();
 		}
-		if ((is_a($item, 'Entity') || is_a($item, 'hook_override')) && isset($item->guid) && is_callable(array($item, 'toReference'))) {
+		if ((is_a($item, '\\Nymph\\Entity') || is_a($item, 'hook_override')) && isset($item->guid) && is_callable(array($item, 'toReference'))) {
 			// This is an entity, so we should put it in the entity cache.
 			if (!isset($this->entityCache["reference_guid: {$item->guid}"])) {
 				$this->entityCache["reference_guid: {$item->guid}"] = clone $item;
@@ -448,7 +448,7 @@ class Entity implements EntityInterface {
 		if ($this->isASleepingReference) {
 			$this->referenceWake();
 		}
-		if (!(is_a($object, 'Entity') || is_a($object, 'hook_override'))) {
+		if (!(is_a($object, '\\Nymph\\Entity') || is_a($object, 'hook_override'))) {
 			return false;
 		}
 		if (isset($this->guid) || isset($object->guid)) {
@@ -482,7 +482,7 @@ class Entity implements EntityInterface {
 		if ($this->isASleepingReference) {
 			$this->referenceWake();
 		}
-		if ((is_a($item, 'Entity') || is_a($item, 'hook_override')) && is_callable(array($item, 'toReference'))) {
+		if ((is_a($item, '\\Nymph\\Entity') || is_a($item, 'hook_override')) && is_callable(array($item, 'toReference'))) {
 			// Convert entities to references.
 			return $item->toReference();
 		} elseif ((array) $item === $item) {
@@ -558,7 +558,7 @@ class Entity implements EntityInterface {
 		if ($this->isASleepingReference) {
 			$this->referenceWake();
 		}
-		if (!(is_a($object, 'Entity') || is_a($object, 'hook_override'))) {
+		if (!(is_a($object, '\\Nymph\\Entity') || is_a($object, 'hook_override'))) {
 			return false;
 		}
 		if (isset($this->guid) || isset($object->guid)) {
@@ -746,7 +746,7 @@ class Entity implements EntityInterface {
 			} else {
 				array_walk($item, array($this, 'referenceToEntity'));
 			}
-		} elseif ((object) $item === $item && !(((is_a($item, 'Entity') || is_a($item, 'hook_override'))) && is_callable(array($item, 'toReference')))) {
+		} elseif ((object) $item === $item && !(((is_a($item, '\\Nymph\\Entity') || is_a($item, 'hook_override'))) && is_callable(array($item, 'toReference')))) {
 			// Only do this for non-entity objects.
 			foreach ($item as &$cur_property) {
 				$this->referenceToEntity($cur_property, null);
@@ -764,7 +764,7 @@ class Entity implements EntityInterface {
 		if (!$this->isASleepingReference) {
 			return true;
 		}
-		$entity = RPHP::_('Nymph')->getEntity(array('class' => $this->sleepingReference[2], 'skip_ac' => (bool) $this->_nUseSkipAC), array('&', 'guid' => $this->sleepingReference[1]));
+		$entity = \RPHP::_('Nymph')->getEntity(array('class' => $this->sleepingReference[2], 'skip_ac' => (bool) $this->_nUseSkipAC), array('&', 'guid' => $this->sleepingReference[1]));
 		if (!isset($entity)) {
 			return false;
 		}
@@ -783,7 +783,7 @@ class Entity implements EntityInterface {
 		if (!isset($this->guid)) {
 			return false;
 		}
-		$refresh = RPHP::_('Nymph')->getEntity(array('class' => get_class($this)), array('&', 'guid' => $this->guid));
+		$refresh = \RPHP::_('Nymph')->getEntity(array('class' => get_class($this)), array('&', 'guid' => $this->guid));
 		if (!isset($refresh)) {
 			return 0;
 		}
@@ -816,7 +816,7 @@ class Entity implements EntityInterface {
 		if ($this->isASleepingReference) {
 			$this->referenceWake();
 		}
-		return RPHP::_('Nymph')->saveEntity($this);
+		return \RPHP::_('Nymph')->saveEntity($this);
 	}
 
 	public function toReference() {

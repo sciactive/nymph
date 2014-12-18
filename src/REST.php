@@ -1,4 +1,4 @@
-<?php
+<?php namespace Nymph;
 /**
  * Simple Nymph REST server implementation.
  *
@@ -10,14 +10,14 @@
  */
 
 /**
- * NymphREST class.
+ * REST class.
  *
  * Provides Nymph functionality compatible with a REST API. Allows the developer
  * to design their own API, or just use the reference implementation.
  *
  * @package Nymph
  */
-class NymphREST {
+class REST {
 	/**
 	 * Run the Nymph REST server process.
 	 *
@@ -53,7 +53,7 @@ class NymphREST {
 				$guid = (int) $delEnt['guid'];
 				$etype = $delEnt['etype'];
 				try {
-					if (RPHP::_('Nymph')->deleteEntityByID($guid, $etype)) {
+					if (\RPHP::_('Nymph')->deleteEntityByID($guid, $etype)) {
 						$deleted[] = $guid;
 					} else {
 						$failures = true;
@@ -76,7 +76,7 @@ class NymphREST {
 			}
 			header("HTTP/1.1 200 OK", true, 200);
 		} else {
-			if (!RPHP::_('Nymph')->deleteUID("$data")) {
+			if (!\RPHP::_('Nymph')->deleteUID("$data")) {
 				return $this->httpError(500, "Internal Server Error");
 			}
 			header("HTTP/1.1 204 No Content", true, 204);
@@ -111,7 +111,7 @@ class NymphREST {
 					if ($entity->save()) {
 						$created[] = $entity;
 					}
-				} catch (EntityInvalidDataException $e) {
+				} catch (Exceptions\EntityInvalidDataException $e) {
 					$invalidData = true;
 				}
 			}
@@ -128,7 +128,7 @@ class NymphREST {
 				echo json_encode($created);
 			}
 		} else {
-			$result = RPHP::_('Nymph')->newUID("$data");
+			$result = \RPHP::_('Nymph')->newUID("$data");
 			if (empty($result)) {
 				return $this->httpError(500, "Internal Server Error");
 			}
@@ -219,7 +219,7 @@ class NymphREST {
 		if (in_array($action, array('entity', 'entities'))) {
 			$args = json_decode($data, true);
 			if (is_int($args)) {
-				$result = RPHP::_('Nymph')->$method($args);
+				$result = \RPHP::_('Nymph')->$method($args);
 			} else {
 				$count = count($args);
 				if ($count > 1) {
@@ -234,17 +234,17 @@ class NymphREST {
 						$args[$i] = $newArg;
 					}
 				}
-				$result = call_user_func_array(array(RPHP::_('Nymph'), $method), $args);
+				$result = call_user_func_array(array(\RPHP::_('Nymph'), $method), $args);
 			}
 			if (empty($result)) {
-				if ($action === 'entity' || RPHP::_('NymphConfig')->empty_list_error['value']) {
+				if ($action === 'entity' || \RPHP::_('NymphConfig')->empty_list_error['value']) {
 					return $this->httpError(404, "Not Found");
 				}
 			}
 			echo json_encode($result);
 			return true;
 		} else {
-			$result = RPHP::_('Nymph')->$method("$data");
+			$result = \RPHP::_('Nymph')->$method("$data");
 			if ($result === null) {
 				return $this->httpError(404, "Not Found");
 			} elseif (empty($result)) {
@@ -260,7 +260,7 @@ class NymphREST {
 			return false;
 		}
 		if ((int)$entityData['guid'] > 0) {
-			$entity = RPHP::_('Nymph')->getEntity(
+			$entity = \RPHP::_('Nymph')->getEntity(
 					array('class' => $entityData['class']),
 					array('&',
 						'guid' => (int)$entityData['guid']
@@ -316,7 +316,7 @@ class NymphREST {
 			} else {
 				array_walk($item, array($this, 'referenceToEntity'));
 			}
-		} elseif ((object) $item === $item && !(((is_a($item, 'Entity') || is_a($item, 'hook_override'))) && is_callable(array($item, 'toReference')))) {
+		} elseif ((object) $item === $item && !(((is_a($item, '\\Nymph\\Entity') || is_a($item, 'hook_override'))) && is_callable(array($item, 'toReference')))) {
 			// Only do this for non-entity objects.
 			foreach ($item as &$cur_property) {
 				$this->referenceToEntity($cur_property, null);

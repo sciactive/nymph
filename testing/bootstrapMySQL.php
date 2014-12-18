@@ -2,12 +2,12 @@
 
 require_once '../lib/require.php';
 
-RPHP::undef('NymphConfig');
-RPHP::undef('Nymph');
+\RPHP::undef('NymphConfig');
+\RPHP::undef('Nymph');
 
 include '../src/Nymph.php';
 
-RPHP::_('NymphConfig', array(), function(){
+\RPHP::_('NymphConfig', array(), function(){
 	// Nymph's configuration.
 
 	$nymph_config = include(dirname(__FILE__).DIRECTORY_SEPARATOR.'../conf/defaults.php');
@@ -28,6 +28,6 @@ RPHP::_('NymphConfig', array(), function(){
 	return $nymph_config;
 });
 
-$Nymph = RPHP::_('Nymph');
+$Nymph = \RPHP::_('Nymph');
 
 require_once 'TestModel.php';

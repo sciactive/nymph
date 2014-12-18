@@ -1,6 +1,6 @@
-<?php
+<?php namespace Nymph\Drivers;
 /**
- * NymphDriverPostgreSQL class.
+ * PostgreSQLDriver class.
  *
  * @package Nymph
  * @license http://www.gnu.org/licenses/lgpl.html
@@ -8,13 +8,14 @@
  * @copyright SciActive.com
  * @link http://sciactive.com/
  */
+use Nymph\Exceptions;
 
 /**
  * PostgreSQL ORM based Nymph driver.
  *
  * @package Nymph
  */
-class NymphDriverPostgreSQL extends NymphDriver {
+class PostgreSQLDriver extends AbstractDriver {
 	/**
 	 * The PostgreSQL link identifier for this instance.
 	 *
@@ -52,7 +53,7 @@ class NymphDriverPostgreSQL extends NymphDriver {
 	public function connect() {
 		// Check that the PostgreSQL extension is installed.
 		if (!is_callable('pg_connect')) {
-			throw new NymphUnableToConnectException('PostgreSQL PHP extension is not available. It probably has not been installed. Please install and configure it in order to use PostgreSQL.');
+			throw new Exceptions\UnableToConnectException('PostgreSQL PHP extension is not available. It probably has not been installed. Please install and configure it in order to use PostgreSQL.');
 		}
 		$connection_type = $this->config->PostgreSQL->connection_type['value'];
 		$host = $this->config->PostgreSQL->host['value'];
@@ -77,9 +78,9 @@ class NymphDriverPostgreSQL extends NymphDriver {
 			} else {
 				$this->connected = false;
 				if ($host == 'localhost' && $user == 'nymph' && $password == 'password' && $database == 'nymph' && $connection_type == 'host') {
-					throw new NymphNotConfiguredException();
+					throw new Exceptions\NotConfiguredException();
 				} else {
-					throw new NymphUnableToConnectException('Could not connect: ' . pg_last_error());
+					throw new Exceptions\UnableToConnectException('Could not connect: ' . pg_last_error());
 				}
 			}
 		}
@@ -179,10 +180,10 @@ class NymphDriverPostgreSQL extends NymphDriver {
 			continue;
 		}
 		if ( !(pg_send_query($this->link, $query)) ) {
-			throw new NymphQueryFailedException('Query failed: ' . pg_last_error(), 0, null, $query);
+			throw new Exceptions\QueryFailedException('Query failed: ' . pg_last_error(), 0, null, $query);
 		}
 		if ( !($result = pg_get_result($this->link)) ) {
-			throw new NymphQueryFailedException('Query failed: ' . pg_last_error(), 0, null, $query);
+			throw new Exceptions\QueryFailedException('Query failed: ' . pg_last_error(), 0, null, $query);
 		}
 		if ($error = pg_result_error_field($result, PGSQL_DIAG_SQLSTATE)) {
 			// If the tables don't exist yet, create them.
@@ -191,10 +192,10 @@ class NymphDriverPostgreSQL extends NymphDriver {
 					$this->createTables($etype_dirty);
 				}
 				if ( !($result = pg_query($this->link, $query)) ) {
-					throw new NymphQueryFailedException('Query failed: ' . pg_last_error(), 0, null, $query);
+					throw new Exceptions\QueryFailedException('Query failed: ' . pg_last_error(), 0, null, $query);
 				}
 			} else {
-				throw new NymphQueryFailedException('Query failed: ' . pg_last_error(), 0, null, $query);
+				throw new Exceptions\QueryFailedException('Query failed: ' . pg_last_error(), 0, null, $query);
 			}
 		}
 		return $result;
@@ -214,7 +215,7 @@ class NymphDriverPostgreSQL extends NymphDriver {
 
 	public function deleteUID($name) {
 		if (!$name) {
-			throw new NymphInvalidParametersException('Name not given for UID');
+			throw new Exceptions\InvalidParametersException('Name not given for UID');
 		}
 		$this->query("DELETE FROM \"{$this->prefix}uids\" WHERE \"name\"='".pg_escape_string($this->link, $name)."';");
 		return true;
@@ -222,7 +223,7 @@ class NymphDriverPostgreSQL extends NymphDriver {
 
 	public function export($filename) {
 		if (!$fhandle = fopen($filename, 'w')) {
-			throw new NymphInvalidParametersException('Provided filename is not writeable.');
+			throw new Exceptions\InvalidParametersException('Provided filename is not writeable.');
 		}
 		fwrite($fhandle, "# Nymph Entity Exchange\n");
 		fwrite($fhandle, "# Nymph Version ".NYMPH_VERSION."\n");
@@ -359,7 +360,7 @@ class NymphDriverPostgreSQL extends NymphDriver {
 
 	public function getEntities() {
 		if (!$this->connected) {
-			throw new NymphUnableToConnectException();
+			throw new Exceptions\UnableToConnectException();
 		}
 		// Set up options and selectors.
 		$selectors = func_get_args();
@@ -927,7 +928,7 @@ class NymphDriverPostgreSQL extends NymphDriver {
 
 	public function getUID($name) {
 		if (!$name) {
-			throw new NymphInvalidParametersException('Name not given for UID.');
+			throw new Exceptions\InvalidParametersException('Name not given for UID.');
 		}
 		$result = $this->query("SELECT \"cur_uid\" FROM \"{$this->prefix}uids\" WHERE \"name\"='".pg_escape_string($this->link, $name)."';");
 		$row = pg_fetch_row($result);
@@ -937,7 +938,7 @@ class NymphDriverPostgreSQL extends NymphDriver {
 
 	public function import($filename) {
 		if (!$fhandle = fopen($filename, 'r')) {
-			throw new NymphInvalidParametersException('Provided filename is unreadable.');
+			throw new Exceptions\InvalidParametersException('Provided filename is unreadable.');
 		}
 		$line = '';
 		$data = array();
@@ -1033,7 +1034,7 @@ class NymphDriverPostgreSQL extends NymphDriver {
 
 	public function newUID($name) {
 		if (!$name) {
-			throw new NymphInvalidParametersException('Name not given for UID.');
+			throw new Exceptions\InvalidParametersException('Name not given for UID.');
 		}
 		$this->query('BEGIN;');
 		$result = $this->query("SELECT \"cur_uid\" FROM \"{$this->prefix}uids\" WHERE \"name\"='".pg_escape_string($this->link, $name)."' FOR UPDATE;");
@@ -1053,7 +1054,7 @@ class NymphDriverPostgreSQL extends NymphDriver {
 
 	public function renameUID($old_name, $new_name) {
 		if (!$old_name || !$new_name) {
-			throw new NymphInvalidParametersException('Name not given for UID.');
+			throw new Exceptions\InvalidParametersException('Name not given for UID.');
 		}
 		$this->query("UPDATE \"{$this->prefix}uids\" SET \"name\"='".pg_escape_string($this->link, $new_name)."' WHERE \"name\"='".pg_escape_string($this->link, $old_name)."';");
 		return true;
@@ -1188,7 +1189,7 @@ class NymphDriverPostgreSQL extends NymphDriver {
 
 	public function setUID($name, $value) {
 		if (!$name) {
-			throw new NymphInvalidParametersException('Name not given for UID.');
+			throw new Exceptions\InvalidParametersException('Name not given for UID.');
 		}
 		$this->query("DELETE FROM \"{$this->prefix}uids\" WHERE \"name\"='".pg_escape_string($this->link, $name)."'; INSERT INTO \"{$this->prefix}uids\" (\"name\", \"cur_uid\") VALUES ('".pg_escape_string($this->link, $name)."', ".((int) $value).");");
 		return true;

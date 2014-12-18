@@ -1,4 +1,4 @@
-<?php
+<?php namespace Nymph\Drivers;
 /**
  * Common Nymph driver.
  *
@@ -8,15 +8,16 @@
  * @copyright SciActive.com
  * @link http://sciactive.com/
  */
+use Nymph\Exceptions;
 
 /**
- * NymphDriver class.
+ * AbstractDriver class.
  *
  * Provides basic methods for a Nymph ORM/DAL.
  *
  * @package Nymph
  */
-class NymphDriver implements NymphDriverInterface {
+class AbstractDriver implements DriverInterface {
 	const VERSION = '1.0.0';
 
 	/**
@@ -112,7 +113,7 @@ class NymphDriver implements NymphDriverInterface {
 	 */
 	protected function entityReferenceSearch($value, $entity) {
 		if ((array) $value !== $value || !isset($entity)) {
-			throw new NymphInvalidParametersException();
+			throw new Exceptions\InvalidParametersException();
 		}
 		// Get the GUID, if the passed $entity is an object.
 		if ((array) $entity === $entity) {

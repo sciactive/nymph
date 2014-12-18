@@ -301,7 +301,7 @@ class EntityClassTest extends PHPUnit_Framework_TestCase {
 			$eighth
 		);
 
-		RPHP::_('Nymph')->sort($arr, 'name');
+		\RPHP::_('Nymph')->sort($arr, 'name');
 
 		$this->assertEquals(array(
 			$first,
@@ -316,7 +316,7 @@ class EntityClassTest extends PHPUnit_Framework_TestCase {
 			$tenth
 		), $arr);
 
-		RPHP::_('Nymph')->sort($arr, 'name', true, true);
+		\RPHP::_('Nymph')->sort($arr, 'name', true, true);
 
 		$this->assertEquals(array_reverse(array(
 			$first,
@@ -394,11 +394,7 @@ class EntityClassTest extends PHPUnit_Framework_TestCase {
 			$firstsub1
 		);
 
-		RPHP::_('Nymph')->hsort($arr, 'name', 'parent');
-
-		foreach ($arr as $cur) {
-			echo "\n".(isset($cur->parent) ? "{$cur->parent->name} : " : '')."$cur->name\n";
-		}
+		\RPHP::_('Nymph')->hsort($arr, 'name', 'parent');
 
 		$this->assertEquals(array(
 			$first,
@@ -419,7 +415,7 @@ class EntityClassTest extends PHPUnit_Framework_TestCase {
 			$tenth
 		), $arr);
 
-		RPHP::_('Nymph')->hsort($arr, 'name', 'parent', true, true);
+		\RPHP::_('Nymph')->hsort($arr, 'name', 'parent', true, true);
 
 		$this->assertEquals(array_reverse(array(
 			$firstsub1,

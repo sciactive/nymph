@@ -15,7 +15,7 @@ define('IS_MANAGER', true);
  * @property int $end_date The employee's end date. (If no longer employed.)
  * @property string $phone The employee's phone number.
  */
-class Employee extends Entity {
+class Employee extends \Nymph\Entity {
 	const etype = 'employee';
 	protected $protectedTags = array('employee');
 	protected $whitelistTags = array('boss', 'bigcheese');
@@ -59,7 +59,7 @@ class Employee extends Entity {
 		}
 		// Generate employee ID.
 		if (!isset($this->id)) {
-			$this->id = RPHP::_('Nymph')->newUID('employee');
+			$this->id = \RPHP::_('Nymph')->newUID('employee');
 		}
 		return parent::save();
 	}

@@ -1,6 +1,6 @@
-<?php
+<?php namespace Nymph\Drivers;
 /**
- * NymphDriverMySQL class.
+ * MySQLDriver class.
  *
  * @package Nymph
  * @license http://www.gnu.org/licenses/lgpl.html
@@ -8,13 +8,14 @@
  * @copyright SciActive.com
  * @link http://sciactive.com/
  */
+use Nymph\Exceptions;
 
 /**
  * MySQL ORM based Nymph driver.
  *
  * @package Nymph
  */
-class NymphDriverMySQL extends NymphDriver {
+class MySQLDriver extends AbstractDriver {
 	/**
 	 * The MySQL link identifier for this instance.
 	 *
@@ -44,7 +45,7 @@ class NymphDriverMySQL extends NymphDriver {
 	public function connect() {
 		// Check that the MySQL extension is installed.
 		if (!is_callable('mysql_connect')) {
-			throw new NymphUnableToConnectException('MySQL PHP extension is not available. It probably has not been installed. Please install and configure it in order to use MySQL.');
+			throw new Exceptions\UnableToConnectException('MySQL PHP extension is not available. It probably has not been installed. Please install and configure it in order to use MySQL.');
 		}
 		$host = $this->config->MySQL->host['value'];
 		$user = $this->config->MySQL->user['value'];
@@ -58,9 +59,9 @@ class NymphDriverMySQL extends NymphDriver {
 			} else {
 				$this->connected = false;
 				if ($host == 'localhost' && $user == 'nymph' && $password == 'password' && $database == 'nymph') {
-					throw new NymphNotConfiguredException();
+					throw new Exceptions\NotConfiguredException();
 				} else {
-					throw new NymphUnableToConnectException('Could not connect: ' . mysqli_error($this->link));
+					throw new Exceptions\UnableToConnectException('Could not connect: ' . mysqli_error($this->link));
 				}
 			}
 		}
@@ -114,10 +115,10 @@ class NymphDriverMySQL extends NymphDriver {
 					$this->createTables($etype_dirty);
 				}
 				if ( !($result = mysqli_query($this->link, $query)) ) {
-					throw new NymphQueryFailedException('Query failed: ' . mysqli_errno($this->link) . ': ' . mysqli_error($this->link), 0, null, $query);
+					throw new Exceptions\QueryFailedException('Query failed: ' . mysqli_errno($this->link) . ': ' . mysqli_error($this->link), 0, null, $query);
 				}
 			} else {
-				throw new NymphQueryFailedException('Query failed: ' . mysqli_errno($this->link) . ': ' . mysqli_error($this->link), 0, null, $query);
+				throw new Exceptions\QueryFailedException('Query failed: ' . mysqli_errno($this->link) . ': ' . mysqli_error($this->link), 0, null, $query);
 			}
 		}
 		return $result;
@@ -144,7 +145,7 @@ class NymphDriverMySQL extends NymphDriver {
 
 	public function export($filename) {
 		if (!$fhandle = fopen($filename, 'w')) {
-			throw new NymphInvalidParametersException('Provided filename is not writeable.');
+			throw new Exceptions\InvalidParametersException('Provided filename is not writeable.');
 		}
 		fwrite($fhandle, "# Nymph Entity Exchange\n");
 		fwrite($fhandle, "# Nymph Version ".NYMPH_VERSION."\n");
@@ -281,7 +282,7 @@ class NymphDriverMySQL extends NymphDriver {
 
 	public function getEntities() {
 		if (!$this->connected) {
-			throw new NymphUnableToConnectException();
+			throw new Exceptions\UnableToConnectException();
 		}
 		// Set up options and selectors.
 		$selectors = func_get_args();
@@ -833,7 +834,7 @@ class NymphDriverMySQL extends NymphDriver {
 
 	public function getUID($name) {
 		if (!$name) {
-			throw new NymphInvalidParametersException('Name not given for UID');
+			throw new Exceptions\InvalidParametersException('Name not given for UID');
 		}
 		$result = $this->query("SELECT `cur_uid` FROM `{$this->prefix}uids` WHERE `name`='".mysqli_real_escape_string($this->link, $name)."';");
 		$row = mysqli_fetch_row($result);
@@ -843,7 +844,7 @@ class NymphDriverMySQL extends NymphDriver {
 
 	public function import($filename) {
 		if (!$fhandle = fopen($filename, 'r')) {
-			throw new NymphInvalidParametersException('Provided filename is unreadable.');
+			throw new Exceptions\InvalidParametersException('Provided filename is unreadable.');
 		}
 		$line = '';
 		$data = array();
@@ -937,7 +938,7 @@ class NymphDriverMySQL extends NymphDriver {
 
 	public function newUID($name) {
 		if (!$name) {
-			throw new NymphInvalidParametersException('Name not given for UID');
+			throw new Exceptions\InvalidParametersException('Name not given for UID');
 		}
 		$this->query("SELECT GET_LOCK('{$this->prefix}uids_".mysqli_real_escape_string($this->link, $name)."', 10);");
 		$this->query("INSERT INTO `{$this->prefix}uids` (`name`, `cur_uid`) VALUES ('".mysqli_real_escape_string($this->link, $name)."', 1) ON DUPLICATE KEY UPDATE `cur_uid`=`cur_uid`+1;");
@@ -950,7 +951,7 @@ class NymphDriverMySQL extends NymphDriver {
 
 	public function renameUID($old_name, $new_name) {
 		if (!$old_name || !$new_name) {
-			throw new NymphInvalidParametersException('Name not given for UID');
+			throw new Exceptions\InvalidParametersException('Name not given for UID');
 		}
 		$this->query("UPDATE `{$this->prefix}uids` SET `name`='".mysqli_real_escape_string($this->link, $new_name)."' WHERE `name`='".mysqli_real_escape_string($this->link, $old_name)."';");
 		return true;
@@ -1081,7 +1082,7 @@ class NymphDriverMySQL extends NymphDriver {
 
 	public function setUID($name, $value) {
 		if (!$name) {
-			throw new NymphInvalidParametersException('Name not given for UID');
+			throw new Exceptions\InvalidParametersException('Name not given for UID');
 		}
 		$this->query("INSERT INTO `{$this->prefix}uids` (`name`, `cur_uid`) VALUES ('".mysqli_real_escape_string($this->link, $name)."', ".((int) $value).") ON DUPLICATE KEY UPDATE `cur_uid`=".((int) $value).";");
 		return true;

@@ -5,7 +5,7 @@
  * @property string $name The todo's text.
  * @property bool $done Whether it's done.
  */
-class Todo extends Entity {
+class Todo extends \Nymph\Entity {
 	const etype = 'todo';
 	protected $clientEnabledMethods = array('archive');
 	protected $whitelistData = array('name', 'done');

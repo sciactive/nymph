@@ -1,8 +1,7 @@
 <?php
 // Make sure RequirePHP is installed.
 require '../../lib/require.php';
-?>
-<!doctype html>
+?><!DOCTYPE html>
 <html ng-app="todoApp">
 	<head>
 		<title>Nymph Angular Todo App</title>

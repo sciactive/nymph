@@ -12,7 +12,7 @@
  * @property TestModel $reference A TestModel.
  * @property array $ref_array An array.
  */
-class TestModel extends Entity {
+class TestModel extends \Nymph\Entity {
 	const etype = 'test_model';
 	protected $privateData = array('boolean');
 	protected $whitelistData = array('string', 'array', 'mdate');
