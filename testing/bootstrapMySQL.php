@@ -17,7 +17,7 @@ RPHP::_('NymphConfig', array(), function(){
 		$nymph_config->MySQL->host['value'] = $dbopts["host"];
 		$nymph_config->MySQL->port['value'] = $dbopts["port"];
 		$nymph_config->MySQL->user['value'] = $dbopts["user"];
-		$nymph_config->MySQL->password['value'] = $dbopts["pass"];
+		$nymph_config->MySQL->password['value'] = key_exists("pass", $dbopts) ? $dbopts["pass"] : '';
 	} else {
 		$nymph_config->MySQL->host['value'] = '127.0.0.1';
 		$nymph_config->MySQL->database['value'] = 'nymph_testing';
