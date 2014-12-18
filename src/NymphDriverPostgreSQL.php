@@ -31,9 +31,6 @@ class NymphDriverPostgreSQL extends NymphDriver {
 	private $usePLPerl;
 	private $prefix;
 
-	/**
-	 * Load the entity manager.
-	 */
 	public function __construct($NymphConfig) {
 		parent::__construct($NymphConfig);
 		$this->usePLPerl = $this->config->use_plperl['value'];
