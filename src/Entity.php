@@ -282,8 +282,10 @@ class Entity implements EntityInterface {
 	public function __set($name, $value) {
 		if ($this->isASleepingReference)
 			$this->referenceWake();
-		if ($name === 'guid' || $name === 'tags')
-			return ($this->$name = $value);
+		if ($name === 'guid')
+			return ($this->$name = isset($value) ? (int) $value : null);
+		if ($name === 'tags')
+			return ($this->$name = (array) $value);
 		// Delete any serialized value.
 		if (isset($this->sdata[$name]))
 			unset($this->sdata[$name]);
