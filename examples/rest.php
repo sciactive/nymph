@@ -5,11 +5,11 @@ error_reporting(E_ALL);
 require '../lib/require.php';
 
 require '../src/Nymph.php';
-\RPHP::_('NymphConfig', array(), function(){
+\SciActive\R::_('NymphConfig', array(), function(){
 	return include 'config.php';
 });
 
-$NymphREST = \RPHP::_('NymphREST');
+$NymphREST = \SciActive\R::_('NymphREST');
 
 require 'employee/Employee.php';
 require 'todo/Todo.php';

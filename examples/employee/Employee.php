@@ -59,7 +59,7 @@ class Employee extends \Nymph\Entity {
 		}
 		// Generate employee ID.
 		if (!isset($this->id)) {
-			$this->id = \RPHP::_('Nymph')->newUID('employee');
+			$this->id = \SciActive\R::_('Nymph')->newUID('employee');
 		}
 		return parent::save();
 	}

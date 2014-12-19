@@ -11,6 +11,7 @@
  * @copyright SciActive.com
  * @link http://sciactive.com/
  */
+use SciActive\R as R;
 
 spl_autoload_register(function ($class) {
     $prefix = 'Nymph\\';
@@ -35,13 +36,13 @@ spl_autoload_register(function ($class) {
     }
 });
 
-\RPHP::_('Nymph', array('NymphConfig'), function($NymphConfig){
+R::_('Nymph', array('NymphConfig'), function($NymphConfig){
 	$class = '\\Nymph\\Drivers\\'.$NymphConfig->driver['value'].'Driver';
 
 	$Nymph = new $class($NymphConfig);
 	return $Nymph;
 });
-\RPHP::_('NymphREST', array('Nymph'), function($Nymph){
+R::_('NymphREST', array('Nymph'), function($Nymph){
 	$NymphREST = new REST();
 	return $NymphREST;
 });

@@ -12,18 +12,18 @@ if ($_FILES) {
 		require '../../lib/require.php';
 
 		require '../../src/Nymph.php';
-		\RPHP::_('NymphConfig', array(), function(){
+		\SciActive\R::_('NymphConfig', array(), function(){
 			return include '../config.php';
 		});
 
-		\RPHP::_(array('Nymph'), function(){
+		\SciActive\R::_(array('Nymph'), function(){
 			require '../employee/Employee.php';
 			require '../sudoku/Game.php';
 			require '../todo/Todo.php';
 		});
 
 		try {
-			$result = \RPHP::_('Nymph')->import($_FILES['nex']['tmp_name']);
+			$result = \SciActive\R::_('Nymph')->import($_FILES['nex']['tmp_name']);
 		} catch (NymphQueryFailedException $e) {
 			echo $e->getMessage()."\n\n".$e->getQuery();
 		}

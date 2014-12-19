@@ -5,15 +5,15 @@ if ($_REQUEST['action'] === 'export' && !getenv('DATABASE_URL')) {
 	require '../../lib/require.php';
 
 	require '../../src/Nymph.php';
-	\RPHP::_('NymphConfig', array(), function(){
+	\SciActive\R::_('NymphConfig', array(), function(){
 		return include '../config.php';
 	});
 
-	\RPHP::_(array('Nymph'), function(){
+	\SciActive\R::_(array('Nymph'), function(){
 		require 'Game.php';
 	});
 
-	\RPHP::_('Nymph')->exportPrint();
+	\SciActive\R::_('Nymph')->exportPrint();
 	exit;
 }
 

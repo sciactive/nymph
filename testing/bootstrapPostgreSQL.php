@@ -1,16 +1,16 @@
 <?php
-
 require_once '../lib/require.php';
+use SciActive\R as R;
 
-\RPHP::undef('NymphConfig');
-\RPHP::undef('Nymph');
+R::undef('NymphConfig');
+R::undef('Nymph');
 
 include '../src/Nymph.php';
 
-\RPHP::_('NymphConfig', array(), function(){
+R::_('NymphConfig', array(), function(){
 	// Nymph's configuration.
 
-	$nymph_config = include(dirname(__FILE__).DIRECTORY_SEPARATOR.'../conf/defaults.php');
+	$nymph_config = include(__DIR__.DIRECTORY_SEPARATOR.'../conf/defaults.php');
 
 		$nymph_config->driver['value'] = 'PostgreSQL';
 	if (getenv('DATABASE_URL')) {
@@ -29,6 +29,6 @@ include '../src/Nymph.php';
 	return $nymph_config;
 });
 
-$Nymph = \RPHP::_('Nymph');
+$Nymph = R::_('Nymph');
 
 require_once 'TestModel.php';

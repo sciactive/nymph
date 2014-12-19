@@ -8,6 +8,7 @@
  * @copyright SciActive.com
  * @link http://sciactive.com/
  */
+use SciActive\R as R;
 
 /**
  * REST class.
@@ -53,7 +54,7 @@ class REST {
 				$guid = (int) $delEnt['guid'];
 				$etype = $delEnt['etype'];
 				try {
-					if (\RPHP::_('Nymph')->deleteEntityByID($guid, $etype)) {
+					if (R::_('Nymph')->deleteEntityByID($guid, $etype)) {
 						$deleted[] = $guid;
 					} else {
 						$failures = true;
@@ -76,7 +77,7 @@ class REST {
 			}
 			header("HTTP/1.1 200 OK", true, 200);
 		} else {
-			if (!\RPHP::_('Nymph')->deleteUID("$data")) {
+			if (!R::_('Nymph')->deleteUID("$data")) {
 				return $this->httpError(500, "Internal Server Error");
 			}
 			header("HTTP/1.1 204 No Content", true, 204);
@@ -128,7 +129,7 @@ class REST {
 				echo json_encode($created);
 			}
 		} else {
-			$result = \RPHP::_('Nymph')->newUID("$data");
+			$result = R::_('Nymph')->newUID("$data");
 			if (empty($result)) {
 				return $this->httpError(500, "Internal Server Error");
 			}
@@ -219,7 +220,7 @@ class REST {
 		if (in_array($action, array('entity', 'entities'))) {
 			$args = json_decode($data, true);
 			if (is_int($args)) {
-				$result = \RPHP::_('Nymph')->$method($args);
+				$result = R::_('Nymph')->$method($args);
 			} else {
 				$count = count($args);
 				if ($count > 1) {
@@ -234,17 +235,17 @@ class REST {
 						$args[$i] = $newArg;
 					}
 				}
-				$result = call_user_func_array(array(\RPHP::_('Nymph'), $method), $args);
+				$result = call_user_func_array(array(R::_('Nymph'), $method), $args);
 			}
 			if (empty($result)) {
-				if ($action === 'entity' || \RPHP::_('NymphConfig')->empty_list_error['value']) {
+				if ($action === 'entity' || R::_('NymphConfig')->empty_list_error['value']) {
 					return $this->httpError(404, "Not Found");
 				}
 			}
 			echo json_encode($result);
 			return true;
 		} else {
-			$result = \RPHP::_('Nymph')->$method("$data");
+			$result = R::_('Nymph')->$method("$data");
 			if ($result === null) {
 				return $this->httpError(404, "Not Found");
 			} elseif (empty($result)) {
@@ -260,7 +261,7 @@ class REST {
 			return false;
 		}
 		if ((int)$entityData['guid'] > 0) {
-			$entity = \RPHP::_('Nymph')->getEntity(
+			$entity = R::_('Nymph')->getEntity(
 					array('class' => $entityData['class']),
 					array('&',
 						'guid' => (int)$entityData['guid']

@@ -6,11 +6,11 @@
 require '../../lib/require.php';
 
 require '../../src/Nymph.php';
-\RPHP::_('NymphConfig', array(), function(){
+\SciActive\R::_('NymphConfig', array(), function(){
 	return include '../config.php';
 });
 
-\RPHP::_(array('Nymph'), function(){
+\SciActive\R::_(array('Nymph'), function(){
 	require 'Employee.php';
 });
 
@@ -27,7 +27,7 @@ $newEntity2->salary = 8000000;
 $newEntity2->subordinates[] = $newEntity;
 $newEntity2->save();
 
-$entity = \RPHP::_('Nymph')->getEntity(array('class' => Employee), array('&', 'guid' => $newEntity2->guid));
+$entity = \SciActive\R::_('Nymph')->getEntity(array('class' => Employee), array('&', 'guid' => $newEntity2->guid));
 
 ?>
 <!DOCTYPE html>

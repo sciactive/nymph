@@ -1,7 +1,7 @@
 <?php
 // Nymph's configuration.
 
-$nymph_config = include(dirname(__FILE__).DIRECTORY_SEPARATOR.'../conf/defaults.php');
+$nymph_config = include(__DIR__.DIRECTORY_SEPARATOR.'../conf/defaults.php');
 
 // Check for Heroku postgres var.
 if (getenv('DATABASE_URL')) {

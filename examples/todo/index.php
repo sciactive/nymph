@@ -77,7 +77,7 @@ require '../../lib/require.php';
 					</div>
 
 
-					<form ng-submit="addTodo()">
+					<form ng-show="!uiState.showArchived" ng-submit="addTodo()">
 						<div class="row">
 							<div class="col-xs-10">
 								<input class="form-control" type="text" ng-model="todoText" placeholder="add new todo here">
