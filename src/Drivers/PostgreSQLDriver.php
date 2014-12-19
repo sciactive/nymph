@@ -17,8 +17,8 @@ use Nymph\Exceptions;
  */
 class PostgreSQLDriver implements DriverInterface {
 	use DriverTrait {
-        DriverTrait::__construct as private __traitConstruct;
-    }
+		DriverTrait::__construct as private __traitConstruct;
+	}
 	/**
 	 * The PostgreSQL link identifier for this instance.
 	 *

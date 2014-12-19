@@ -17,8 +17,8 @@ use Nymph\Exceptions;
  */
 class MySQLDriver implements DriverInterface {
 	use DriverTrait {
-        DriverTrait::__construct as private __traitConstruct;
-    }
+		DriverTrait::__construct as private __traitConstruct;
+	}
 	/**
 	 * The MySQL link identifier for this instance.
 	 *
@@ -46,8 +46,8 @@ class MySQLDriver implements DriverInterface {
 	 * @return bool Whether this instance is connected to a MySQL database after the method has run.
 	 */
 	public function connect() {
-		// Check that the MySQL extension is installed.
-		if (!is_callable('mysql_connect')) {
+		// Check that the MySQLi extension is installed.
+		if (!is_callable('mysqli_connect')) {
 			throw new Exceptions\UnableToConnectException('MySQL PHP extension is not available. It probably has not been installed. Please install and configure it in order to use MySQL.');
 		}
 		$host = $this->config->MySQL->host['value'];

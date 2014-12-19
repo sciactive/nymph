@@ -172,10 +172,10 @@ class EntityClassTest extends PHPUnit_Framework_TestCase {
 		$this->assertSame($arr['refGuid'], $testEntity->reference->guid);
 		$this->assertSame($arr['refGuid'], $testEntity->ref_array[0]['entity']->guid);
 
-		$testEntity = TestModel::factory($testEntity->guid);
+		$entity = TestModel::factory($testEntity->guid);
 
-		$this->assertSame($arr['refGuid'], $testEntity->reference->guid);
-		$this->assertSame($arr['refGuid'], $testEntity->ref_array[0]['entity']->guid);
+		$this->assertSame($arr['refGuid'], $entity->reference->guid);
+		$this->assertSame($arr['refGuid'], $entity->ref_array[0]['entity']->guid);
 	}
 
 	/**
@@ -184,15 +184,15 @@ class EntityClassTest extends PHPUnit_Framework_TestCase {
 	public function testSleepingReferences($arr) {
 		$testEntity = $arr['entity'];
 
-		$testEntity = TestModel::factoryReference(array('nymph_sleeping_reference', $testEntity->guid, 'TestModel'));
+		$entity = TestModel::factoryReference(array('nymph_sleeping_reference', $testEntity->guid, 'TestModel'));
 
-		$this->assertSame('Entity Test', $testEntity->name);
-		$this->assertNull($testEntity->null);
-		$this->assertSame('test', $testEntity->string);
-		$this->assertSame(array('full', 'of', 'values', 500), $testEntity->array);
-		$this->assertSame(30, $testEntity->number);
-		$this->assertSame($arr['refGuid'], $testEntity->reference->guid);
-		$this->assertSame($arr['refGuid'], $testEntity->ref_array[0]['entity']->guid);
+		$this->assertSame('Entity Test', $entity->name);
+		$this->assertNull($entity->null);
+		$this->assertSame('test', $entity->string);
+		$this->assertSame(array('full', 'of', 'values', 500), $entity->array);
+		$this->assertSame(30, $entity->number);
+		$this->assertSame($arr['refGuid'], $entity->reference->guid);
+		$this->assertSame($arr['refGuid'], $entity->ref_array[0]['entity']->guid);
 	}
 
 	/**
