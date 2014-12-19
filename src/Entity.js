@@ -15,35 +15,38 @@ license LGPL
 }(function(Nymph, Promise){
 	var sleepErr = "This entity is in a sleeping reference state. You must use .ready().then() to wake it.",
 	isArray = Array.isArray || function(arr){
-		return Object.prototype.toString.call(arr) == '[object Array]';
+		return Object.prototype.toString.call(arr) === '[object Array]';
 	}, indexOf = function(array, item){
 		for (var i = 0; i < array.length; i++) {
-			if (array[i] === item)
+			if (array[i] === item) {
 				return i;
+			}
 		}
 		return -1;
 	}, map = function(arr, fn){
 		var results = [];
-		for (var i = 0; i < arr.length; i++)
+		for (var i = 0; i < arr.length; i++) {
 			results.push(fn(arr[i], i));
+		}
 		return results;
 	}, arrayUnique = function(array){
 		var a = array.concat();
 		for(var i=0; i<a.length; ++i) {
 			for(var j=i+1; j<a.length; ++j) {
-				if(a[i] === a[j])
+				if(a[i] === a[j]) {
 					a.splice(j--, 1);
+				}
 			}
 		}
 		return a;
 	}, onlyStrings = function(array){
 		var newArray = [];
-		for (var k in array) {
-			if (typeof array[k] === "string") {
-				newArray.push(array[k]);
+		for (var i=0; i<array.length; i++) {
+			if (typeof array[i] === "string") {
+				newArray.push(array[i]);
 			} else {
-				if (typeof array[k].toString === "function") {
-					newArray.push(array[k].toString());
+				if (typeof array[i].toString === "function") {
+					newArray.push(array[i].toString());
 				}
 			}
 		}
@@ -65,7 +68,9 @@ license LGPL
 				newObj = new F();
 			}
 			for (var k in item) {
-				newObj[k] = getDataReference(item[k]);
+				if (item.hasOwnProperty(k)) {
+					newObj[k] = getDataReference(item[k]);
+				}
 			}
 		}
 		// Not an entity or array, just return it.
@@ -80,7 +85,7 @@ license LGPL
 				} else if (typeof require !== 'undefined' && require('Nymph'+item[2]).prototype.init === "function") {
 					entity = new require('Nymph'+item[2])();
 				} else {
-					throw new NymphClassNotAvailableError(item[2]+" class cannot be found.")
+					throw new NymphClassNotAvailableError(item[2]+" class cannot be found.");
 				}
 				entity.referenceSleep(item);
 				return entity;
@@ -90,7 +95,9 @@ license LGPL
 			}
 		} else if (item instanceof Object) {
 			for (var k in item) {
-				item[k] = getSleepingReference(item[k]);
+				if (item.hasOwnProperty(k)) {
+					item[k] = getSleepingReference(item[k]);
+				}
 			}
 		}
 		// Not an array, just return it.
@@ -143,7 +150,7 @@ license LGPL
 		// === Events ===
 
 		init: function(jsonEntity){
-			if (jsonEntity == null) {
+			if (typeof jsonEntity === "undefined" || jsonEntity === null) {
 				return this;
 			}
 
@@ -157,7 +164,9 @@ license LGPL
 			this.info = jsonEntity.info;
 			this.data = jsonEntity.data;
 			for (var k in this.data) {
-				this.data[k] = getSleepingReference(this.data[k]);
+				if (this.data.hasOwnProperty(k)) {
+					this.data[k] = getSleepingReference(this.data[k]);
+				}
 			}
 
 			return this;
@@ -167,8 +176,9 @@ license LGPL
 
 		// Tag methods.
 		addTag: function(){
-			if (this.isASleepingReference)
+			if (this.isASleepingReference) {
 				throw new EntityIsSleepingReferenceError(sleepErr);
+			}
 			var tags;
 			if (isArray(arguments[0])) {
 				tags = arguments[0];
@@ -178,14 +188,17 @@ license LGPL
 			this.tags = onlyStrings(arrayUnique(this.tags.concat(tags)));
 		},
 		hasTag: function(){
-			if (this.isASleepingReference)
+			if (this.isASleepingReference) {
 				throw new EntityIsSleepingReferenceError(sleepErr);
+			}
 			var tagArray = arguments;
-			if (isArray(arguments[0]))
+			if (isArray(arguments[0])) {
 				tagArray = tagArray[0];
-			for (var k in tagArray) {
-				if (indexOf(this.tags, tagArray[k]) === -1)
+			}
+			for (var i=0; i<tagArray.length; i++) {
+				if (indexOf(this.tags, tagArray[i]) === -1) {
 					return false;
+				}
 			}
 			return true;
 		},
@@ -193,11 +206,12 @@ license LGPL
 			if (this.isASleepingReference)
 				throw new EntityIsSleepingReferenceError(sleepErr);
 			var tagArray = arguments, newTags = [];
-			if (isArray(arguments[0]))
+			if (isArray(arguments[0])) {
 				tagArray = tagArray[0];
-			for (var k in this.tags) {
-				if (indexOf(tagArray, this.tags[k]) === -1) {
-					newTags.push(this.tags[k]);
+			}
+			for (var i=0; i<this.tags.length; i++) {
+				if (indexOf(tagArray, this.tags[i]) === -1) {
+					newTags.push(this.tags[i]);
 				}
 			}
 			this.tags = newTags;
@@ -205,12 +219,13 @@ license LGPL
 
 		// Property getter and setter. You can also just access Entity.data directly.
 		get: function(name){
-			if (this.isASleepingReference)
+			if (this.isASleepingReference) {
 				throw new EntityIsSleepingReferenceError(sleepErr);
+			}
 			if (isArray(arguments[0])) {
 				var result = {};
-				for (var k in name) {
-					result[name[k]] = this.data[name[k]];
+				for (var i=0; i<name.length; i++) {
+					result[name[i]] = this.data[name[i]];
 				}
 				return result;
 			} else {
@@ -218,11 +233,14 @@ license LGPL
 			}
 		},
 		set: function(name, value){
-			if (this.isASleepingReference)
+			if (this.isASleepingReference) {
 				throw new EntityIsSleepingReferenceError(sleepErr);
+			}
 			if (typeof name === "object") {
 				for (var k in name) {
-					this.data[k] = name[k];
+					if (name.hasOwnProperty(k)) {
+						this.data[k] = name[k];
+					}
 				}
 			} else {
 				this.data[name] = value;
@@ -230,24 +248,28 @@ license LGPL
 		},
 
 		save: function(){
-			if (this.isASleepingReference)
+			if (this.isASleepingReference) {
 				throw new EntityIsSleepingReferenceError(sleepErr);
+			}
 			return Nymph.saveEntity(this);
 		},
 
 		delete: function(){
-			if (this.isASleepingReference)
+			if (this.isASleepingReference) {
 				throw new EntityIsSleepingReferenceError(sleepErr);
+			}
 			return Nymph.deleteEntity(this);
 		},
 
 		is: function(object){
-			if (this.isASleepingReference)
+			if (this.isASleepingReference) {
 				throw new EntityIsSleepingReferenceError(sleepErr);
-			if (!(object instanceof Entity))
+			}
+			if (!(object instanceof Entity)) {
 				return false;
+			}
 			if ((this.guid && this.guid > 0) || (object.guid && object.guid > 0)) {
-				return this.guid == object.guid;
+				return this.guid === object.guid;
 			} else if (typeof object.toJSON !== 'function') {
 				return false;
 			} else {
@@ -257,20 +279,24 @@ license LGPL
 				var myData = sortObj(this.toJSON());
 				myData.tags.sort();
 				myData.data = sortObj(myData.data);
-				return JSON.stringify(obData) == JSON.stringify(myData);
+				return JSON.stringify(obData) === JSON.stringify(myData);
 			}
 		},
 		equals: function(object){
-			if (this.isASleepingReference)
+			if (this.isASleepingReference) {
 				throw new EntityIsSleepingReferenceError(sleepErr);
-			if (!(object instanceof Entity))
-				return false;
-			if ((this.guid && this.guid > 0) || (object.guid && object.guid > 0)) {
-				if (this.guid != object.guid)
-					return false;
 			}
-			if (object.class != this.class)
+			if (!(object instanceof Entity)) {
 				return false;
+			}
+			if ((this.guid && this.guid > 0) || (object.guid && object.guid > 0)) {
+				if (this.guid !== object.guid) {
+					return false;
+				}
+			}
+			if (object.class !== this.class) {
+				return false;
+			}
 			//return eq(this, object, [], []);
 			var obData = sortObj(object.toJSON());
 			obData.tags.sort();
@@ -278,34 +304,41 @@ license LGPL
 			var myData = sortObj(this.toJSON());
 			myData.tags.sort();
 			myData.data = sortObj(myData.data);
-			return JSON.stringify(obData) == JSON.stringify(myData);
+			return JSON.stringify(obData) === JSON.stringify(myData);
 		},
 		inArray: function(array, strict){
-			if (this.isASleepingReference)
+			if (this.isASleepingReference) {
 				throw new EntityIsSleepingReferenceError(sleepErr);
-			if (!isArray(array))
+			}
+			if (!isArray(array)) {
 				return false;
-			for (var k in array) {
-				if (strict ? this.equals(array[k]) : this.is(array[k]))
+			}
+			for (var i=0; i<array.length; i++) {
+				if (strict ? this.equals(array[i]) : this.is(array[i])) {
 					return true;
+				}
 			}
 			return false;
 		},
 		arraySearch: function(array, strict){
-			if (this.isASleepingReference)
+			if (this.isASleepingReference) {
 				throw new EntityIsSleepingReferenceError(sleepErr);
-			if (!isArray(array))
+			}
+			if (!isArray(array)) {
 				return false;
-			for (var k in array) {
-				if (strict ? this.equals(array[k]) : this.is(array[k]))
-					return k;
+			}
+			for (var i=0; i<array.length; i++) {
+				if (strict ? this.equals(array[i]) : this.is(array[i])) {
+					return i;
+				}
 			}
 			return false;
 		},
 
 		refresh: function(){
-			if (this.isASleepingReference)
+			if (this.isASleepingReference) {
 				return this.ready();
+			}
 			var that = this;
 			return new Promise(function(resolve, reject){
 				Nymph.getEntityData({"class":that.class},{"type":"&","guid":that.guid}).then(function(data){
@@ -317,18 +350,17 @@ license LGPL
 		},
 
 		serverCall: function(method, params, dontUpdateAfterCall){
-			if (this.isASleepingReference)
+			if (this.isASleepingReference) {
 				throw new EntityIsSleepingReferenceError(sleepErr);
+			}
 			var that = this;
 			// Turn the params into a real array, in case an arguments object was passed.
-			paramArray = [];
-			for (var n in params) {
-				paramArray.push(params[n]);
-			}
+			var paramArray = Array.prototype.splice.call(params);
 			return new Promise(function(resolve, reject){
-				Nymph.serverCall(that, method, params).then(function(data){
-					if (!dontUpdateAfterCall)
+				Nymph.serverCall(that, method, paramArray).then(function(data){
+					if (!dontUpdateAfterCall) {
 						that.init(data.entity);
+					}
 					resolve(data.return);
 				}, function(errObj){
 					reject(errObj);
@@ -337,8 +369,9 @@ license LGPL
 		},
 
 		toJSON: function(){
-			if (this.isASleepingReference)
+			if (this.isASleepingReference) {
 				throw new EntityIsSleepingReferenceError(sleepErr);
+			}
 			var obj = {};
 			obj.guid = this.guid;
 			obj.cdate = this.cdate;
@@ -346,17 +379,21 @@ license LGPL
 			obj.tags = this.tags.slice(0);
 			obj.data = {};
 			for (var k in this.data) {
-				obj.data[k] = getDataReference(this.data[k]);
+				if (this.data.hasOwnProperty(k)) {
+					obj.data[k] = getDataReference(this.data[k]);
+				}
 			}
 			obj.class = this.class;
 			return obj;
 		},
 
 		toReference: function(){
-			if (this.isASleepingReference)
+			if (this.isASleepingReference) {
 				return this.sleepingReference;
-			if (this.guid == null)
+			}
+			if (this.guid === null) {
 				return this;
+			}
 			return ['nymph_entity_reference', this.guid, this.class];
 		},
 
@@ -371,30 +408,35 @@ license LGPL
 				if (!that.isASleepingReference) {
 					that.readyPromise = null;
 					resolve(that);
-					if (typeof success === "function")
+					if (typeof success === "function") {
 						success(that);
+					}
 				} else {
 					if (that.readyPromise) {
 						that.readyPromise.then(function(){
 							resolve(that);
-							if (typeof success === "function")
+							if (typeof success === "function") {
 								success(that);
+							}
 						}, function(errObj){
 							reject(errObj);
-							if (typeof error === "function")
+							if (typeof error === "function") {
 								error(errObj);
+							}
 						});
 					} else {
 						Nymph.getEntityData({"class":that.sleepingReference[2]}, {"type":"&","guid":that.sleepingReference[1]}).then(function(data){
 							that.readyPromise = null;
 							resolve(that.init(data));
-							if (typeof success === "function")
+							if (typeof success === "function") {
 								success(that);
+							}
 						}, function(errObj){
 							that.readyPromise = null;
 							reject(errObj);
-							if (typeof error === "function")
+							if (typeof error === "function") {
 								error(errObj);
+							}
 						});
 					}
 				}
@@ -407,35 +449,42 @@ license LGPL
 				that.ready(function(){
 					var promises = [];
 					for (var k in that.data) {
-						if (that.data[k] instanceof Entity) {
-							promises.push(that.data[k].readyAll());
-						} else if (isArray(that.data[k])) {
-							for (var i in that.data[k]) {
-								if (that.data[k][i] instanceof Entity) {
-									promises.push(that.data[k][i].readyAll());
+						if (that.data.hasOwnProperty(k)) {
+							if (that.data[k] instanceof Entity) {
+								promises.push(that.data[k].readyAll());
+							} else if (isArray(that.data[k])) {
+								for (var i=0; i<that.data[k].length; i++) {
+									if (that.data[k][i] instanceof Entity) {
+										promises.push(that.data[k][i].readyAll());
+									}
 								}
 							}
 						}
 					}
 					Promise.all(promises).then(function(){
 						resolve(that);
-						if (typeof success === "function")
+						if (typeof success === "function") {
 							success(that);
+						}
 					}, function(errObj){
 						reject(errObj);
-						if (typeof error === "function")
+						if (typeof error === "function") {
 							error(errObj);
+						}
 					});
 				}, function(errObj){
 					reject(errObj);
-					if (typeof error === "function")
+					if (typeof error === "function") {
 						error(errObj);
+					}
 				});
 			});
 		}
 	};
 	for (var p in thisClass) {
-		Entity.prototype[p] = thisClass[p];
+		if (thisClass.hasOwnProperty(p)) {
+			Entity.prototype[p] = thisClass[p];
+		}
 	}
 
 	EntityIsSleepingReferenceError = function(message){
@@ -443,14 +492,14 @@ license LGPL
 		this.message = message;
 		this.stack = (new Error()).stack;
 	};
-	EntityIsSleepingReferenceError.prototype = new Error;
+	EntityIsSleepingReferenceError.prototype = new Error();
 
 	NymphClassNotAvailableError = function(message){
 		this.name = 'NymphClassNotAvailableError';
 		this.message = message;
 		this.stack = (new Error()).stack;
 	};
-	NymphClassNotAvailableError.prototype = new Error;
+	NymphClassNotAvailableError.prototype = new Error();
 
 	return Entity;
 }));

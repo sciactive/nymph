@@ -135,6 +135,14 @@ class Entity implements EntityInterface {
 	 */
 	protected $clientEnabledMethods = array();
 	/**
+	 * The name of the corresponding class on the client side. Leave null to use
+	 * the same name.
+	 *
+	 * @var string
+	 * @access protected
+	 */
+	protected $clientClassName = null;
+	/**
 	 * Whether to use "skip_ac" when accessing entity references.
 	 *
 	 * @var bool
@@ -231,6 +239,10 @@ class Entity implements EntityInterface {
 			} else {
 				throw new Exceptions\EntityCorruptedException("Corrupted entity data found on entity with GUID {$this->guid}.");
 			}
+		}
+		// Check if it's set.
+		if (!isset($this->data[$name])) {
+			return $this->data[$name];
 		}
 		// If it's not an entity, return the regular value.
 		if ((array) $this->data[$name] === $this->data[$name]) {
@@ -459,14 +471,20 @@ class Entity implements EntityInterface {
 		if (get_class($object) != get_class($this)) {
 			return false;
 		}
-		$ob_data = $object->getData();
-		$my_data = $this->getData();
+		$ob_data = $object->getData(true);
+		$my_data = $this->getData(true);
 		return ($ob_data == $my_data);
 	}
 
-	public function getData() {
+	public function getData($includeSData = false) {
 		if ($this->isASleepingReference) {
 			$this->referenceWake();
+		}
+		if ($includeSData) {
+			foreach ($this->sdata as $key => $value) {
+				$this->data[$key] = unserialize($value);
+				unset($this->sdata[$key]);
+			}
 		}
 		// Convert any entities to references.
 		return array_map(array($this, 'getDataReference'), $this->data);
@@ -612,7 +630,7 @@ class Entity implements EntityInterface {
 				$object->data[$key] = unserialize($val);
 			}
 		}
-		$object->class = get_class($this);
+		$object->class = isset($this->clientClassName) ? $this->clientClassName : get_class($this);
 		return $object;
 	}
 
@@ -664,7 +682,9 @@ class Entity implements EntityInterface {
 			}
 		}
 
+		$nonWhitelistData = array();
 		if ($this->whitelistData !== false) {
+			$nonWhitelistData = $this->getData(true);
 			foreach ($data as $var => $val) {
 				if (!in_array($var, $this->whitelistData)) {
 					unset($data[$var]);
@@ -672,7 +692,7 @@ class Entity implements EntityInterface {
 			}
 		}
 
-		$data = array_merge($data, $protectedData, $privateData);
+		$data = array_merge($nonWhitelistData, $data, $protectedData, $privateData);
 
 		if (!isset($data['cdate'])) {
 			$data['cdate'] = $this->cdate;
@@ -694,7 +714,7 @@ class Entity implements EntityInterface {
 		// Erase the entity cache.
 		$this->entityCache = array();
 		foreach ($data as $name => $value) {
-			if ((array) $value === $value && $value[0] === 'nymph_entity_reference') {
+			if ((array) $value === $value && isset($value[0]) && $value[0] === 'nymph_entity_reference') {
 				// Don't load the entity yet, but make the entry in the array,
 				// so we know it is an entity reference. This will speed up
 				// retrieving entities with lots of references, especially

@@ -210,7 +210,6 @@ class EntityClassTest extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * @expectedException PHPUnit_Framework_Error_Notice
 	 * @depends testAssignment
 	 */
 	public function testAcceptJSON($arr) {
@@ -332,9 +331,6 @@ class EntityClassTest extends PHPUnit_Framework_TestCase {
 		)), $arr);
 	}
 
-	/**
-	 * @expectedException PHPUnit_Framework_Error_Notice
-	 */
 	public function testHSort() {
 		$first = new TestModel();
 		$first->name = 'Thing A';
@@ -357,7 +353,7 @@ class EntityClassTest extends PHPUnit_Framework_TestCase {
 		$firstsub4->name = 'Thing 0';
 		$firstsub4->parent = $fourth;
 		$firstsub5 = new TestModel();
-		$firstsub5->name = 'Thing 0';
+		$firstsub5->name = 'Thing 0.0';
 		$firstsub5->parent = $firstsub4;
 		$firstsub6 = new TestModel();
 		$firstsub6->name = 'Thing 1';
@@ -396,6 +392,10 @@ class EntityClassTest extends PHPUnit_Framework_TestCase {
 
 		\RPHP::_('Nymph')->hsort($arr, 'name', 'parent');
 
+		/*foreach ($arr as $cur) {
+			echo "\n".(isset($cur->parent) ? (isset($cur->parent->parent) ? "{$cur->parent->parent->name} : " : '')."{$cur->parent->name} : " : '')."$cur->name\n";
+		}*/
+
 		$this->assertEquals(array(
 			$first,
 			$firstsub1,
@@ -417,23 +417,27 @@ class EntityClassTest extends PHPUnit_Framework_TestCase {
 
 		\RPHP::_('Nymph')->hsort($arr, 'name', 'parent', true, true);
 
-		$this->assertEquals(array_reverse(array(
-			$firstsub1,
-			$firstsub2,
-			$first,
-			$firstsub3,
-			$third,
-			$firstsub6,
-			$firstsub5,
-			$firstsub4,
-			$fourth,
-			$fifth,
-			$sixth,
-			$seventh,
-			$eighth,
-			$ninth,
+		/*foreach ($arr as $cur) {
+			echo "\n".(isset($cur->parent) ? (isset($cur->parent->parent) ? "{$cur->parent->parent->name} : " : '')."{$cur->parent->name} : " : '')."$cur->name\n";
+		}*/
+
+		$this->assertEquals(array(
+			$second,
 			$tenth,
-			$second
-		)), $arr);
+			$ninth,
+			$eighth,
+			$seventh,
+			$sixth,
+			$fifth,
+			$fourth,
+			$firstsub6,
+			$firstsub4,
+			$firstsub5,
+			$third,
+			$firstsub3,
+			$first,
+			$firstsub2,
+			$firstsub1,
+		), $arr);
 	}
 }

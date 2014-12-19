@@ -17,51 +17,61 @@ license LGPL
 		sortParent = null,
 		sortCaseSensitive = null,
 		arraySortProperty = function(a, b){
-			var property = sortProperty;
-			var parent = sortParent;
-			var notData = property === "guid" || property === "cdate" || property === "mdate";
+			var aprop, bprop,
+				property = sortProperty,
+				parent = sortParent,
+				notData = property === "guid" || property === "cdate" || property === "mdate";
 			if (parent !== null && ((a.data[parent] instanceof Entity && typeof (notData ? a.data[parent][property] : a.data[parent].data[property]) !== "undefined") || (b.data[parent] instanceof Entity && typeof (notData ? b.data[parent][property] : b.data[parent].data[property]) !== "undefined"))) {
 				if (!sortCaseSensitive && typeof (notData ? a.data[parent][property] : a.data[parent].data[property]) === "string" && typeof (notData ? b.data[parent][property] : b.data[parent].data[property]) === "string") {
-					var aprop = (notData ? a.data[parent][property] : a.data[parent].data[property]).toUpperCase();
-					var bprop = (notData ? b.data[parent][property] : b.data[parent].data[property]).toUpperCase();
-					if (aprop !== bprop)
+					aprop = (notData ? a.data[parent][property] : a.data[parent].data[property]).toUpperCase();
+					bprop = (notData ? b.data[parent][property] : b.data[parent].data[property]).toUpperCase();
+					if (aprop !== bprop) {
 						return aprop.localeCompare(bprop);
+					}
 				} else {
-					if ((notData ? a.data[parent][property] : a.data[parent].data[property]) > (notData ? b.data[parent][property] : b.data[parent].data[property]))
+					if ((notData ? a.data[parent][property] : a.data[parent].data[property]) > (notData ? b.data[parent][property] : b.data[parent].data[property])) {
 						return 1;
-					if ((notData ? a.data[parent][property] : a.data[parent].data[property]) < (notData ? b.data[parent][property] : b.data[parent].data[property]))
+					}
+					if ((notData ? a.data[parent][property] : a.data[parent].data[property]) < (notData ? b.data[parent][property] : b.data[parent].data[property])) {
 						return -1;
+					}
 				}
 			}
 			// If they have the same parent, order them by their own property.
 			if (!sortCaseSensitive && typeof (notData ? a[property] : a.data[property]) === "string" && typeof (notData ? b[property] : b.data[property]) === "string") {
-				var aprop = (notData ? a[property] : a.data[property]).toUpperCase();
-				var bprop = (notData ? b[property] : b.data[property]).toUpperCase();
+				aprop = (notData ? a[property] : a.data[property]).toUpperCase();
+				bprop = (notData ? b[property] : b.data[property]).toUpperCase();
 				return aprop.localeCompare(bprop);
 			} else {
-				if ((notData ? a[property] : a.data[property]) > (notData ? b[property] : b.data[property]))
+				if ((notData ? a[property] : a.data[property]) > (notData ? b[property] : b.data[property])) {
 					return 1;
-				if ((notData ? a[property] : a.data[property]) < (notData ? b[property] : b.data[property]))
+				}
+				if ((notData ? a[property] : a.data[property]) < (notData ? b[property] : b.data[property])) {
 					return -1;
+				}
 			}
 			return 0;
 		},
 		map = function(arr, fn){
 			var results = [];
-			for (var i = 0; i < arr.length; i++)
+			for (var i = 0; i < arr.length; i++) {
 				results.push(fn(arr[i], i));
+			}
 			return results;
 		},
 		makeUrl = function(url, data, noSep) {
-			if (!data)
+			if (!data) {
 				return url;
+			}
 			for (var k in data) {
-				if (noSep) {
-					url = url+(url.length ? '&' : '');
-				} else {
-					url = url+(url.indexOf('?') !== -1 ? '&' : '?');
+				if (data.hasOwnProperty(k)) {
+					if (noSep) {
+						url = url+(url.length ? '&' : '');
+					} else {
+						url = url+(url.indexOf('?') !== -1 ? '&' : '?');
+					}
+					url = url+encodeURIComponent(k)+'='+encodeURIComponent(data[k]);
 				}
-				url = url+encodeURIComponent(k)+'='+encodeURIComponent(data[k]);
 			}
 			return url;
 		},
@@ -182,7 +192,7 @@ license LGPL
 			var that = this;
 			return new Promise(function(resolve, reject){
 				postputdelAjax({
-					type: entity.guid == null ? 'PUT' : 'POST',
+					type: entity.guid === null ? 'PUT' : 'POST',
 					url: that.restURL,
 					dataType: 'json',
 					data: {'action': 'entity', 'data': JSON.stringify(entity)},
@@ -204,7 +214,7 @@ license LGPL
 			var that = this, args = Array.prototype.slice.call(arguments);
 			return new Promise(function(resolve, reject){
 				that.getEntityData.apply(that, args).then(function(data){
-					if (data != null) {
+					if (data !== null) {
 						resolve(that.initEntity(data));
 					} else {
 						resolve(null);
@@ -262,7 +272,7 @@ license LGPL
 			} else if (typeof require !== 'undefined' && require('Nymph'+entityJSON.class).prototype.init === "function") {
 				entity = new require('Nymph'+entityJSON.class)();
 			} else {
-				throw new NymphClassNotAvailableError(entityJSON.class+" class cannot be found.")
+				throw new NymphClassNotAvailableError(entityJSON.class+" class cannot be found.");
 			}
 			return entity.init(entityJSON);
 		},
@@ -270,7 +280,7 @@ license LGPL
 		deleteEntity: function(entity, plural){
 			var that = this, cur;
 			if (plural) {
-				for (var i in entity) {
+				for (var i=0; i<entity.length; i++) {
 					cur = entity[i].toJSON();
 					cur.etype = entity[i].etype;
 					entity[i] = cur;
@@ -323,16 +333,17 @@ license LGPL
 		hsort: function(array, property, parentProperty, caseSensitive, reverse) {
 			// First sort by the requested property.
 			this.sort(array, property, caseSensitive, reverse);
-			if (typeof parentProperty === "undefined" || parentProperty === null)
+			if (typeof parentProperty === "undefined" || parentProperty === null) {
 				return array;
+			}
 
 			// Now sort by children.
-			var new_array = [];
-			// Look for entities ready to go in order.
-			var changed, pkey, ancestry, new_key;
+			var new_array = [],
+				// Look for entities ready to go in order.
+				changed, pkey, ancestry, new_key;
 			while (array.length) {
 				changed = false;
-				for (var key in array) {
+				for (var key=0; key<array.length; key++) {
 					// Must break after adding one, so any following children don't go in the wrong order.
 					if (
 							typeof array[key].data[parentProperty] === "undefined" ||
@@ -359,7 +370,7 @@ license LGPL
 									new_array[new_key + 1].data[parentProperty] !== null &&
 									ancestry.indexOf(new_array[new_key + 1].data[parentProperty].guid) !== -1
 								) {
-								ancestry.push(new_array[new_key + 1].data[parentProperty].guid);
+								ancestry.push(new_array[new_key + 1].guid);
 								new_key += 1;
 							}
 							// Where to place the entity.
@@ -394,11 +405,12 @@ license LGPL
 			if (typeof property !== "undefined") {
 				sortProperty = property;
 				sortParent = parentProperty;
-				sortCaseSensitive = (caseSensitive == true);
+				sortCaseSensitive = !!caseSensitive;
 				array.sort(arraySortProperty);
 			}
-			if (reverse)
+			if (reverse) {
 				array.reverse();
+			}
 			return array;
 		},
 		sort: function(array, property, caseSensitive, reverse) {
@@ -406,11 +418,12 @@ license LGPL
 			if (typeof property !== "undefined") {
 				sortProperty = property;
 				sortParent = null;
-				sortCaseSensitive = (caseSensitive == true);
+				sortCaseSensitive = !!caseSensitive;
 				array.sort(arraySortProperty);
 			}
-			if (reverse)
+			if (reverse) {
 				array.reverse();
+			}
 			return array;
 		}
 	};
@@ -420,7 +433,7 @@ license LGPL
 		this.message = message;
 		this.stack = (new Error()).stack;
 	};
-	NymphClassNotAvailableError.prototype = new Error;
+	NymphClassNotAvailableError.prototype = new Error();
 
 	return Nymph.init(NymphOptions);
 }));

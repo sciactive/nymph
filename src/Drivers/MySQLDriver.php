@@ -15,7 +15,10 @@ use Nymph\Exceptions;
  *
  * @package Nymph
  */
-class MySQLDriver extends AbstractDriver {
+class MySQLDriver implements DriverInterface {
+	use DriverTrait {
+        DriverTrait::__construct as private __traitConstruct;
+    }
 	/**
 	 * The MySQL link identifier for this instance.
 	 *
@@ -26,7 +29,7 @@ class MySQLDriver extends AbstractDriver {
 	private $prefix;
 
 	public function __construct($NymphConfig) {
-		parent::__construct($NymphConfig);
+		$this->__traitConstruct($NymphConfig);
 		$this->prefix = $this->config->MySQL->prefix['value'];
 	}
 

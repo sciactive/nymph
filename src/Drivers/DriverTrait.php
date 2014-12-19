@@ -1,6 +1,6 @@
 <?php namespace Nymph\Drivers;
 /**
- * Common Nymph driver.
+ * Common Nymph driver methods.
  *
  * @package Nymph
  * @license http://www.gnu.org/licenses/lgpl.html
@@ -11,15 +11,13 @@
 use Nymph\Exceptions;
 
 /**
- * AbstractDriver class.
+ * DriverTrait.
  *
- * Provides basic methods for a Nymph ORM/DAL.
+ * Provides basic methods for a Nymph ORM driver.
  *
  * @package Nymph
  */
-class AbstractDriver implements DriverInterface {
-	const VERSION = '1.0.0';
-
+trait DriverTrait {
 	/**
 	 * Whether this instance is currently connected to a database.
 	 *
@@ -62,22 +60,6 @@ class AbstractDriver implements DriverInterface {
 	 * @var string
 	 */
 	protected $sortProperty;
-
-	// The following methods depend on the driver. Any other methods can be
-	// overridden by the driver.
-	public function connect() { }
-	public function deleteEntityByID($guid, $etype = null) { }
-	public function deleteUID($name) { }
-	public function disconnect() { }
-	public function export($filename) { }
-	public function exportPrint() { }
-	public function getEntities() { }
-	public function getUID($name) { }
-	public function import($filename) { }
-	public function newUID($name) { }
-	public function renameUID($old_name, $new_name) { }
-	public function saveEntity(&$entity) { }
-	public function setUID($name, $value) { }
 
 	public function __construct($nymphConfig) {
 		$this->config = $nymphConfig;
@@ -185,16 +167,18 @@ class AbstractDriver implements DriverInterface {
 					if ($pkey !== false) {
 						// And insert after the parent.
 						// This makes entities go to the end of the child list.
-						$cur_ancestor = $cur_entity->$parentProperty;
-						while (isset($cur_ancestor)) {
-							if (!isset($child_counter[$cur_ancestor->guid])) {
-								$child_counter[$cur_ancestor->guid] = 0;
-							}
-							$child_counter[$cur_ancestor->guid]++;
-							$cur_ancestor = $cur_ancestor->$parentProperty;
+						$ancestry = array($array[$key]->$parentProperty);
+						$new_key = $pkey;
+						while (
+								isset($new_array[$new_key + 1]) &&
+								isset($new_array[$new_key + 1]->$parentProperty) &&
+								$new_array[$new_key + 1]->$parentProperty->inArray($ancestry)
+							) {
+							$ancestry[] = $new_array[$new_key + 1];
+							$new_key += 1;
 						}
 						// Where to place the entity.
-						$new_key = $pkey + $child_counter[$cur_entity->$parentProperty->guid];
+						$new_key += 1;
 						if (isset($new_array[$new_key])) {
 							// If it already exists, we have to splice it in.
 							array_splice($new_array, $new_key, 0, array($cur_entity));
@@ -217,7 +201,7 @@ class AbstractDriver implements DriverInterface {
 			}
 		}
 		// Now push the new array out.
-		$array = $new_array;
+		$array = array_values($new_array);
 	}
 
 	public function psort(&$array, $property = null, $parentProperty = null, $caseSensitive = false, $reverse = false) {

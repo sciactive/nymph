@@ -15,7 +15,10 @@ use Nymph\Exceptions;
  *
  * @package Nymph
  */
-class PostgreSQLDriver extends AbstractDriver {
+class PostgreSQLDriver implements DriverInterface {
+	use DriverTrait {
+        DriverTrait::__construct as private __traitConstruct;
+    }
 	/**
 	 * The PostgreSQL link identifier for this instance.
 	 *
@@ -33,7 +36,7 @@ class PostgreSQLDriver extends AbstractDriver {
 	private $prefix;
 
 	public function __construct($NymphConfig) {
-		parent::__construct($NymphConfig);
+		$this->__traitConstruct($NymphConfig);
 		$this->usePLPerl = $this->config->use_plperl['value'];
 		$this->prefix = $this->config->PostgreSQL->prefix['value'];
 	}

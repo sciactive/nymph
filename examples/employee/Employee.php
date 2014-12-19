@@ -44,7 +44,7 @@ class Employee extends \Nymph\Entity {
 
 	public function save() {
 		// Validate employee data.
-		$exc = new EntityInvalidDataException();
+		$exc = new \Nymph\Exceptions\EntityInvalidDataException();
 		if (empty($this->name)) {
 			$exc->addField('name');
 		}

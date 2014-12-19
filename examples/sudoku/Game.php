@@ -195,7 +195,7 @@ class Game extends \Nymph\Entity {
 					continue;
 				$count = count($this->optionsLeft($x, $y));
 				$grid[$y][$x] = $count;
-				$counts[$count] or $counts[$count] = array();
+				isset($counts[$count]) or $counts[$count] = array();
 				$counts[$count][] = array($x, $y);
 			}
 		}
