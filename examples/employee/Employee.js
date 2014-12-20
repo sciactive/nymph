@@ -25,7 +25,9 @@
 		etype: "employee"
 	};
 	for (var p in thisClass) {
-		Employee.prototype[p] = thisClass[p];
+		if (thisClass.hasOwnProperty(p)) {
+			Employee.prototype[p] = thisClass[p];
+		}
 	}
 
 	return Employee;

@@ -136,7 +136,9 @@
 		}
 	};
 	for (var p in thisClass) {
-		Game.prototype[p] = thisClass[p];
+		if (thisClass.hasOwnProperty(p)) {
+			Game.prototype[p] = thisClass[p];
+		}
 	}
 
 	return Game;

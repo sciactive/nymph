@@ -29,7 +29,9 @@
 		}
 	};
 	for (var p in thisClass) {
-		Todo.prototype[p] = thisClass[p];
+		if (thisClass.hasOwnProperty(p)) {
+			Todo.prototype[p] = thisClass[p];
+		}
 	}
 
 	return Todo;
