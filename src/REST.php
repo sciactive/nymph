@@ -317,7 +317,7 @@ class REST {
 			} else {
 				array_walk($item, array($this, 'referenceToEntity'));
 			}
-		} elseif ((object) $item === $item && !(((is_a($item, '\\Nymph\\Entity') || is_a($item, 'hook_override'))) && is_callable(array($item, 'toReference')))) {
+		} elseif ((object) $item === $item && !(((is_a($item, '\\Nymph\\Entity') || is_a($item, '\\SciActive\\HookOverride'))) && is_callable(array($item, 'toReference')))) {
 			// Only do this for non-entity objects.
 			foreach ($item as &$cur_property) {
 				$this->referenceToEntity($cur_property, null);

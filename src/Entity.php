@@ -249,7 +249,7 @@ class Entity implements EntityInterface {
 		if ((array) $this->data[$name] === $this->data[$name]) {
 			// But, if it's an array, check all the values for entity references, and change them.
 			array_walk($this->data[$name], array($this, 'referenceToEntity'));
-		} elseif ((object) $this->data[$name] === $this->data[$name] && !(((is_a($this->data[$name], '\\Nymph\\Entity') || is_a($this->data[$name], 'hook_override'))) && is_callable(array($this->data[$name], 'toReference')))) {
+		} elseif ((object) $this->data[$name] === $this->data[$name] && !(((is_a($this->data[$name], '\\Nymph\\Entity') || is_a($this->data[$name], '\\SciActive\\HookOverride'))) && is_callable(array($this->data[$name], 'toReference')))) {
 			// Only do this for non-entity objects.
 			foreach ($this->data[$name] as &$cur_property) {
 				$this->referenceToEntity($cur_property, null);
@@ -312,7 +312,7 @@ class Entity implements EntityInterface {
 		if (isset($this->sdata[$name])) {
 			unset($this->sdata[$name]);
 		}
-		if ((is_a($value, '\\Nymph\\Entity') || is_a($value, 'hook_override')) && is_callable(array($value, 'toReference'))) {
+		if ((is_a($value, '\\Nymph\\Entity') || is_a($value, '\\SciActive\\HookOverride')) && is_callable(array($value, 'toReference'))) {
 			// Store a reference to the entity (its GUID and the class it was loaded as).
 			// We don't want to manipulate $value itself, because it could be a variable that the program is still using.
 			$save_value = $value->toReference();
@@ -447,7 +447,7 @@ class Entity implements EntityInterface {
 		if ($this->isASleepingReference) {
 			$this->referenceWake();
 		}
-		if ((is_a($item, '\\Nymph\\Entity') || is_a($item, 'hook_override')) && isset($item->guid) && is_callable(array($item, 'toReference'))) {
+		if ((is_a($item, '\\Nymph\\Entity') || is_a($item, '\\SciActive\\HookOverride')) && isset($item->guid) && is_callable(array($item, 'toReference'))) {
 			// This is an entity, so we should put it in the entity cache.
 			if (!isset($this->entityCache["reference_guid: {$item->guid}"])) {
 				$this->entityCache["reference_guid: {$item->guid}"] = clone $item;
@@ -461,7 +461,7 @@ class Entity implements EntityInterface {
 		if ($this->isASleepingReference) {
 			$this->referenceWake();
 		}
-		if (!(is_a($object, '\\Nymph\\Entity') || is_a($object, 'hook_override'))) {
+		if (!(is_a($object, '\\Nymph\\Entity') || is_a($object, '\\SciActive\\HookOverride'))) {
 			return false;
 		}
 		if (isset($this->guid) || isset($object->guid)) {
@@ -501,7 +501,7 @@ class Entity implements EntityInterface {
 		if ($this->isASleepingReference) {
 			$this->referenceWake();
 		}
-		if ((is_a($item, '\\Nymph\\Entity') || is_a($item, 'hook_override')) && is_callable(array($item, 'toReference'))) {
+		if ((is_a($item, '\\Nymph\\Entity') || is_a($item, '\\SciActive\\HookOverride')) && is_callable(array($item, 'toReference'))) {
 			// Convert entities to references.
 			return $item->toReference();
 		} elseif ((array) $item === $item) {
@@ -577,7 +577,7 @@ class Entity implements EntityInterface {
 		if ($this->isASleepingReference) {
 			$this->referenceWake();
 		}
-		if (!(is_a($object, '\\Nymph\\Entity') || is_a($object, 'hook_override'))) {
+		if (!(is_a($object, '\\Nymph\\Entity') || is_a($object, '\\SciActive\\HookOverride'))) {
 			return false;
 		}
 		if (isset($this->guid) || isset($object->guid)) {
@@ -767,7 +767,7 @@ class Entity implements EntityInterface {
 			} else {
 				array_walk($item, array($this, 'referenceToEntity'));
 			}
-		} elseif ((object) $item === $item && !(((is_a($item, '\\Nymph\\Entity') || is_a($item, 'hook_override'))) && is_callable(array($item, 'toReference')))) {
+		} elseif ((object) $item === $item && !(((is_a($item, '\\Nymph\\Entity') || is_a($item, '\\SciActive\\HookOverride'))) && is_callable(array($item, 'toReference')))) {
 			// Only do this for non-entity objects.
 			foreach ($item as &$cur_property) {
 				$this->referenceToEntity($cur_property, null);

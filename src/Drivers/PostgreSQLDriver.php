@@ -1182,7 +1182,7 @@ class PostgreSQLDriver implements DriverInterface {
 		if ($this->config->cache['value']) {
 			$class = get_class($entity);
 			// Replace hook override in the class name.
-			if (strpos($class, 'hook_override_') === 0) {
+			if (strpos($class, '\\SciActive\\HookOverride_') === 0) {
 				$class = substr($class, 14);
 			}
 			$this->pushCache($entity, $class);
