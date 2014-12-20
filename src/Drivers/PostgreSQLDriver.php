@@ -975,9 +975,9 @@ class PostgreSQLDriver implements DriverInterface {
 								pg_escape_string($this->link, (strpos($value, "\0") !== false ? '~'.addcslashes($value, chr(0).'\\') : $value)),
 								pg_escape_string($this->link, '{'.implode(',', $references[1]).'}'),
 								$uvalue == true ? 'TRUE' : 'FALSE',
-								$uvalue == 1 ? 'TRUE' : 'FALSE',
-								$uvalue == 0 ? 'TRUE' : 'FALSE',
-								$uvalue == -1 ? 'TRUE' : 'FALSE',
+								(!is_object($uvalue) && $uvalue == 1) ? 'TRUE' : 'FALSE',
+								(!is_object($uvalue) && $uvalue == 0) ? 'TRUE' : 'FALSE',
+								(!is_object($uvalue) && $uvalue == -1) ? 'TRUE' : 'FALSE',
 								$uvalue == array() ? 'TRUE' : 'FALSE',
 								is_string($uvalue) ? '\''.pg_escape_string($this->link, $uvalue).'\'' : 'NULL');
 						}
@@ -1022,9 +1022,9 @@ class PostgreSQLDriver implements DriverInterface {
 						pg_escape_string($this->link, (strpos($value, "\0") !== false ? '~'.addcslashes($value, chr(0).'\\') : $value)),
 						pg_escape_string($this->link, '{'.implode(',', $references[1]).'}'),
 						$uvalue == true ? 'TRUE' : 'FALSE',
-						$uvalue == 1 ? 'TRUE' : 'FALSE',
-						$uvalue == 0 ? 'TRUE' : 'FALSE',
-						$uvalue == -1 ? 'TRUE' : 'FALSE',
+						(!is_object($uvalue) && $uvalue == 1) ? 'TRUE' : 'FALSE',
+						(!is_object($uvalue) && $uvalue == 0) ? 'TRUE' : 'FALSE',
+						(!is_object($uvalue) && $uvalue == -1) ? 'TRUE' : 'FALSE',
 						$uvalue == array() ? 'TRUE' : 'FALSE',
 						is_string($uvalue) ? '\''.pg_escape_string($this->link, $uvalue).'\'' : 'NULL');
 				}
@@ -1106,9 +1106,9 @@ class PostgreSQLDriver implements DriverInterface {
 						pg_escape_string($this->link, (strpos($svalue, "\0") !== false ? '~'.addcslashes($svalue, chr(0).'\\') : $svalue)),
 						pg_escape_string($this->link, '{'.implode(',', $references[1]).'}'),
 						$value == true ? 'TRUE' : 'FALSE',
-						$value == 1 ? 'TRUE' : 'FALSE',
-						$value == 0 ? 'TRUE' : 'FALSE',
-						$value == -1 ? 'TRUE' : 'FALSE',
+						(!is_object($value) && $value == 1) ? 'TRUE' : 'FALSE',
+						(!is_object($value) && $value == 0) ? 'TRUE' : 'FALSE',
+						(!is_object($value) && $value == -1) ? 'TRUE' : 'FALSE',
 						$value == array() ? 'TRUE' : 'FALSE',
 						is_string($value) ? '\''.pg_escape_string($this->link, $value).'\'' : 'NULL'
 					);
@@ -1123,9 +1123,9 @@ class PostgreSQLDriver implements DriverInterface {
 						pg_escape_string($this->link, (strpos($value, "\0") !== false ? '~'.addcslashes($value, chr(0).'\\') : $value)),
 						pg_escape_string($this->link, '{'.implode(',', $references[1]).'}'),
 						$uvalue == true ? 'TRUE' : 'FALSE',
-						$uvalue == 1 ? 'TRUE' : 'FALSE',
-						$uvalue == 0 ? 'TRUE' : 'FALSE',
-						$uvalue == -1 ? 'TRUE' : 'FALSE',
+						(!is_object($uvalue) && $uvalue == 1) ? 'TRUE' : 'FALSE',
+						(!is_object($uvalue) && $uvalue == 0) ? 'TRUE' : 'FALSE',
+						(!is_object($uvalue) && $uvalue == -1) ? 'TRUE' : 'FALSE',
 						$uvalue == array() ? 'TRUE' : 'FALSE',
 						is_string($uvalue) ? '\''.pg_escape_string($this->link, $uvalue).'\'' : 'NULL'
 					);
@@ -1150,9 +1150,9 @@ class PostgreSQLDriver implements DriverInterface {
 						pg_escape_string($this->link, (strpos($svalue, "\0") !== false ? '~'.addcslashes($svalue, chr(0).'\\') : $svalue)),
 						pg_escape_string($this->link, '{'.implode(',', $references[1]).'}'),
 						$value == true ? 'TRUE' : 'FALSE',
-						$value == 1 ? 'TRUE' : 'FALSE',
-						$value == 0 ? 'TRUE' : 'FALSE',
-						$value == -1 ? 'TRUE' : 'FALSE',
+						(!is_object($value) && $value == 1) ? 'TRUE' : 'FALSE',
+						(!is_object($value) && $value == 0) ? 'TRUE' : 'FALSE',
+						(!is_object($value) && $value == -1) ? 'TRUE' : 'FALSE',
 						$value == array() ? 'TRUE' : 'FALSE',
 						is_string($value) ? '\''.pg_escape_string($this->link, $value).'\'' : 'NULL'
 					);
@@ -1167,9 +1167,9 @@ class PostgreSQLDriver implements DriverInterface {
 						pg_escape_string($this->link, (strpos($value, "\0") !== false ? '~'.addcslashes($value, chr(0).'\\') : $value)),
 						pg_escape_string($this->link, '{'.implode(',', $references[1]).'}'),
 						$uvalue == true ? 'TRUE' : 'FALSE',
-						$uvalue == 1 ? 'TRUE' : 'FALSE',
-						$uvalue == 0 ? 'TRUE' : 'FALSE',
-						$uvalue == -1 ? 'TRUE' : 'FALSE',
+						(!is_object($uvalue) && $uvalue == 1) ? 'TRUE' : 'FALSE',
+						(!is_object($uvalue) && $uvalue == 0) ? 'TRUE' : 'FALSE',
+						(!is_object($uvalue) && $uvalue == -1) ? 'TRUE' : 'FALSE',
 						$uvalue == array() ? 'TRUE' : 'FALSE',
 						is_string($uvalue) ? '\''.pg_escape_string($this->link, $uvalue).'\'' : 'NULL'
 					);

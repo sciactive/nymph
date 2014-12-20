@@ -879,9 +879,9 @@ class MySQLDriver implements DriverInterface {
 								mysqli_real_escape_string($this->link, $value),
 								mysqli_real_escape_string($this->link, ','.implode(',', $references[1]).','),
 								$uvalue == true ? 'TRUE' : 'FALSE',
-								$uvalue == 1 ? 'TRUE' : 'FALSE',
-								$uvalue == 0 ? 'TRUE' : 'FALSE',
-								$uvalue == -1 ? 'TRUE' : 'FALSE',
+								(!is_object($uvalue) && $uvalue == 1) ? 'TRUE' : 'FALSE',
+								(!is_object($uvalue) && $uvalue == 0) ? 'TRUE' : 'FALSE',
+								(!is_object($uvalue) && $uvalue == -1) ? 'TRUE' : 'FALSE',
 								$uvalue == array() ? 'TRUE' : 'FALSE',
 								is_string($uvalue) ? '\''.mysqli_real_escape_string($this->link, $uvalue).'\'' : 'NULL');
 						}
@@ -926,9 +926,9 @@ class MySQLDriver implements DriverInterface {
 						mysqli_real_escape_string($this->link, $value),
 						mysqli_real_escape_string($this->link, ','.implode(',', $references[1]).','),
 						$uvalue == true ? 'TRUE' : 'FALSE',
-						$uvalue == 1 ? 'TRUE' : 'FALSE',
-						$uvalue == 0 ? 'TRUE' : 'FALSE',
-						$uvalue == -1 ? 'TRUE' : 'FALSE',
+						(!is_object($uvalue) && $uvalue == 1) ? 'TRUE' : 'FALSE',
+						(!is_object($uvalue) && $uvalue == 0) ? 'TRUE' : 'FALSE',
+						(!is_object($uvalue) && $uvalue == -1) ? 'TRUE' : 'FALSE',
 						$uvalue == array() ? 'TRUE' : 'FALSE',
 						is_string($uvalue) ? '\''.mysqli_real_escape_string($this->link, $uvalue).'\'' : 'NULL');
 				}
@@ -1004,9 +1004,9 @@ class MySQLDriver implements DriverInterface {
 					mysqli_real_escape_string($this->link, $svalue),
 					mysqli_real_escape_string($this->link, ','.implode(',', $references[1]).','),
 					$value == true ? 'TRUE' : 'FALSE',
-					$value == 1 ? 'TRUE' : 'FALSE',
-					$value == 0 ? 'TRUE' : 'FALSE',
-					$value == -1 ? 'TRUE' : 'FALSE',
+					(!is_object($value) && $value == 1) ? 'TRUE' : 'FALSE',
+					(!is_object($value) && $value == 0) ? 'TRUE' : 'FALSE',
+					(!is_object($value) && $value == -1) ? 'TRUE' : 'FALSE',
 					$value == array() ? 'TRUE' : 'FALSE',
 					is_string($value) ? '\''.mysqli_real_escape_string($this->link, $value).'\'' : 'NULL');
 			}
@@ -1019,9 +1019,9 @@ class MySQLDriver implements DriverInterface {
 					mysqli_real_escape_string($this->link, $value),
 					mysqli_real_escape_string($this->link, ','.implode(',', $references[1]).','),
 					$uvalue == true ? 'TRUE' : 'FALSE',
-					$uvalue == 1 ? 'TRUE' : 'FALSE',
-					$uvalue == 0 ? 'TRUE' : 'FALSE',
-					$uvalue == -1 ? 'TRUE' : 'FALSE',
+					(!is_object($uvalue) && $uvalue == 1) ? 'TRUE' : 'FALSE',
+					(!is_object($uvalue) && $uvalue == 0) ? 'TRUE' : 'FALSE',
+					(!is_object($uvalue) && $uvalue == -1) ? 'TRUE' : 'FALSE',
 					$uvalue == array() ? 'TRUE' : 'FALSE',
 					is_string($uvalue) ? '\''.mysqli_real_escape_string($this->link, $uvalue).'\'' : 'NULL');
 			}
@@ -1046,9 +1046,9 @@ class MySQLDriver implements DriverInterface {
 					mysqli_real_escape_string($this->link, $svalue),
 					mysqli_real_escape_string($this->link, ','.implode(',', $references[1]).','),
 					$value == true ? 'TRUE' : 'FALSE',
-					$value == 1 ? 'TRUE' : 'FALSE',
-					$value == 0 ? 'TRUE' : 'FALSE',
-					$value == -1 ? 'TRUE' : 'FALSE',
+					(!is_object($value) && $value == 1) ? 'TRUE' : 'FALSE',
+					(!is_object($value) && $value == 0) ? 'TRUE' : 'FALSE',
+					(!is_object($value) && $value == -1) ? 'TRUE' : 'FALSE',
 					$value == array() ? 'TRUE' : 'FALSE',
 					is_string($value) ? '\''.mysqli_real_escape_string($this->link, $value).'\'' : 'NULL');
 			}
@@ -1061,9 +1061,9 @@ class MySQLDriver implements DriverInterface {
 					mysqli_real_escape_string($this->link, $value),
 					mysqli_real_escape_string($this->link, ','.implode(',', $references[1]).','),
 					$uvalue == true ? 'TRUE' : 'FALSE',
-					$uvalue == 1 ? 'TRUE' : 'FALSE',
-					$uvalue == 0 ? 'TRUE' : 'FALSE',
-					$uvalue == -1 ? 'TRUE' : 'FALSE',
+					(!is_object($uvalue) && $uvalue == 1) ? 'TRUE' : 'FALSE',
+					(!is_object($uvalue) && $uvalue == 0) ? 'TRUE' : 'FALSE',
+					(!is_object($uvalue) && $uvalue == -1) ? 'TRUE' : 'FALSE',
 					$uvalue == array() ? 'TRUE' : 'FALSE',
 					is_string($uvalue) ? '\''.mysqli_real_escape_string($this->link, $uvalue).'\'' : 'NULL');
 			}

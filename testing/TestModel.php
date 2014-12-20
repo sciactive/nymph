@@ -11,6 +11,7 @@
  * @property bool $boolean A boolean.
  * @property TestModel $reference A TestModel.
  * @property array $ref_array An array.
+ * @property stdClass $ref_object An object.
  */
 class TestModel extends \Nymph\Entity {
 	const etype = 'test_model';

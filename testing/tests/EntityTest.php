@@ -39,6 +39,7 @@ class EntityTest extends PHPUnit_Framework_TestCase {
 		$entity_reference_guid = $entity_reference_test->guid;
 		$testEntity->reference = $entity_reference_test;
 		$testEntity->ref_array = array(0 => array('entity' => $entity_reference_test));
+		$testEntity->ref_object = (object) array('thing' => (object) array('entity' => $entity_reference_test));
 		$this->assertTrue($testEntity->save());
 
 		$entity_reference_test->test = 'good';
@@ -171,11 +172,13 @@ class EntityTest extends PHPUnit_Framework_TestCase {
 
 		$this->assertSame($arr['refGuid'], $testEntity->reference->guid);
 		$this->assertSame($arr['refGuid'], $testEntity->ref_array[0]['entity']->guid);
+		$this->assertSame($arr['refGuid'], $testEntity->ref_object->thing->entity->guid);
 
 		$entity = TestModel::factory($testEntity->guid);
 
 		$this->assertSame($arr['refGuid'], $entity->reference->guid);
 		$this->assertSame($arr['refGuid'], $entity->ref_array[0]['entity']->guid);
+		$this->assertSame($arr['refGuid'], $entity->ref_object->thing->entity->guid);
 	}
 
 	/**
@@ -193,6 +196,7 @@ class EntityTest extends PHPUnit_Framework_TestCase {
 		$this->assertSame(30, $entity->number);
 		$this->assertSame($arr['refGuid'], $entity->reference->guid);
 		$this->assertSame($arr['refGuid'], $entity->ref_array[0]['entity']->guid);
+		$this->assertSame($arr['refGuid'], $entity->ref_object->thing->entity->guid);
 	}
 
 	/**
@@ -204,7 +208,7 @@ class EntityTest extends PHPUnit_Framework_TestCase {
 		$json = json_encode($testEntity);
 
 		$this->assertJsonStringEqualsJsonString(
-			'{"guid":'.$testEntity->guid.',"cdate":'.json_encode($testEntity->cdate).',"mdate":'.json_encode($testEntity->mdate).',"tags":["test"],"info":{"name":"Entity Test","type":"test","types":"tests"},"data":{"reference":["nymph_entity_reference",'.$arr['refGuid'].',"TestModel"],"ref_array":[{"entity":["nymph_entity_reference",'.$arr['refGuid'].',"TestModel"]}],"name":"Entity Test","number":30,"array":["full","of","values",500],"string":"test","null":null},"class":"TestModel"}',
+			'{"guid":'.$testEntity->guid.',"cdate":'.json_encode($testEntity->cdate).',"mdate":'.json_encode($testEntity->mdate).',"tags":["test"],"info":{"name":"Entity Test","type":"test","types":"tests"},"data":{"reference":["nymph_entity_reference",'.$arr['refGuid'].',"TestModel"],"ref_array":[{"entity":["nymph_entity_reference",'.$arr['refGuid'].',"TestModel"]}],"ref_object":{"thing":{"entity":["nymph_entity_reference",'.$arr['refGuid'].',"TestModel"]}},"name":"Entity Test","number":30,"array":["full","of","values",500],"string":"test","null":null},"class":"TestModel"}',
 			$json
 		);
 	}
@@ -230,6 +234,7 @@ class EntityTest extends PHPUnit_Framework_TestCase {
 		$entityData['data']['number'] = 4;
 		$entityData['data']['reference'] = false;
 		$entityData['data']['ref_array'] = array(false);
+		$entityData['data']['ref_object'] = (object) array("thing"=>false);
 		$testEntity->jsonAcceptData($entityData['data']);
 
 		$this->assertFalse($testEntity->hasTag('notag'));
@@ -243,6 +248,7 @@ class EntityTest extends PHPUnit_Framework_TestCase {
 		$this->assertSame(30, $testEntity->number);
 		$this->assertSame($arr['refGuid'], $testEntity->reference->guid);
 		$this->assertSame($arr['refGuid'], $testEntity->ref_array[0]['entity']->guid);
+		$this->assertSame($arr['refGuid'], $testEntity->ref_object->thing->entity->guid);
 
 		$this->assertTrue($testEntity->refresh());
 		$testEntity->useProtectedData();
@@ -261,6 +267,7 @@ class EntityTest extends PHPUnit_Framework_TestCase {
 		$this->assertSame(30, $testEntity->number);
 		$this->assertFalse($testEntity->reference);
 		$this->assertSame(array(false), $testEntity->ref_array);
+		$this->assertEquals((object) array("thing"=>false), $testEntity->ref_object);
 
 		$this->assertTrue($testEntity->refresh());
 	}
