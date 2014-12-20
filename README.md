@@ -4,6 +4,16 @@
 
 Nymph is an ORM that is simple to use in both JavaScript and PHP.
 
+## Installation
+
+You can install Nymph with Composer or Bower.
+
+```sh
+composer require sciactive/nymph
+
+bower install https://github.com/sciactive/nymph.git
+```
+
 ## Nymph Query Language vs Just SQL
 
 #### Nymph Query from Frontend
