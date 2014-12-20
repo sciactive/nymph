@@ -164,7 +164,7 @@ interface DriverInterface {
 	 * - If age is 22 or more, then pay is not greater than 8.
 	 *
 	 * <pre>
-	 * $entities = \SciActive\R::_('Nymph')->getEntities(
+	 * $entities = \Nymph\Nymph::getEntities(
 	 *	array('reverse' => true, 'limit' => 2),
 	 *	array(
 	 *		'&', // all must be true

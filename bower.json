@@ -6,7 +6,7 @@
 	"authors": [
 		"Hunter Perrin <hunter@sciactive.com>"
 	],
-	"main": "src/Nymph.php",
+	"main": "src/autoload.php",
 	"moduleType": [
 		"amd"
 	],

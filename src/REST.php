@@ -54,7 +54,7 @@ class REST {
 				$guid = (int) $delEnt['guid'];
 				$etype = $delEnt['etype'];
 				try {
-					if (R::_('Nymph')->deleteEntityByID($guid, $etype)) {
+					if (Nymph::deleteEntityByID($guid, $etype)) {
 						$deleted[] = $guid;
 					} else {
 						$failures = true;
@@ -77,7 +77,7 @@ class REST {
 			}
 			header("HTTP/1.1 200 OK", true, 200);
 		} else {
-			if (!R::_('Nymph')->deleteUID("$data")) {
+			if (!Nymph::deleteUID("$data")) {
 				return $this->httpError(500, "Internal Server Error");
 			}
 			header("HTTP/1.1 204 No Content", true, 204);
@@ -129,7 +129,7 @@ class REST {
 				echo json_encode($created);
 			}
 		} else {
-			$result = R::_('Nymph')->newUID("$data");
+			$result = Nymph::newUID("$data");
 			if (empty($result)) {
 				return $this->httpError(500, "Internal Server Error");
 			}
@@ -220,7 +220,7 @@ class REST {
 		if (in_array($action, array('entity', 'entities'))) {
 			$args = json_decode($data, true);
 			if (is_int($args)) {
-				$result = R::_('Nymph')->$method($args);
+				$result = Nymph::$method($args);
 			} else {
 				$count = count($args);
 				if ($count > 1) {
@@ -235,7 +235,7 @@ class REST {
 						$args[$i] = $newArg;
 					}
 				}
-				$result = call_user_func_array(array(R::_('Nymph'), $method), $args);
+				$result = call_user_func_array("\Nymph\Nymph::$method", $args);
 			}
 			if (empty($result)) {
 				if ($action === 'entity' || R::_('NymphConfig')->empty_list_error['value']) {
@@ -245,7 +245,7 @@ class REST {
 			echo json_encode($result);
 			return true;
 		} else {
-			$result = R::_('Nymph')->$method("$data");
+			$result = Nymph::$method("$data");
 			if ($result === null) {
 				return $this->httpError(404, "Not Found");
 			} elseif (empty($result)) {
@@ -261,7 +261,7 @@ class REST {
 			return false;
 		}
 		if ((int)$entityData['guid'] > 0) {
-			$entity = R::_('Nymph')->getEntity(
+			$entity = Nymph::getEntity(
 					array('class' => $entityData['class']),
 					array('&',
 						'guid' => (int)$entityData['guid']

@@ -33,12 +33,15 @@ class Employee extends \Nymph\Entity {
 	}
 
 	public function info($type) {
-		if ($type == 'name' && isset($this->name))
+		if ($type == 'name' && isset($this->name)) {
 			return $this->name;
-		elseif ($type == 'type')
+		}
+		elseif ($type == 'type') {
 			return 'employee';
-		elseif ($type == 'types')
+		}
+		elseif ($type == 'types') {
 			return 'employees';
+		}
 		return null;
 	}
 
@@ -59,7 +62,7 @@ class Employee extends \Nymph\Entity {
 		}
 		// Generate employee ID.
 		if (!isset($this->id)) {
-			$this->id = \SciActive\R::_('Nymph')->newUID('employee');
+			$this->id = \Nymph\Nymph::newUID('employee');
 		}
 		return parent::save();
 	}

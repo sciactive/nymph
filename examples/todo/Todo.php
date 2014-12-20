@@ -18,18 +18,20 @@ class Todo extends \Nymph\Entity {
 	}
 
 	public function info($type) {
-		if ($type == 'name' && isset($this->name))
+		if ($type == 'name' && isset($this->name)) {
 			return $this->name;
-		elseif ($type == 'type')
+		} elseif ($type == 'type') {
 			return 'todo';
-		elseif ($type == 'types')
+		} elseif ($type == 'types') {
 			return 'todos';
+		}
 		return null;
 	}
 
 	public function archive() {
-		if ($this->hasTag('archived'))
+		if ($this->hasTag('archived')) {
 			return true;
+		}
 		$this->addTag('archived');
 		return $this->save();
 	}

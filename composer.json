@@ -41,6 +41,14 @@
 			"bower.json"
 		]
 	},
+	"autoload": {
+		"psr-0": {
+			"Nymph\\": "src/"
+		},
+		"psr-4": {
+			"Nymph\\": "src/"
+		}
+	},
 	"require": {
 		"sciactive/requirephp": "~1.2"
 	},

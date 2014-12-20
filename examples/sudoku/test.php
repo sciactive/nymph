@@ -2,19 +2,18 @@
 
 require '../../lib/require.php';
 
-require '../../src/Nymph.php';
+require '../../src/autoload.php';
 \SciActive\R::_('NymphConfig', array(), function(){
 	return include '../config.php';
 });
-
-$NymphREST = \SciActive\R::_('NymphREST');
 
 require 'Game.php';
 
 $newGame = new Game();
 
-if (is_numeric($_REQUEST['difficulty']) && (int)$_REQUEST['difficulty'] >= 1 && (int)$_REQUEST['difficulty'] <= 3)
+if (is_numeric($_REQUEST['difficulty']) && (int)$_REQUEST['difficulty'] >= 1 && (int)$_REQUEST['difficulty'] <= 3) {
 	$newGame->difficulty = (int)$_REQUEST['difficulty'];
+}
 
 $time = microtime(true);
 $newGame->generateBoard();

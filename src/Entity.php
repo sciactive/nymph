@@ -157,7 +157,7 @@ class Entity implements EntityInterface {
 	 */
 	public function __construct($id = 0) {
 		if ($id > 0) {
-			$entity = R::_('Nymph')->getEntity(array('class' => get_class($this)), array('&', 'guid' => $id));
+			$entity = Nymph::getEntity(array('class' => get_class($this)), array('&', 'guid' => $id));
 			if (isset($entity)) {
 				$this->guid = $entity->guid;
 				$this->tags = $entity->tags;
@@ -433,7 +433,7 @@ class Entity implements EntityInterface {
 		if ($this->isASleepingReference) {
 			$this->referenceWake();
 		}
-		return R::_('Nymph')->deleteEntity($this);
+		return Nymph::deleteEntity($this);
 	}
 
 	/**
@@ -785,7 +785,7 @@ class Entity implements EntityInterface {
 		if (!$this->isASleepingReference) {
 			return true;
 		}
-		$entity = R::_('Nymph')->getEntity(array('class' => $this->sleepingReference[2], 'skip_ac' => (bool) $this->_nUseSkipAC), array('&', 'guid' => $this->sleepingReference[1]));
+		$entity = Nymph::getEntity(array('class' => $this->sleepingReference[2], 'skip_ac' => (bool) $this->_nUseSkipAC), array('&', 'guid' => $this->sleepingReference[1]));
 		if (!isset($entity)) {
 			return false;
 		}
@@ -804,7 +804,7 @@ class Entity implements EntityInterface {
 		if (!isset($this->guid)) {
 			return false;
 		}
-		$refresh = R::_('Nymph')->getEntity(array('class' => get_class($this)), array('&', 'guid' => $this->guid));
+		$refresh = Nymph::getEntity(array('class' => get_class($this)), array('&', 'guid' => $this->guid));
 		if (!isset($refresh)) {
 			return 0;
 		}
@@ -837,7 +837,7 @@ class Entity implements EntityInterface {
 		if ($this->isASleepingReference) {
 			$this->referenceWake();
 		}
-		return R::_('Nymph')->saveEntity($this);
+		return Nymph::saveEntity($this);
 	}
 
 	public function toReference() {

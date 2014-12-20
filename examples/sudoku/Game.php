@@ -35,12 +35,13 @@ class Game extends \Nymph\Entity {
 	}
 
 	public function info($type) {
-		if ($type == 'name' && isset($this->name))
+		if ($type == 'name' && isset($this->name)) {
 			return $this->name;
-		elseif ($type == 'type')
+		} elseif ($type == 'type') {
 			return 'game';
-		elseif ($type == 'types')
+		} elseif ($type == 'types') {
 			return 'games';
+		}
 		return null;
 	}
 
@@ -83,8 +84,9 @@ class Game extends \Nymph\Entity {
 				}
 				$affinityOptions = array_intersect($affinity, $options);
 				// If we can use a value from our affinity values, let's use it.
-				if ($affinityOptions)
+				if ($affinityOptions) {
 					$options = $affinityOptions;
+				}
 
 				// Do we have options?
 				if (!$options) {
@@ -134,8 +136,9 @@ class Game extends \Nymph\Entity {
 		$randos = array();
 		while (count($randos) < $randoCount) {
 			$newRando = array(rand(0, 8), rand(0, 8));
-			if (!in_array($newRando, $randos))
+			if (!in_array($newRando, $randos)) {
 				$randos[] = $newRando;
+			}
 		}
 		foreach ($randos as $curRemove) {
 			$this->board[$curRemove[1]][$curRemove[0]] = null;
@@ -189,10 +192,12 @@ class Game extends \Nymph\Entity {
 
 		for ($y = 0; $y <= 8; $y++) {
 			for ($x = 0; $x <= 8; $x++) {
-				if (!$emptySquares && !isset($this->board[$y][$x]))
+				if (!$emptySquares && !isset($this->board[$y][$x])) {
 					continue;
-				if ($emptySquares && isset($this->board[$y][$x]))
+				}
+				if ($emptySquares && isset($this->board[$y][$x])) {
 					continue;
+				}
 				$count = count($this->optionsLeft($x, $y));
 				$grid[$y][$x] = $count;
 				isset($counts[$count]) or $counts[$count] = array();
@@ -212,20 +217,24 @@ class Game extends \Nymph\Entity {
 	private function neighborsY($x, $y) {
 		$results = array();
 		for ($y2 = 0; $y2 <= 8; $y2++) {
-			if ($y === $y2)
+			if ($y === $y2) {
 				continue;
-			if (isset($this->board[$y2][$x]))
+			}
+			if (isset($this->board[$y2][$x])) {
 				$results[] = $this->board[$y2][$x];
+			}
 		}
 		return $results;
 	}
 	private function neighborsX($x, $y) {
 		$results = array();
 		for ($x2 = 0; $x2 <= 8; $x2++) {
-			if ($x === $x2)
+			if ($x === $x2) {
 				continue;
-			if (isset($this->board[$y][$x2]))
+			}
+			if (isset($this->board[$y][$x2])) {
 				$results[] = $this->board[$y][$x2];
+			}
 		}
 		return $results;
 	}
@@ -235,10 +244,12 @@ class Game extends \Nymph\Entity {
 		$minY = $x - ($x % 3);
 		for ($y2 = $minX; $y2 <= $minX+2; $y2++) {
 			for ($x2 = $minY; $x2 <= $minY+2; $x2++) {
-				if ($y2 === $y && $x2 === $x)
+				if ($y2 === $y && $x2 === $x) {
 					continue;
-				if (isset($this->board[$y2][$x2]))
+				}
+				if (isset($this->board[$y2][$x2])) {
 					$results[] = $this->board[$y2][$x2];
+				}
 			}
 		}
 		return $results;

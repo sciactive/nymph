@@ -4,16 +4,14 @@ if ($_REQUEST['action'] === 'export' && !getenv('DATABASE_URL')) {
 	// No import/export on Heroku.
 	require '../../lib/require.php';
 
-	require '../../src/Nymph.php';
+	require '../../src/autoload.php';
 	\SciActive\R::_('NymphConfig', array(), function(){
 		return include '../config.php';
 	});
 
-	\SciActive\R::_(array('Nymph'), function(){
-		require 'Game.php';
-	});
+	require 'Game.php';
 
-	\SciActive\R::_('Nymph')->exportPrint();
+	\Nymph\Nymph::exportPrint();
 	exit;
 }
 

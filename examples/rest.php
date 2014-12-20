@@ -4,12 +4,12 @@ error_reporting(E_ALL);
 
 require '../lib/require.php';
 
-require '../src/Nymph.php';
+require '../src/autoload.php';
 \SciActive\R::_('NymphConfig', array(), function(){
 	return include 'config.php';
 });
 
-$NymphREST = \SciActive\R::_('NymphREST');
+$NymphREST = new \Nymph\REST();
 
 require 'employee/Employee.php';
 require 'todo/Todo.php';

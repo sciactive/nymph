@@ -5,7 +5,7 @@ use SciActive\R as R;
 R::undef('NymphConfig');
 R::undef('Nymph');
 
-include '../src/Nymph.php';
+include '../src/autoload.php';
 
 R::_('NymphConfig', array(), function(){
 	// Nymph's configuration.
@@ -28,7 +28,5 @@ R::_('NymphConfig', array(), function(){
 
 	return $nymph_config;
 });
-
-$Nymph = R::_('Nymph');
 
 require_once 'TestModel.php';

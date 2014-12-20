@@ -1,4 +1,5 @@
 <?php
+use Nymph\Nymph as Nymph;
 
 class EntityClassTest extends PHPUnit_Framework_TestCase {
 	public function testInstantiate() {
@@ -300,7 +301,7 @@ class EntityClassTest extends PHPUnit_Framework_TestCase {
 			$eighth
 		);
 
-		\SciActive\R::_('Nymph')->sort($arr, 'name');
+		Nymph::sort($arr, 'name');
 
 		$this->assertEquals(array(
 			$first,
@@ -315,7 +316,7 @@ class EntityClassTest extends PHPUnit_Framework_TestCase {
 			$tenth
 		), $arr);
 
-		\SciActive\R::_('Nymph')->sort($arr, 'name', true, true);
+		Nymph::sort($arr, 'name', true, true);
 
 		$this->assertEquals(array_reverse(array(
 			$first,
@@ -390,7 +391,7 @@ class EntityClassTest extends PHPUnit_Framework_TestCase {
 			$firstsub1
 		);
 
-		\SciActive\R::_('Nymph')->hsort($arr, 'name', 'parent');
+		Nymph::hsort($arr, 'name', 'parent');
 
 		/*foreach ($arr as $cur) {
 			echo "\n".(isset($cur->parent) ? (isset($cur->parent->parent) ? "{$cur->parent->parent->name} : " : '')."{$cur->parent->name} : " : '')."$cur->name\n";
@@ -415,7 +416,7 @@ class EntityClassTest extends PHPUnit_Framework_TestCase {
 			$tenth
 		), $arr);
 
-		\SciActive\R::_('Nymph')->hsort($arr, 'name', 'parent', true, true);
+		Nymph::hsort($arr, 'name', 'parent', true, true);
 
 		/*foreach ($arr as $cur) {
 			echo "\n".(isset($cur->parent) ? (isset($cur->parent->parent) ? "{$cur->parent->parent->name} : " : '')."{$cur->parent->name} : " : '')."$cur->name\n";

@@ -5,7 +5,7 @@
 
 require '../../lib/require.php';
 
-require '../../src/Nymph.php';
+require '../../src/autoload.php';
 \SciActive\R::_('NymphConfig', array(), function(){
 	return include '../config.php';
 });
@@ -27,7 +27,7 @@ $newEntity2->salary = 8000000;
 $newEntity2->subordinates[] = $newEntity;
 $newEntity2->save();
 
-$entity = \SciActive\R::_('Nymph')->getEntity(array('class' => Employee), array('&', 'guid' => $newEntity2->guid));
+$entity = \Nymph\Nymph::getEntity(array('class' => Employee), array('&', 'guid' => $newEntity2->guid));
 
 ?>
 <!DOCTYPE html>

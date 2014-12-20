@@ -11,7 +11,7 @@ if ($_FILES) {
 	if ($_FILES['nex']['error'] === 0) {
 		require '../../lib/require.php';
 
-		require '../../src/Nymph.php';
+		require '../../src/autoload.php';
 		\SciActive\R::_('NymphConfig', array(), function(){
 			return include '../config.php';
 		});
@@ -23,7 +23,7 @@ if ($_FILES) {
 		});
 
 		try {
-			$result = \SciActive\R::_('Nymph')->import($_FILES['nex']['tmp_name']);
+			$result = \Nymph\Nymph::import($_FILES['nex']['tmp_name']);
 		} catch (NymphQueryFailedException $e) {
 			echo $e->getMessage()."\n\n".$e->getQuery();
 		}

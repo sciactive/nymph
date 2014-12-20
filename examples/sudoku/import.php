@@ -11,7 +11,7 @@ if ($_FILES) {
 	if ($_FILES['games']['error'] === 0) {
 		require '../../lib/require.php';
 
-		require '../../src/Nymph.php';
+		require '../../src/autoload.php';
 		\SciActive\R::_('NymphConfig', array(), function(){
 			return include '../config.php';
 		});
@@ -20,7 +20,7 @@ if ($_FILES) {
 			require 'Game.php';
 		});
 
-		$result = \SciActive\R::_('Nymph')->import($_FILES['games']['tmp_name']);
+		$result = \Nymph\Nymph::import($_FILES['games']['tmp_name']);
 		if ($result) {
 			header("HTTP/1.1 302 Found", true, 302);
 			header("Location: index.php");

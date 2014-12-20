@@ -13,36 +13,36 @@
  */
 use SciActive\R as R;
 
-spl_autoload_register(function ($class) {
-    $prefix = 'Nymph\\';
-    $base_dir = __DIR__.'/';
-    // Does the class use the namespace prefix?
-    $len = strlen($prefix);
-    if (strncmp($prefix, $class, $len) !== 0) {
-        // No, move to the next registered autoloader.
-        return;
-    }
-    // Get the relative class name.
-    $relative_class = substr($class, $len);
-
-    // Replace the namespace prefix with the base directory, replace namespace
-    // separators with directory separators in the relative class name, append
-    // with .php.
-    $file = $base_dir . str_replace('\\', '/', $relative_class) . '.php';
-
-    // If the file exists, require it.
-    if (file_exists($file)) {
-        require $file;
-    }
-});
-
 R::_('Nymph', array('NymphConfig'), function($NymphConfig){
 	$class = '\\Nymph\\Drivers\\'.$NymphConfig->driver['value'].'Driver';
 
 	$Nymph = new $class($NymphConfig);
 	return $Nymph;
 });
-R::_('NymphREST', array('Nymph'), function($Nymph){
-	$NymphREST = new REST();
-	return $NymphREST;
-});
+
+class Nymph {
+	public static function __callStatic($name, $args) {
+		return call_user_func_array(array(R::_('Nymph'), $name), $args);
+	}
+
+	// Any method with an argument passed by reference must be redeclared.
+	public static function deleteEntity(&$entity) {
+		return R::_('Nymph')->deleteEntity($entity);
+	}
+
+	public static function saveEntity(&$entity) {
+		return R::_('Nymph')->saveEntity($entity);
+	}
+
+	public static function hsort(&$array, $property = null, $parent_property = null, $case_sensitive = false, $reverse = false) {
+		return R::_('Nymph')->hsort($array, $property, $parent_property, $case_sensitive, $reverse);
+	}
+
+	public static function psort(&$array, $property = null, $parent_property = null, $case_sensitive = false, $reverse = false) {
+		return R::_('Nymph')->psort($array, $property, $parent_property, $case_sensitive, $reverse);
+	}
+
+	public static function sort(&$array, $property = null, $case_sensitive = false, $reverse = false) {
+		return R::_('Nymph')->sort($array, $property, $case_sensitive, $reverse);
+	}
+}

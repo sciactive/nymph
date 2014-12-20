@@ -9,7 +9,7 @@ if (getenv('DATABASE_URL')) {
 
 require '../../lib/require.php';
 
-require '../../src/Nymph.php';
+require '../../src/autoload.php';
 \SciActive\R::_('NymphConfig', array(), function(){
 	return include '../config.php';
 });
@@ -20,4 +20,4 @@ require '../../src/Nymph.php';
 	require '../todo/Todo.php';
 });
 
-\SciActive\R::_('Nymph')->exportPrint();
+\Nymph\Nymph::exportPrint();
