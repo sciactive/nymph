@@ -22,6 +22,7 @@
 		<testsuite name="all-dbs">
 			<file>tests/EntityTest.php</file>
 			<file>tests/SortingTest.php</file>
+			<file>tests/UIDTest.php</file>
 			<file>tests/QueriesTest.php</file>
 			<file>tests/QueriesPostgresTest.php</file>
 		</testsuite>
