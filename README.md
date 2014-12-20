@@ -1,6 +1,6 @@
 # <img alt="logo" src="https://raw.githubusercontent.com/sciactive/2be-extras/master/logo/product-icon-40-bw.png" align="top" /> Nymph - a PHP and JS ORM
 
-[![Build Status](https://travis-ci.org/sciactive/nymph.svg?branch=master)](http://travis-ci.org/sciactive/nymph)
+[![Build Status](https://travis-ci.org/sciactive/nymph.svg?branch=master)](http://travis-ci.org/sciactive/nymph) [![Stories in Ready](https://badge.waffle.io/sciactive/nymph.png?label=ready&title=Ready)](http://waffle.io/sciactive/nymph) [![Stories in Progress](https://badge.waffle.io/sciactive/nymph.png?label=in progress&title=In Progress)](http://waffle.io/sciactive/nymph)
 
 Nymph is an ORM that is simple to use in both JavaScript and PHP.
 
