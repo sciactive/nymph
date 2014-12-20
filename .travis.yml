@@ -7,13 +7,20 @@ php:
   - hhvm
 
 env:
-  - DB=mysql DATABASE_URL=mysql://root@localhost:3306/nymph_testing
-  - DB=pgsql DATABASE_URL=postgres://postgres@localhost:5432/nymph_testing
+  - DB=mysql DATABASE_MYSQL=mysql://root@localhost:3306/nymph_testing
+  - DB=pgsql DATABASE_PGSQL=postgres://postgres@localhost:5432/nymph_testing
+  - DATABASE_MYSQL=mysql://root@localhost:3306/nymph_testing DATABASE_PGSQL=postgres://postgres@localhost:5432/nymph_testing
 
 matrix:
   exclude:
     - php: hhvm
-      env: DB=pgsql DATABASE_URL=postgres://postgres@localhost:5432/nymph_testing
+      env: DB=pgsql DATABASE_PGSQL=postgres://postgres@localhost:5432/nymph_testing
+    - php: hhvm
+      env: DATABASE_MYSQL=mysql://root@localhost:3306/nymph_testing DATABASE_PGSQL=postgres://postgres@localhost:5432/nymph_testing
+    - php: 5.5
+      env: DATABASE_MYSQL=mysql://root@localhost:3306/nymph_testing DATABASE_PGSQL=postgres://postgres@localhost:5432/nymph_testing
+    - php: 5.6
+      env: DATABASE_MYSQL=mysql://root@localhost:3306/nymph_testing DATABASE_PGSQL=postgres://postgres@localhost:5432/nymph_testing
 
 mysql:
   database: nymph_testing
@@ -23,11 +30,10 @@ mysql:
 install: composer install
 
 before_script:
-  - if [[ "$DB" == "pgsql" ]]; then psql -c "CREATE DATABASE nymph_testing;" -U postgres; fi
-  - if [[ "$DB" == "mysql" ]]; then mysql -e "CREATE DATABASE IF NOT EXISTS nymph_testing;" -uroot; fi
+  - if [[ "$DB" == "pgsql" || "$DB" == "" ]]; then psql -c "CREATE DATABASE nymph_testing;" -U postgres; fi
+  - if [[ "$DB" == "mysql" || "$DB" == "" ]]; then mysql -e "CREATE DATABASE IF NOT EXISTS nymph_testing;" -uroot; fi
 
 script: ./testing/run coverage
 
 after_success:
-  - if [[ "$DB" == "mysql" ]]; then ./vendor/bin/test-reporter --coverage-report="testing/logs/clover-mysql.xml"; fi
-  - if [[ "$DB" == "pgsql" ]]; then ./vendor/bin/test-reporter --coverage-report="testing/logs/clover-pgsql.xml"; fi
+  - if [[ "$DB" == "" ]]; then ./vendor/bin/test-reporter --coverage-report="testing/logs/clover.xml"; fi

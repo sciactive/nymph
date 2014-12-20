@@ -13,8 +13,8 @@ R::_('NymphConfig', array(), function(){
 	$nymph_config = include(__DIR__.DIRECTORY_SEPARATOR.'../conf/defaults.php');
 
 		$nymph_config->driver['value'] = 'PostgreSQL';
-	if (getenv('DATABASE_URL')) {
-		$dbopts = parse_url(getenv('DATABASE_URL'));
+	if (getenv('DATABASE_PGSQL')) {
+		$dbopts = parse_url(getenv('DATABASE_PGSQL'));
 		$nymph_config->PostgreSQL->database['value'] = ltrim($dbopts["path"],'/');
 		$nymph_config->PostgreSQL->host['value'] = $dbopts["host"];
 		$nymph_config->PostgreSQL->port['value'] = $dbopts["port"];

@@ -15,15 +15,22 @@
 	strict="false"
 	verbose="false">
 	<testsuites>
-		<testsuite name="Nymph Test Suite">
+		<testsuite name="default">
 			<directory>tests</directory>
+			<exclude>tests/QueriesPostgresTest.php</exclude>
+		</testsuite>
+		<testsuite name="all-dbs">
+			<file>tests/EntityTest.php</file>
+			<file>tests/SortingTest.php</file>
+			<file>tests/QueriesTest.php</file>
+			<file>tests/QueriesPostgresTest.php</file>
 		</testsuite>
 	</testsuites>
 	<filter>
 		<whitelist processUncoveredFilesFromWhitelist="false">
 			<directory suffix=".php">../src</directory>
 			<exclude>
-				<file>../src/NymphREST.php</file>
+				<file>../src/REST.php</file>
 			</exclude>
 		</whitelist>
 	</filter>

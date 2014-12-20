@@ -7,20 +7,36 @@ echo "Use \`run coverage\` to build coverage clover."
 echo
 
 if [[ "$1" == "coverage" ]]; then
-	CVG="-coverage"
+	CVGMYSQL="--coverage-clover logs/clover-mysql.xml"
+	CVGPGSQL="--coverage-clover logs/clover-pgsql.xml"
+	CVG="--coverage-clover logs/clover.xml"
 else
+	CVGMYSQL=""
+	CVGPGSQL=""
 	CVG=""
 fi
 
 cd $(dirname $0)
 
-if [[ "$DB" == "" || "$DB" == "mysql" ]]; then
-	./run-mysql$CVG
+if [[ "$DB" == "mysql" ]]; then
+	echo "################################################################################"
+	echo "#                           Running tests for MySQL                            #"
+	echo -e "################################################################################\n"
+
+	phpunit --testsuite default --bootstrap bootstrapMySQL.php $CVGMYSQL
+fi
+if [[ "$DB" == "pgsql" ]]; then
+	echo "################################################################################"
+	echo "#                         Running tests for PostgreSQL                         #"
+	echo -e "################################################################################\n"
+
+	phpunit --testsuite default --bootstrap bootstrapPostgreSQL.php $CVGPGSQL
 fi
 if [[ "$DB" == "" ]]; then
-	echo -e "\n\n"
-fi
-if [[ "$DB" == "" || "$DB" == "pgsql" ]]; then
-	./run-postgresql$CVG
+	echo "################################################################################"
+	echo "#                          Running tests for All DBs                           #"
+	echo -e "################################################################################\n"
+
+	phpunit --testsuite all-dbs --bootstrap bootstrapMySQL.php $CVG
 fi
 

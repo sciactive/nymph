@@ -1,7 +1,0 @@
-#!/bin/bash
-
-echo "################################################################################"
-echo "#                         Running tests for PostgreSQL                         #"
-echo -e "################################################################################\n"
-
-phpunit --coverage-clover logs/clover-pgsql.xml --bootstrap bootstrapPostgreSQL.php -c phpunit-pgsql.xml

@@ -1,7 +1,0 @@
-#!/bin/bash
-
-echo "################################################################################"
-echo "#                           Running tests for MySQL                            #"
-echo -e "################################################################################\n"
-
-phpunit --coverage-clover logs/clover-mysql.xml --bootstrap bootstrapMySQL.php

@@ -11,8 +11,8 @@ R::_('NymphConfig', array(), function(){
 	// Nymph's configuration.
 
 	$nymph_config = include(__DIR__.DIRECTORY_SEPARATOR.'../conf/defaults.php');
-	if (getenv('DATABASE_URL')) {
-		$dbopts = parse_url(getenv('DATABASE_URL'));
+	if (getenv('DATABASE_MYSQL')) {
+		$dbopts = parse_url(getenv('DATABASE_MYSQL'));
 		$nymph_config->MySQL->database['value'] = ltrim($dbopts["path"],'/');
 		$nymph_config->MySQL->host['value'] = $dbopts["host"];
 		$nymph_config->MySQL->port['value'] = $dbopts["port"];
