@@ -18,13 +18,15 @@
 		<testsuite name="default">
 			<directory>tests</directory>
 			<exclude>tests/QueriesPostgresTest.php</exclude>
+			<exclude>tests/UIDPostgresTest.php</exclude>
 		</testsuite>
 		<testsuite name="all-dbs">
 			<file>tests/EntityTest.php</file>
 			<file>tests/SortingTest.php</file>
-			<file>tests/UIDTest.php</file>
 			<file>tests/QueriesTest.php</file>
+			<file>tests/UIDTest.php</file>
 			<file>tests/QueriesPostgresTest.php</file>
+			<file>tests/UIDPostgresTest.php</file>
 		</testsuite>
 	</testsuites>
 	<filter>
