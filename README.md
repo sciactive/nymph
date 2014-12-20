@@ -97,7 +97,34 @@ Nymph in JavaScript handles any database interaction by using a NymphREST endpoi
 
 ## Setting up a Nymph Application
 
-For a step by step guide to setting up Nymph on your own server, visit the [Setup Guide](https://github.com/sciactive/nymph/wiki/Setup-Guide).
+<div dir="rtl">Quick Setup with Composer</div>
+```sh
+composer require sciactive/nymph
+```
+```php
+require 'vendor/autoload.php';
+use Nymph\Nymph as Nymph;
+\SciActive\R::_('NymphConfig', array(), function(){
+	$config = include('vendor/sciactive/nymph/conf/defaults.php');
+	$config->MySQL->host['value'] = '127.0.0.1';
+	$config->MySQL->database['value'] = 'my_database';
+	$config->MySQL->user['value'] = 'my_user';
+	$config->MySQL->password['value'] = 'my_password';
+	return $config;
+});
+
+// You are set up. Now make a class like `MyEntity` and use it.
+
+require 'my_autoloader.php';
+
+$myEntity = new MyEntity();
+$myEntity->myVar = "myValue";
+$myEntity->save();
+
+$allMyEntities = Nymph::getEntities(array('class' => 'MyEntity'));
+```
+
+For a thorough step by step guide to setting up Nymph on your own server, visit the [Setup Guide](https://github.com/sciactive/nymph/wiki/Setup-Guide).
 
 ## Technical Documentation
 
