@@ -7,6 +7,21 @@ class QueriesTest extends PHPUnit_Framework_TestCase {
 		$this->assertInstanceOf('\\Nymph\\Drivers\\DriverInterface', $nymph);
 	}
 
+	/**
+	 * @expectedException \Nymph\Exceptions\InvalidParametersException
+	 */
+	public function testInvalidQuery() {
+		$all = Nymph::getEntities(
+				array('class' => 'TestModel'),
+				array('&',
+					'tag' => 'thing'
+				),
+				array(
+					'data' => array('this_query', 'should_fail')
+				)
+			);
+	}
+
 	public function testDeleteOldTestData() {
 		$all = Nymph::getEntities(array('class' => 'TestModel'));
 		$this->assertTrue((array)$all===$all);

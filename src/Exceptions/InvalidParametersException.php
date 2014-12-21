@@ -9,4 +9,4 @@
  * @link http://sciactive.com/
  */
 
-class InvalidParametersException extends \Exception {}
+class InvalidParametersException extends \InvalidArgumentException {}
