@@ -24,7 +24,7 @@ if ($_FILES) {
 
 		try {
 			$result = \Nymph\Nymph::import($_FILES['nex']['tmp_name']);
-		} catch (NymphQueryFailedException $e) {
+		} catch (\Nymph\Exceptions\QueryFailedException $e) {
 			echo $e->getMessage()."\n\n".$e->getQuery();
 		}
 	} else {

@@ -14,6 +14,9 @@ use SciActive\R as R;
  * Database abstraction object.
  *
  * @package Nymph
+ * @property int $guid The entity's Globally Unique ID.
+ * @property int $cdate The entity's creation date, as a Unix timestamp.
+ * @property int $mdate The entity's modification date, as a Unix timestamp.
  */
 class Entity implements EntityInterface {
 	const etype = 'entity';
@@ -21,7 +24,7 @@ class Entity implements EntityInterface {
 	/**
 	 * The GUID of the entity.
 	 *
-	 * @var int
+	 * @var int|null
 	 * @access private
 	 */
 	private $guid = null;
@@ -66,10 +69,10 @@ class Entity implements EntityInterface {
 	/**
 	 * The reference to use to wake.
 	 *
-	 * @var array
+	 * @var array|null
 	 * @access private
 	 */
-	private $sleepingReference = false;
+	private $sleepingReference = null;
 	/**
 	 * The entries listed here correspond to variables that should be converted
 	 * to standard objects instead of arrays when unserializing from JSON.
@@ -105,7 +108,7 @@ class Entity implements EntityInterface {
 	 * If you use a whitelist, you don't need to use protectedData, since you
 	 * can simply leave those entries out of whitelistData.
 	 *
-	 * @var array
+	 * @var array|bool
 	 * @access protected
 	 */
 	protected $whitelistData = false;
@@ -123,7 +126,7 @@ class Entity implements EntityInterface {
 	 * If this is an array, then tags listed here are the only tags that will be
 	 * accepted from incoming JSON. Any other tags will be ignored.
 	 *
-	 * @var array
+	 * @var array|bool
 	 * @access protected
 	 */
 	protected $whitelistTags = false;
@@ -139,7 +142,7 @@ class Entity implements EntityInterface {
 	 * The name of the corresponding class on the client side. Leave null to use
 	 * the same name.
 	 *
-	 * @var string
+	 * @var string|null
 	 * @access protected
 	 */
 	protected $clientClassName = null;
@@ -170,7 +173,7 @@ class Entity implements EntityInterface {
 
 	/**
 	 * Create a new instance.
-	 * @return Entity The new instance.
+	 * @return \Nymph\Entity The new instance.
 	 */
 	public static function factory() {
 		global $_;
@@ -192,7 +195,7 @@ class Entity implements EntityInterface {
 	 * is actually used.
 	 *
 	 * @param array $reference The Nymph Entity Reference to use to wake.
-	 * @return Entity The new instance.
+	 * @return \Nymph\Entity The new instance.
 	 */
 	public static function factoryReference($reference) {
 		$class = $reference[2];

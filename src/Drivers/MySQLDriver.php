@@ -357,7 +357,6 @@ class MySQLDriver implements DriverInterface {
 				// Any options having to do with data only return if the entity has
 				// the specified variables.
 				foreach ($value as $cur_value) {
-					$query_made = false;
 					switch ($key) {
 						case 'guid':
 						case '!guid':

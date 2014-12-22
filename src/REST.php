@@ -59,7 +59,7 @@ class REST {
 					} else {
 						$failures = true;
 					}
-				} catch (Exception $e) {
+				} catch (\Exception $e) {
 					$failures = true;
 				}
 			}
@@ -158,7 +158,7 @@ class REST {
 			try {
 				$return = call_user_func_array(array($entity, $args['method']), $args['params']);
 				echo json_encode(array('entity' => $entity, 'return' => $return));
-			} catch (Exception $e) {
+			} catch (\Exception $e) {
 				return $this->httpError(500, "Internal Server Error");
 			}
 		} else {
@@ -183,7 +183,7 @@ class REST {
 					if ($entity->save()) {
 						$saved[] = $entity;
 					}
-				} catch (EntityInvalidDataException $e) {
+				} catch (Exceptions\EntityInvalidDataException $e) {
 					$invalidData = true;
 				}
 			}
@@ -310,10 +310,7 @@ class REST {
 	private function referenceToEntity(&$item, $key) {
 		if ((array) $item === $item) {
 			if (isset($item[0]) && $item[0] === 'nymph_entity_reference') {
-				if (!isset($this->entityCache["reference_guid: {$item[1]}"])) {
-					$this->entityCache["reference_guid: {$item[1]}"] = call_user_func(array($item[2], 'factoryReference'), $item);
-				}
-				$item = $this->entityCache["reference_guid: {$item[1]}"];
+				$item = call_user_func(array($item[2], 'factoryReference'), $item);
 			} else {
 				array_walk($item, array($this, 'referenceToEntity'));
 			}

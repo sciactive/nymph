@@ -156,7 +156,7 @@ interface EntityInterface extends DataObjectInterface, \JsonSerializable {
 	/**
 	 * Return a Nymph Entity Reference for this entity.
 	 *
-	 * @return array A Nymph Entity Reference array.
+	 * @return array|\Nymph\Entity A Nymph Entity Reference array, or the entity if it is not saved yet.
 	 */
 	public function toReference();
 }

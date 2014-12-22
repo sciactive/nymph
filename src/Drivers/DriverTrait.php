@@ -148,8 +148,6 @@ trait DriverTrait {
 		}
 		// Now sort by children.
 		$new_array = array();
-		// Count the children.
-		$child_counter = array();
 		while ($array) {
 			// Look for entities ready to go in order.
 			$changed = false;

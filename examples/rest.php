@@ -22,6 +22,6 @@ try {
 	} else {
 		$NymphREST->run($_SERVER['REQUEST_METHOD'], $_REQUEST['action'], $_REQUEST['data']);
 	}
-} catch (NymphQueryFailedException $e) {
+} catch (\Nymph\Exceptions\QueryFailedException $e) {
 	echo $e->getMessage()."\n\n".$e->getQuery();
 }

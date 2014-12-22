@@ -11,7 +11,7 @@ class QueriesTest extends PHPUnit_Framework_TestCase {
 	 * @expectedException \Nymph\Exceptions\InvalidParametersException
 	 */
 	public function testInvalidQuery() {
-		$all = Nymph::getEntities(
+		Nymph::getEntities(
 				array('class' => 'TestModel'),
 				array('&',
 					'tag' => 'thing'
