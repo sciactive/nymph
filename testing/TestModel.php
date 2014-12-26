@@ -17,10 +17,10 @@
  */
 class TestModel extends \Nymph\Entity {
 	const etype = 'test_model';
-	protected $privateData = array('boolean');
-	protected $whitelistData = array('string', 'array', 'mdate');
-	protected $protectedTags = array('test', 'notag');
-	protected $whitelistTags = array('newtag');
+	protected $privateData = ['boolean'];
+	protected $whitelistData = ['string', 'array', 'mdate'];
+	protected $protectedTags = ['test', 'notag'];
+	protected $whitelistTags = ['newtag'];
 
 	public function __construct($id = 0) {
 		$this->addTag('test');
@@ -41,6 +41,6 @@ class TestModel extends \Nymph\Entity {
 
 	public function useProtectedData() {
 		$this->whitelistData = false;
-		$this->protectedData = array('number');
+		$this->protectedData = ['number'];
 	}
 }

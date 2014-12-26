@@ -24,7 +24,7 @@ class SortingTest extends PHPUnit_Framework_TestCase {
 		$tenth = new TestModel();
 		$tenth->name = 'Thing J';
 
-		$arr = array(
+		$arr = [
 			$second,
 			$sixth,
 			$ninth,
@@ -35,11 +35,11 @@ class SortingTest extends PHPUnit_Framework_TestCase {
 			$first,
 			$seventh,
 			$eighth
-		);
+		];
 
 		Nymph::sort($arr, 'name');
 
-		$this->assertEquals(array(
+		$this->assertEquals([
 			$first,
 			$second,
 			$third,
@@ -50,11 +50,11 @@ class SortingTest extends PHPUnit_Framework_TestCase {
 			$eighth,
 			$ninth,
 			$tenth
-		), $arr);
+		], $arr);
 
 		Nymph::sort($arr, 'name', true, true);
 
-		$this->assertEquals(array_reverse(array(
+		$this->assertEquals(array_reverse([
 			$first,
 			$third,
 			$fourth,
@@ -65,7 +65,7 @@ class SortingTest extends PHPUnit_Framework_TestCase {
 			$ninth,
 			$tenth,
 			$second
-		)), $arr);
+		]), $arr);
 	}
 
 	public function testHSort() {
@@ -108,7 +108,7 @@ class SortingTest extends PHPUnit_Framework_TestCase {
 		$tenth = new TestModel();
 		$tenth->name = 'Thing J';
 
-		$arr = array(
+		$arr = [
 			$second,
 			$sixth,
 			$firstsub6,
@@ -125,7 +125,7 @@ class SortingTest extends PHPUnit_Framework_TestCase {
 			$eighth,
 			$firstsub4,
 			$firstsub1
-		);
+		];
 
 		Nymph::hsort($arr, 'name', 'parent');
 
@@ -133,7 +133,7 @@ class SortingTest extends PHPUnit_Framework_TestCase {
 			echo "\n".(isset($cur->parent) ? (isset($cur->parent->parent) ? "{$cur->parent->parent->name} : " : '')."{$cur->parent->name} : " : '')."$cur->name\n";
 		}*/
 
-		$this->assertEquals(array(
+		$this->assertEquals([
 			$first,
 			$firstsub1,
 			$firstsub2,
@@ -150,7 +150,7 @@ class SortingTest extends PHPUnit_Framework_TestCase {
 			$eighth,
 			$ninth,
 			$tenth
-		), $arr);
+		], $arr);
 
 		Nymph::hsort($arr, 'name', 'parent', true, true);
 
@@ -158,7 +158,7 @@ class SortingTest extends PHPUnit_Framework_TestCase {
 			echo "\n".(isset($cur->parent) ? (isset($cur->parent->parent) ? "{$cur->parent->parent->name} : " : '')."{$cur->parent->name} : " : '')."$cur->name\n";
 		}*/
 
-		$this->assertEquals(array(
+		$this->assertEquals([
 			$second,
 			$tenth,
 			$ninth,
@@ -175,6 +175,6 @@ class SortingTest extends PHPUnit_Framework_TestCase {
 			$first,
 			$firstsub2,
 			$firstsub1,
-		), $arr);
+		], $arr);
 	}
 }

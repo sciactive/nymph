@@ -10,25 +10,25 @@
  */
 class Game extends \Nymph\Entity {
 	const etype = 'game';
-	protected $whitelistTags = array();
-	protected $whitelistData = array('name', 'difficulty', 'board', 'solvedBoard', 'playBoard', 'time', 'done');
-	protected $clientEnabledMethods = array('generateBoard', 'makeItFun');
+	protected $whitelistTags = [];
+	protected $whitelistData = ['name', 'difficulty', 'board', 'solvedBoard', 'playBoard', 'time', 'done'];
+	protected $clientEnabledMethods = ['generateBoard', 'makeItFun'];
 
 	public function __construct($id = 0) {
 		$this->difficulty = 1;
 		// In the board, if a value is an integer, that means it was preset by
 		// the game. If it's a string, that means it was provided by the user.
-		$this->board = array(
-			0 => array(),
-			1 => array(),
-			2 => array(),
-			3 => array(),
-			4 => array(),
-			5 => array(),
-			6 => array(),
-			7 => array(),
-			8 => array(),
-		);
+		$this->board = [
+			0 => [],
+			1 => [],
+			2 => [],
+			3 => [],
+			4 => [],
+			5 => [],
+			6 => [],
+			7 => [],
+			8 => [],
+		];
 		$this->time = 0;
 		$this->done = false;
 		parent::__construct($id);
@@ -53,9 +53,9 @@ class Game extends \Nymph\Entity {
 		for ($x = 0; $x <= 8; $x++) {
 			$this->board[0][$x] = $firstRow[$x];
 		}
-		$firstBlockAffinity = array($this->board[0][6], $this->board[0][7], $this->board[0][8]);
-		$secondBlockAffinity = array($this->board[0][0], $this->board[0][1], $this->board[0][2]);
-		$thirdBlockAffinity = array($this->board[0][3], $this->board[0][4], $this->board[0][5]);
+		$firstBlockAffinity = [$this->board[0][6], $this->board[0][7], $this->board[0][8]];
+		$secondBlockAffinity = [$this->board[0][0], $this->board[0][1], $this->board[0][2]];
+		$thirdBlockAffinity = [$this->board[0][3], $this->board[0][4], $this->board[0][5]];
 
 		// Oh there has to be a better way to do this, but in the interest of
 		// time, I'm basically going to brute force a board together.
@@ -64,7 +64,7 @@ class Game extends \Nymph\Entity {
 			for ($x = 0; $x <= 8; $x++) {
 				$options = $this->optionsLeft($x, $y);
 				// Let's find our affinity.
-				$affinities = array($firstBlockAffinity, $secondBlockAffinity, $thirdBlockAffinity);
+				$affinities = [$firstBlockAffinity, $secondBlockAffinity, $thirdBlockAffinity];
 				switch ($x) {
 					case 0:
 					case 1:
@@ -94,19 +94,19 @@ class Game extends \Nymph\Entity {
 					// If we've been going at it for a while, just give up and
 					// try again.
 					if ($rowAttemts > 15) {
-						$this->board = array(0 => array(),1 => array(),2 => array(),3 => array(),4 => array(),5 => array(),6 => array(),7 => array(),8 => array());
+						$this->board = [0 => [],1 => [],2 => [],3 => [],4 => [],5 => [],6 => [],7 => [],8 => []];
 						return $this->generateBoard();
 					}
-					$this->board[$y] = array();
+					$this->board[$y] = [];
 					$x = -1;
 					continue;
 				}
 
 				$this->board[$y][$x] = $options[array_rand($options)];
 			}
-			$firstBlockAffinity = array($this->board[$y][6], $this->board[$y][7], $this->board[$y][8]);
-			$secondBlockAffinity = array($this->board[$y][0], $this->board[$y][1], $this->board[$y][2]);
-			$thirdBlockAffinity = array($this->board[$y][3], $this->board[$y][4], $this->board[$y][5]);
+			$firstBlockAffinity = [$this->board[$y][6], $this->board[$y][7], $this->board[$y][8]];
+			$secondBlockAffinity = [$this->board[$y][0], $this->board[$y][1], $this->board[$y][2]];
+			$thirdBlockAffinity = [$this->board[$y][3], $this->board[$y][4], $this->board[$y][5]];
 		}
 
 		// Cool, our board is done. Now let's keep the solved board.
@@ -133,9 +133,9 @@ class Game extends \Nymph\Entity {
 		}
 
 		// First, let's start by removing 20 random squares.
-		$randos = array();
+		$randos = [];
 		while (count($randos) < $randoCount) {
-			$newRando = array(rand(0, 8), rand(0, 8));
+			$newRando = [rand(0, 8), rand(0, 8)];
 			if (!in_array($newRando, $randos)) {
 				$randos[] = $newRando;
 			}
@@ -176,8 +176,9 @@ class Game extends \Nymph\Entity {
 				$curRemove = $coords[$key][$curKey];
 				$this->board[$curRemove[1]][$curRemove[0]] = null;
 				$removed++;
-				if ($removed >= $remove)
+				if ($removed >= $remove) {
 					break;
+				}
 			}
 		}
 
@@ -187,8 +188,8 @@ class Game extends \Nymph\Entity {
 	}
 
 	public function optionDistribution($emptySquares = false) {
-		$counts = array();
-		$grid = array(0 => array(),1 => array(),2 => array(),3 => array(),4 => array(),5 => array(),6 => array(),7 => array(),8 => array());
+		$counts = [];
+		$grid = [0 => [],1 => [],2 => [],3 => [],4 => [],5 => [],6 => [],7 => [],8 => []];
 
 		for ($y = 0; $y <= 8; $y++) {
 			for ($x = 0; $x <= 8; $x++) {
@@ -200,22 +201,22 @@ class Game extends \Nymph\Entity {
 				}
 				$count = count($this->optionsLeft($x, $y));
 				$grid[$y][$x] = $count;
-				isset($counts[$count]) or $counts[$count] = array();
-				$counts[$count][] = array($x, $y);
+				isset($counts[$count]) or $counts[$count] = [];
+				$counts[$count][] = [$x, $y];
 			}
 		}
 
-		return array('grid' => $grid, 'coords' => $counts);
+		return ['grid' => $grid, 'coords' => $counts];
 	}
 
 	private function optionsLeft($x, $y) {
 		$taken = array_merge($this->neighborsX($x, $y), $this->neighborsY($x, $y), $this->neighborsSquare($x, $y));
-		$notTaken = array_diff(array(1, 2, 3, 4, 5, 6, 7, 8, 9), $taken); // Not calling range() because functions are costly in PHP.
+		$notTaken = array_diff([1, 2, 3, 4, 5, 6, 7, 8, 9], $taken); // Not calling range() because functions are costly in PHP.
 		return $notTaken;
 	}
 
 	private function neighborsY($x, $y) {
-		$results = array();
+		$results = [];
 		for ($y2 = 0; $y2 <= 8; $y2++) {
 			if ($y === $y2) {
 				continue;
@@ -227,7 +228,7 @@ class Game extends \Nymph\Entity {
 		return $results;
 	}
 	private function neighborsX($x, $y) {
-		$results = array();
+		$results = [];
 		for ($x2 = 0; $x2 <= 8; $x2++) {
 			if ($x === $x2) {
 				continue;
@@ -239,7 +240,7 @@ class Game extends \Nymph\Entity {
 		return $results;
 	}
 	private function neighborsSquare($x, $y) {
-		$results = array();
+		$results = [];
 		$minX = $y - ($y % 3);
 		$minY = $x - ($x % 3);
 		for ($y2 = $minX; $y2 <= $minX+2; $y2++) {

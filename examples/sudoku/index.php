@@ -5,7 +5,7 @@ if ($_REQUEST['action'] === 'export' && !getenv('DATABASE_URL')) {
 	require '../../lib/require.php';
 
 	require '../../src/autoload.php';
-	\SciActive\R::_('NymphConfig', array(), function(){
+	\SciActive\R::_('NymphConfig', [], function(){
 		return include '../config.php';
 	});
 

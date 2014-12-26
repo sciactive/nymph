@@ -12,24 +12,24 @@ class QueriesTest extends PHPUnit_Framework_TestCase {
 	 */
 	public function testInvalidQuery() {
 		Nymph::getEntities(
-				array('class' => 'TestModel'),
-				array('&',
+				['class' => 'TestModel'],
+				['&',
 					'tag' => 'thing'
-				),
-				array(
-					'data' => array('this_query', 'should_fail')
-				)
+				],
+				[
+					'data' => ['this_query', 'should_fail']
+				]
 			);
 	}
 
 	public function testDeleteOldTestData() {
-		$all = Nymph::getEntities(array('class' => 'TestModel'));
+		$all = Nymph::getEntities(['class' => 'TestModel']);
 		$this->assertTrue((array)$all===$all);
 		foreach ($all as $cur) {
 			$this->assertTrue($cur->delete());
 		}
 
-		$all = Nymph::getEntities(array('class' => 'TestModel'));
+		$all = Nymph::getEntities(['class' => 'TestModel']);
 		$this->assertEmpty($all);
 	}
 
@@ -45,7 +45,7 @@ class QueriesTest extends PHPUnit_Framework_TestCase {
 		$testEntity->name = 'Entity Test '.time();
 		$testEntity->null = null;
 		$testEntity->string = 'test';
-		$testEntity->array = array('full', 'of', 'values', 500);
+		$testEntity->array = ['full', 'of', 'values', 500];
 		$testEntity->match = "Hello, my name is Edward McCheese. It is a pleasure to meet you. As you can see, I have several hats of the most pleasant nature.
 
 This one's email address is nice_hat-wednesday+newyork@im-a-hat.hat.
@@ -60,16 +60,16 @@ This one's zip code is 92064.";
 		$this->assertTrue($entity_reference_test->save());
 		$entity_reference_guid = $entity_reference_test->guid;
 		$testEntity->reference = $entity_reference_test;
-		$testEntity->ref_array = array(0 => array('entity' => $entity_reference_test));
+		$testEntity->ref_array = [0 => ['entity' => $entity_reference_test]];
 		$this->assertTrue($testEntity->save());
 
 		$entity_reference_test->test = 'good';
 		$this->assertTrue($entity_reference_test->save());
 
-		$testEntity = Nymph::getEntity(array('class' => 'TestModel'), $entity_guid);
+		$testEntity = Nymph::getEntity(['class' => 'TestModel'], $entity_guid);
 		$this->assertInstanceOf('TestModel', $testEntity);
 
-		return array('entity' => $testEntity, 'refGuid' => $entity_reference_guid);
+		return ['entity' => $testEntity, 'refGuid' => $entity_reference_guid];
 	}
 
 	/**
@@ -79,7 +79,7 @@ This one's zip code is 92064.";
 		$testEntity = $arr['entity'];
 
 		// Retrieving entity by GUID...
-		$resultEntity = Nymph::getEntity(array('class' => 'TestModel'), $testEntity->guid);
+		$resultEntity = Nymph::getEntity(['class' => 'TestModel'], $testEntity->guid);
 		$this->assertTrue($testEntity->is($resultEntity));
 
 		// Using class constructor...
@@ -87,7 +87,7 @@ This one's zip code is 92064.";
 		$this->assertTrue($testEntity->is($resultEntity));
 
 		// Testing wrong GUID...
-		$resultEntity = Nymph::getEntity(array('class' => 'TestModel'), $testEntity->guid + 1);
+		$resultEntity = Nymph::getEntity(['class' => 'TestModel'], $testEntity->guid + 1);
 		if (!empty($resultEntity)) {
 			$this->assertTrue(!$testEntity->is($resultEntity));
 		} else {
@@ -103,8 +103,8 @@ This one's zip code is 92064.";
 
 		// Testing entity order, offset, limit...
 		$resultEntity = Nymph::getEntities(
-				array('class' => 'TestModel', 'reverse' => true, 'offset' => 1, 'limit' => 1, 'sort' => 'cdate'),
-				array('&', 'tag' => 'test')
+				['class' => 'TestModel', 'reverse' => true, 'offset' => 1, 'limit' => 1, 'sort' => 'cdate'],
+				['&', 'tag' => 'test']
 			);
 		$this->assertTrue($testEntity->is($resultEntity[0]));
 	}
@@ -117,8 +117,8 @@ This one's zip code is 92064.";
 
 		// Retrieving entity by GUID and tags...
 		$resultEntity = Nymph::getEntity(
-				array('class' => 'TestModel'),
-				array('&', 'guid' => $testEntity->guid, 'tag' => 'test')
+				['class' => 'TestModel'],
+				['&', 'guid' => $testEntity->guid, 'tag' => 'test']
 			);
 		$this->assertTrue($testEntity->is($resultEntity));
 	}
@@ -131,8 +131,8 @@ This one's zip code is 92064.";
 
 		// Retrieving entity by GUID and tags...
 		$resultEntity = Nymph::getEntity(
-				array('class' => 'TestModel'),
-				array('|', 'guid' => array($testEntity->guid, $testEntity->guid % 1000 + 1))
+				['class' => 'TestModel'],
+				['|', 'guid' => [$testEntity->guid, $testEntity->guid % 1000 + 1]]
 			);
 		$this->assertTrue($testEntity->is($resultEntity));
 	}
@@ -145,8 +145,8 @@ This one's zip code is 92064.";
 
 		// Retrieving entity by GUID and tags...
 		$resultEntity = Nymph::getEntity(
-				array('class' => 'TestModel'),
-				array('|', 'guid' => array($testEntity->guid % 1000 + 1, $testEntity->guid % 1000 + 2))
+				['class' => 'TestModel'],
+				['|', 'guid' => [$testEntity->guid % 1000 + 1, $testEntity->guid % 1000 + 2]]
 			);
 		$this->assertFalse($testEntity->is($resultEntity));
 	}
@@ -159,8 +159,8 @@ This one's zip code is 92064.";
 
 		// Retrieving entity by !GUID...
 		$resultEntity = Nymph::getEntities(
-				array('class' => 'TestModel'),
-				array('&', '!guid' => ($testEntity->guid + 1), 'tag' => 'test')
+				['class' => 'TestModel'],
+				['&', '!guid' => ($testEntity->guid + 1), 'tag' => 'test']
 			);
 		$this->assertTrue($testEntity->inArray($resultEntity));
 	}
@@ -173,8 +173,8 @@ This one's zip code is 92064.";
 
 		// Retrieving entity by !tags...
 		$resultEntity = Nymph::getEntities(
-				array('class' => 'TestModel'),
-				array('&', 'guid' => $testEntity->guid, '!tag' => array('barbecue', 'pickles'))
+				['class' => 'TestModel'],
+				['&', 'guid' => $testEntity->guid, '!tag' => ['barbecue', 'pickles']]
 			);
 		$this->assertTrue($testEntity->inArray($resultEntity));
 	}
@@ -187,8 +187,8 @@ This one's zip code is 92064.";
 
 		// Testing GUID and wrong tags...
 		$resultEntity = Nymph::getEntity(
-				array('class' => 'TestModel'),
-				array('&', 'guid' => $testEntity->guid, 'tag' => array('pickles'))
+				['class' => 'TestModel'],
+				['&', 'guid' => $testEntity->guid, 'tag' => ['pickles']]
 			);
 		$this->assertEmpty($resultEntity);
 	}
@@ -201,8 +201,8 @@ This one's zip code is 92064.";
 
 		// Retrieving entity by tags...
 		$resultEntity = Nymph::getEntities(
-				array('class' => 'TestModel'),
-				array('&', 'tag' => 'test')
+				['class' => 'TestModel'],
+				['&', 'tag' => 'test']
 			);
 		$this->assertTrue($testEntity->inArray($resultEntity));
 	}
@@ -215,8 +215,8 @@ This one's zip code is 92064.";
 
 		// Testing wrong tags...
 		$resultEntity = Nymph::getEntities(
-				array('class' => 'TestModel'),
-				array('&', 'tag' => 'pickles')
+				['class' => 'TestModel'],
+				['&', 'tag' => 'pickles']
 			);
 		$this->assertFalse($testEntity->inArray($resultEntity));
 	}
@@ -229,8 +229,8 @@ This one's zip code is 92064.";
 
 		// Retrieving entity by tags inclusively...
 		$resultEntity = Nymph::getEntities(
-				array('class' => 'TestModel'),
-				array('|', 'tag' => array('pickles', 'test', 'barbecue'))
+				['class' => 'TestModel'],
+				['|', 'tag' => ['pickles', 'test', 'barbecue']]
 			);
 		$this->assertTrue($testEntity->inArray($resultEntity));
 	}
@@ -243,8 +243,8 @@ This one's zip code is 92064.";
 
 		// Testing wrong inclusive tags...
 		$resultEntity = Nymph::getEntities(
-				array('class' => 'TestModel'),
-				array('|', 'tag' => array('pickles', 'barbecue'))
+				['class' => 'TestModel'],
+				['|', 'tag' => ['pickles', 'barbecue']]
 			);
 		$this->assertFalse($testEntity->inArray($resultEntity));
 	}
@@ -257,9 +257,9 @@ This one's zip code is 92064.";
 
 		// Retrieving entity by mixed tags...
 		$resultEntity = Nymph::getEntities(
-				array('class' => 'TestModel'),
-				array('&', 'tag' => 'test'),
-				array('|', 'tag' => array('pickles', 'test', 'barbecue'))
+				['class' => 'TestModel'],
+				['&', 'tag' => 'test'],
+				['|', 'tag' => ['pickles', 'test', 'barbecue']]
 			);
 		$this->assertTrue($testEntity->inArray($resultEntity));
 	}
@@ -272,9 +272,9 @@ This one's zip code is 92064.";
 
 		// Testing wrong inclusive mixed tags...
 		$resultEntity = Nymph::getEntities(
-				array('class' => 'TestModel'),
-				array('&', 'tag' => 'test'),
-				array('|', 'tag' => array('pickles', 'barbecue'))
+				['class' => 'TestModel'],
+				['&', 'tag' => 'test'],
+				['|', 'tag' => ['pickles', 'barbecue']]
 			);
 		$this->assertFalse($testEntity->inArray($resultEntity));
 	}
@@ -287,9 +287,9 @@ This one's zip code is 92064.";
 
 		// Testing wrong exclusive mixed tags...
 		$resultEntity = Nymph::getEntities(
-				array('class' => 'TestModel'),
-				array('&', 'tag' => 'pickles'),
-				array('|', 'tag' => array('test', 'barbecue'))
+				['class' => 'TestModel'],
+				['&', 'tag' => 'pickles'],
+				['|', 'tag' => ['test', 'barbecue']]
 			);
 		$this->assertFalse($testEntity->inArray($resultEntity));
 	}
@@ -302,8 +302,8 @@ This one's zip code is 92064.";
 
 		// Retrieving entity by isset...
 		$resultEntity = Nymph::getEntities(
-				array('class' => 'TestModel'),
-				array('&', 'isset' => array('string'))
+				['class' => 'TestModel'],
+				['&', 'isset' => ['string']]
 			);
 		$this->assertTrue($testEntity->inArray($resultEntity));
 	}
@@ -316,8 +316,8 @@ This one's zip code is 92064.";
 
 		// Retrieving entity by !isset...
 		$resultEntity = Nymph::getEntities(
-				array('class' => 'TestModel'),
-				array('&', 'tag' => 'test', '!isset' => array('null'))
+				['class' => 'TestModel'],
+				['&', 'tag' => 'test', '!isset' => ['null']]
 			);
 		$this->assertTrue($testEntity->inArray($resultEntity));
 	}
@@ -330,9 +330,9 @@ This one's zip code is 92064.";
 
 		// Retrieving entity by !isset on unset var...
 		$resultEntity = Nymph::getEntities(
-				array('class' => 'TestModel'),
-				array('!&', 'isset' => array('pickles')),
-				array('&', 'tag' => 'test')
+				['class' => 'TestModel'],
+				['!&', 'isset' => ['pickles']],
+				['&', 'tag' => 'test']
 			);
 		$this->assertTrue($testEntity->inArray($resultEntity));
 	}
@@ -345,8 +345,8 @@ This one's zip code is 92064.";
 
 		// Retrieving entity by strict...
 		$resultEntity = Nymph::getEntities(
-				array('class' => 'TestModel'),
-				array('&', 'strict' => array('string', 'test'))
+				['class' => 'TestModel'],
+				['&', 'strict' => ['string', 'test']]
 			);
 		$this->assertTrue($testEntity->inArray($resultEntity));
 	}
@@ -361,8 +361,8 @@ This one's zip code is 92064.";
 
 		// Retrieving entity by !strict...
 		$resultEntity = Nymph::getEntities(
-				array('class' => 'TestModel'),
-				array('&', 'tag' => 'test', '!strict' => array('string', 'wrong'))
+				['class' => 'TestModel'],
+				['&', 'tag' => 'test', '!strict' => ['string', 'wrong']]
 			);
 		$this->assertTrue($testEntity->inArray($resultEntity));
 		$this->assertFalse($referenceEntity->inArray($resultEntity));
@@ -376,8 +376,8 @@ This one's zip code is 92064.";
 
 		// Retrieving entity by data...
 		$resultEntity = Nymph::getEntities(
-				array('class' => 'TestModel'),
-				array('&', 'data' => array('string', 'test'))
+				['class' => 'TestModel'],
+				['&', 'data' => ['string', 'test']]
 			);
 		$this->assertTrue($testEntity->inArray($resultEntity));
 	}
@@ -392,8 +392,8 @@ This one's zip code is 92064.";
 
 		// Retrieving entity by !data...
 		$resultEntity = Nymph::getEntities(
-				array('class' => 'TestModel'),
-				array('&', 'tag' => 'test', '!data' => array('string', 'wrong'))
+				['class' => 'TestModel'],
+				['&', 'tag' => 'test', '!data' => ['string', 'wrong']]
 			);
 		$this->assertTrue($testEntity->inArray($resultEntity));
 		$this->assertFalse($referenceEntity->inArray($resultEntity));
@@ -407,8 +407,8 @@ This one's zip code is 92064.";
 
 		// Retrieving entity by data...
 		$resultEntity = Nymph::getEntities(
-				array('class' => 'TestModel'),
-				array('&', 'like' => array('string', 't_s%'))
+				['class' => 'TestModel'],
+				['&', 'like' => ['string', 't_s%']]
 			);
 		$this->assertTrue($testEntity->inArray($resultEntity));
 	}
@@ -423,8 +423,8 @@ This one's zip code is 92064.";
 
 		// Retrieving entity by !data...
 		$resultEntity = Nymph::getEntities(
-				array('class' => 'TestModel'),
-				array('&', 'tag' => 'test', '!like' => array('string', 'wr_n%'))
+				['class' => 'TestModel'],
+				['&', 'tag' => 'test', '!like' => ['string', 'wr_n%']]
 			);
 		$this->assertTrue($testEntity->inArray($resultEntity));
 		$this->assertFalse($referenceEntity->inArray($resultEntity));
@@ -438,8 +438,8 @@ This one's zip code is 92064.";
 
 		// Retrieving entity by data inclusively...
 		$resultEntity = Nymph::getEntities(
-				array('class' => 'TestModel'),
-				array('|', 'data' => array(array('string', 'test'), array('string', 'pickles')))
+				['class' => 'TestModel'],
+				['|', 'data' => [['string', 'test'], ['string', 'pickles']]]
 			);
 		$this->assertTrue($testEntity->inArray($resultEntity));
 	}
@@ -453,10 +453,10 @@ This one's zip code is 92064.";
 
 		// Retrieving entity by !data inclusively...
 		$resultEntity = Nymph::getEntities(
-				array('class' => 'TestModel'),
-				array('&', 'tag' => 'test'),
-				array('!|', 'data' => array(array('name', $testEntity->name), array('string', 'pickles'))),
-				array('|', '!data' => array(array('name', $testEntity->name), array('string', 'pickles')))
+				['class' => 'TestModel'],
+				['&', 'tag' => 'test'],
+				['!|', 'data' => [['name', $testEntity->name], ['string', 'pickles']]],
+				['|', '!data' => [['name', $testEntity->name], ['string', 'pickles']]]
 			);
 		$this->assertTrue($testEntity->inArray($resultEntity));
 	}
@@ -469,8 +469,8 @@ This one's zip code is 92064.";
 
 		// Testing wrong data...
 		$resultEntity = Nymph::getEntities(
-				array('class' => 'TestModel'),
-				array('&', 'data' => array('string', 'pickles'))
+				['class' => 'TestModel'],
+				['&', 'data' => ['string', 'pickles']]
 			);
 		$this->assertFalse($testEntity->inArray($resultEntity));
 	}
@@ -483,8 +483,8 @@ This one's zip code is 92064.";
 
 		// Retrieving entity by tags and data...
 		$resultEntity = Nymph::getEntities(
-				array('class' => 'TestModel'),
-				array('&', 'tag' => 'test', 'data' => array('string', 'test'))
+				['class' => 'TestModel'],
+				['&', 'tag' => 'test', 'data' => ['string', 'test']]
 			);
 		$this->assertTrue($testEntity->inArray($resultEntity));
 	}
@@ -497,8 +497,8 @@ This one's zip code is 92064.";
 
 		// Testing wrong tags and right data...
 		$resultEntity = Nymph::getEntities(
-				array('class' => 'TestModel'),
-				array('&', 'tag' => 'pickles', 'data' => array('string', 'test'))
+				['class' => 'TestModel'],
+				['&', 'tag' => 'pickles', 'data' => ['string', 'test']]
 			);
 		$this->assertFalse($testEntity->inArray($resultEntity));
 	}
@@ -511,8 +511,8 @@ This one's zip code is 92064.";
 
 		// Testing right tags and wrong data...
 		$resultEntity = Nymph::getEntities(
-				array('class' => 'TestModel'),
-				array('&', 'tag' => 'test', 'data' => array('string', 'pickles'))
+				['class' => 'TestModel'],
+				['&', 'tag' => 'test', 'data' => ['string', 'pickles']]
 			);
 		$this->assertFalse($testEntity->inArray($resultEntity));
 	}
@@ -525,8 +525,8 @@ This one's zip code is 92064.";
 
 		// Testing wrong tags and wrong data...
 		$resultEntity = Nymph::getEntities(
-				array('class' => 'TestModel'),
-				array('&', 'tag' => 'pickles', 'data' => array('string', 'pickles'))
+				['class' => 'TestModel'],
+				['&', 'tag' => 'pickles', 'data' => ['string', 'pickles']]
 			);
 		$this->assertFalse($testEntity->inArray($resultEntity));
 	}
@@ -539,8 +539,8 @@ This one's zip code is 92064.";
 
 		// Retrieving entity by array value...
 		$resultEntity = Nymph::getEntities(
-				array('class' => 'TestModel'),
-				array('&', 'array' => array('array', 'values'))
+				['class' => 'TestModel'],
+				['&', 'array' => ['array', 'values']]
 			);
 		$this->assertTrue($testEntity->inArray($resultEntity));
 	}
@@ -554,9 +554,9 @@ This one's zip code is 92064.";
 
 		// Retrieving entity by !array value...
 		$resultEntity = Nymph::getEntities(
-				array('class' => 'TestModel'),
-				array('&', 'tag' => 'test'),
-				array('!&', 'array' => array('array', 'pickles'))
+				['class' => 'TestModel'],
+				['&', 'tag' => 'test'],
+				['!&', 'array' => ['array', 'pickles']]
 			);
 		$this->assertTrue($testEntity->inArray($resultEntity));
 	}
@@ -569,8 +569,8 @@ This one's zip code is 92064.";
 
 		// Testing wrong array value...
 		$resultEntity = Nymph::getEntities(
-				array('class' => 'TestModel'),
-				array('&', 'array' => array('array', 'pickles'))
+				['class' => 'TestModel'],
+				['&', 'array' => ['array', 'pickles']]
 			);
 		$this->assertFalse($testEntity->inArray($resultEntity));
 	}
@@ -583,29 +583,29 @@ This one's zip code is 92064.";
 
 		// Retrieving entity by regex match...
 		$resultEntity = Nymph::getEntities(
-				array('class' => 'TestModel'),
-				array('&', 'match' => array('match', '/.*/')) // anything
+				['class' => 'TestModel'],
+				['&', 'match' => ['match', '/.*/']] // anything
 			);
 		$this->assertTrue($testEntity->inArray($resultEntity));
 		$resultEntity = Nymph::getEntities(
-				array('class' => 'TestModel'),
-				array('&', 'tag' => 'test', 'match' => array('match', '/Edward McCheese/')) // a substring
+				['class' => 'TestModel'],
+				['&', 'tag' => 'test', 'match' => ['match', '/Edward McCheese/']] // a substring
 			);
 		$this->assertTrue($testEntity->inArray($resultEntity));
 		$resultEntity = Nymph::getEntities(
-				array('class' => 'TestModel'),
-				array('&', 'tag' => 'test'),
-				array('|', 'match' => array(array('string', '/\d/'), array('match', '/Edward McCheese/'))) // inclusive test
+				['class' => 'TestModel'],
+				['&', 'tag' => 'test'],
+				['|', 'match' => [['string', '/\d/'], ['match', '/Edward McCheese/']]] // inclusive test
 			);
 		$this->assertTrue($testEntity->inArray($resultEntity));
 		$resultEntity = Nymph::getEntities(
-				array('class' => 'TestModel'),
-				array('&', 'tag' => 'test', 'match' => array('match', '/\b[\w\-+]+@[\w-]+\.\w{2,4}\b/')) // a simple email
+				['class' => 'TestModel'],
+				['&', 'tag' => 'test', 'match' => ['match', '/\b[\w\-+]+@[\w-]+\.\w{2,4}\b/']] // a simple email
 			);
 		$this->assertTrue($testEntity->inArray($resultEntity));
 		$resultEntity = Nymph::getEntities(
-				array('class' => 'TestModel'),
-				array('&', 'tag' => 'test', 'match' => array('match', '/\(\d{3}\)\s\d{3}-\d{4}/')) // a phone number
+				['class' => 'TestModel'],
+				['&', 'tag' => 'test', 'match' => ['match', '/\(\d{3}\)\s\d{3}-\d{4}/']] // a phone number
 			);
 		$this->assertTrue($testEntity->inArray($resultEntity));
 	}
@@ -618,18 +618,18 @@ This one's zip code is 92064.";
 
 		// Testing wrong regex match...
 		$resultEntity = Nymph::getEntities(
-				array('class' => 'TestModel'),
-				array('&', 'match' => array('match', '/Q/'))
+				['class' => 'TestModel'],
+				['&', 'match' => ['match', '/Q/']]
 			);
 		$this->assertFalse($testEntity->inArray($resultEntity));
 		$resultEntity = Nymph::getEntities(
-				array('class' => 'TestModel'),
-				array('&', 'tag' => 'pickle', 'match' => array('match', '/.*/'))
+				['class' => 'TestModel'],
+				['&', 'tag' => 'pickle', 'match' => ['match', '/.*/']]
 			);
 		$this->assertFalse($testEntity->inArray($resultEntity));
 		$resultEntity = Nymph::getEntities(
-				array('class' => 'TestModel'),
-				array('|', 'match' => array(array('string', '/\d/'), array('match', '/,,/')))
+				['class' => 'TestModel'],
+				['|', 'match' => [['string', '/\d/'], ['match', '/,,/']]]
 			);
 		$this->assertFalse($testEntity->inArray($resultEntity));
 	}
@@ -642,9 +642,9 @@ This one's zip code is 92064.";
 
 		// Retrieving entity by regex + data inclusively...
 		$resultEntity = Nymph::getEntities(
-				array('class' => 'TestModel'),
-				array('&', 'tag' => 'test'),
-				array('|', 'data' => array('string', 'pickles'), 'match' => array('string', '/test/'))
+				['class' => 'TestModel'],
+				['&', 'tag' => 'test'],
+				['|', 'data' => ['string', 'pickles'], 'match' => ['string', '/test/']]
 			);
 		$this->assertTrue($testEntity->inArray($resultEntity));
 	}
@@ -657,29 +657,29 @@ This one's zip code is 92064.";
 
 		// Retrieving entity by regex match...
 		$resultEntity = Nymph::getEntities(
-				array('class' => 'TestModel'),
-				array('&', 'pmatch' => array('match', '.*')) // anything
+				['class' => 'TestModel'],
+				['&', 'pmatch' => ['match', '.*']] // anything
 			);
 		$this->assertTrue($testEntity->inArray($resultEntity));
 		$resultEntity = Nymph::getEntities(
-				array('class' => 'TestModel'),
-				array('&', 'tag' => 'test', 'pmatch' => array('match', 'Edward McCheese')) // a substring
+				['class' => 'TestModel'],
+				['&', 'tag' => 'test', 'pmatch' => ['match', 'Edward McCheese']] // a substring
 			);
 		$this->assertTrue($testEntity->inArray($resultEntity));
 		$resultEntity = Nymph::getEntities(
-				array('class' => 'TestModel'),
-				array('&', 'tag' => 'test'),
-				array('|', 'pmatch' => array(array('string', '[0-9]'), array('match', 'Edward McCheese'))) // inclusive test
+				['class' => 'TestModel'],
+				['&', 'tag' => 'test'],
+				['|', 'pmatch' => [['string', '[0-9]'], ['match', 'Edward McCheese']]] // inclusive test
 			);
 		$this->assertTrue($testEntity->inArray($resultEntity));
 		$resultEntity = Nymph::getEntities(
-				array('class' => 'TestModel'),
-				array('&', 'tag' => 'test', 'pmatch' => array('match', '[[:<:]][a-zA-Z0-9+_-]+@[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]{2,4}[[:>:]]')) // a simple email
+				['class' => 'TestModel'],
+				['&', 'tag' => 'test', 'pmatch' => ['match', '[[:<:]][a-zA-Z0-9+_-]+@[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]{2,4}[[:>:]]']] // a simple email
 			);
 		$this->assertTrue($testEntity->inArray($resultEntity));
 		$resultEntity = Nymph::getEntities(
-				array('class' => 'TestModel'),
-				array('&', 'tag' => 'test', 'pmatch' => array('match', '\([0-9]{3}\) [0-9]{3}-[0-9]{4}')) // a phone number
+				['class' => 'TestModel'],
+				['&', 'tag' => 'test', 'pmatch' => ['match', '\([0-9]{3}\) [0-9]{3}-[0-9]{4}']] // a phone number
 			);
 		$this->assertTrue($testEntity->inArray($resultEntity));
 	}
@@ -692,18 +692,18 @@ This one's zip code is 92064.";
 
 		// Testing wrong regex match...
 		$resultEntity = Nymph::getEntities(
-				array('class' => 'TestModel'),
-				array('&', 'match' => array('pmatch', 'Q'))
+				['class' => 'TestModel'],
+				['&', 'match' => ['pmatch', 'Q']]
 			);
 		$this->assertFalse($testEntity->inArray($resultEntity));
 		$resultEntity = Nymph::getEntities(
-				array('class' => 'TestModel'),
-				array('&', 'tag' => 'pickle', 'pmatch' => array('match', '.*'))
+				['class' => 'TestModel'],
+				['&', 'tag' => 'pickle', 'pmatch' => ['match', '.*']]
 			);
 		$this->assertFalse($testEntity->inArray($resultEntity));
 		$resultEntity = Nymph::getEntities(
-				array('class' => 'TestModel'),
-				array('|', 'pmatch' => array(array('string', '[0-9]'), array('match', ',,')))
+				['class' => 'TestModel'],
+				['|', 'pmatch' => [['string', '[0-9]'], ['match', ',,']]]
 			);
 		$this->assertFalse($testEntity->inArray($resultEntity));
 	}
@@ -716,9 +716,9 @@ This one's zip code is 92064.";
 
 		// Retrieving entity by regex + data inclusively...
 		$resultEntity = Nymph::getEntities(
-				array('class' => 'TestModel'),
-				array('&', 'tag' => 'test'),
-				array('|', 'data' => array('string', 'pickles'), 'pmatch' => array('string', 'test'))
+				['class' => 'TestModel'],
+				['&', 'tag' => 'test'],
+				['|', 'data' => ['string', 'pickles'], 'pmatch' => ['string', 'test']]
 			);
 		$this->assertTrue($testEntity->inArray($resultEntity));
 	}
@@ -731,8 +731,8 @@ This one's zip code is 92064.";
 
 		// Retrieving entity by inequality...
 		$resultEntity = Nymph::getEntities(
-				array('class' => 'TestModel'),
-				array('|', 'gte' => array(array('number', 30), array('pickles', 100)))
+				['class' => 'TestModel'],
+				['|', 'gte' => [['number', 30], ['pickles', 100]]]
 			);
 		$this->assertTrue($testEntity->inArray($resultEntity));
 	}
@@ -746,9 +746,9 @@ This one's zip code is 92064.";
 
 		// Retrieving entity by !inequality...
 		$resultEntity = Nymph::getEntities(
-				array('class' => 'TestModel'),
-				array('&', 'tag' => 'test'),
-				array('!&', 'gte' => array('number', 60))
+				['class' => 'TestModel'],
+				['&', 'tag' => 'test'],
+				['!&', 'gte' => ['number', 60]]
 			);
 		$this->assertTrue($testEntity->inArray($resultEntity));
 	}
@@ -761,8 +761,8 @@ This one's zip code is 92064.";
 
 		// Testing wrong inequality...
 		$resultEntity = Nymph::getEntities(
-				array('class' => 'TestModel'),
-				array('&', 'lte' => array('number', 29.99))
+				['class' => 'TestModel'],
+				['&', 'lte' => ['number', 29.99]]
 			);
 		$this->assertFalse($testEntity->inArray($resultEntity));
 	}
@@ -775,8 +775,8 @@ This one's zip code is 92064.";
 
 		// Retrieving entity by time...
 		$resultEntity = Nymph::getEntities(
-				array('class' => 'TestModel'),
-				array('&', 'tag' => 'test', 'gt' => array('cdate', $testEntity->cdate - 120))
+				['class' => 'TestModel'],
+				['&', 'tag' => 'test', 'gt' => ['cdate', $testEntity->cdate - 120]]
 			);
 		$this->assertTrue($testEntity->inArray($resultEntity));
 	}
@@ -789,8 +789,8 @@ This one's zip code is 92064.";
 
 		// Testing wrong time...
 		$resultEntity = Nymph::getEntities(
-				array('class' => 'TestModel'),
-				array('&', 'tag' => 'test', 'gte' => array('cdate', $testEntity->cdate + 1))
+				['class' => 'TestModel'],
+				['&', 'tag' => 'test', 'gte' => ['cdate', $testEntity->cdate + 1]]
 			);
 		$this->assertFalse($testEntity->inArray($resultEntity));
 	}
@@ -816,8 +816,8 @@ This one's zip code is 92064.";
 
 		// Retrieving entity by reference...
 		$resultEntity = Nymph::getEntities(
-				array('class' => 'TestModel'),
-				array('&', 'ref' => array('reference', $arr['refGuid']))
+				['class' => 'TestModel'],
+				['&', 'ref' => ['reference', $arr['refGuid']]]
 			);
 		$this->assertTrue($testEntity->inArray($resultEntity));
 	}
@@ -830,9 +830,9 @@ This one's zip code is 92064.";
 
 		// Retrieving entity by !reference...
 		$resultEntity = Nymph::getEntities(
-				array('class' => 'TestModel'),
-				array('&', 'tag' => 'test'),
-				array('!&', 'ref' => array('reference', $arr['refGuid'] + 1))
+				['class' => 'TestModel'],
+				['&', 'tag' => 'test'],
+				['!&', 'ref' => ['reference', $arr['refGuid'] + 1]]
 			);
 		$this->assertTrue($testEntity->inArray($resultEntity));
 	}
@@ -845,8 +845,8 @@ This one's zip code is 92064.";
 
 		// Testing wrong reference...
 		$resultEntity = Nymph::getEntities(
-				array('class' => 'TestModel'),
-				array('&', 'ref' => array('reference', $arr['refGuid'] + 1))
+				['class' => 'TestModel'],
+				['&', 'ref' => ['reference', $arr['refGuid'] + 1]]
 			);
 		$this->assertFalse($testEntity->inArray($resultEntity));
 	}
@@ -859,8 +859,8 @@ This one's zip code is 92064.";
 
 		// Testing non-existent reference...
 		$resultEntity = Nymph::getEntities(
-				array('class' => 'TestModel'),
-				array('&', 'ref' => array('pickle', $arr['refGuid']))
+				['class' => 'TestModel'],
+				['&', 'ref' => ['pickle', $arr['refGuid']]]
 			);
 		$this->assertFalse($testEntity->inArray($resultEntity));
 	}
@@ -873,8 +873,8 @@ This one's zip code is 92064.";
 
 		// Retrieving entity by inclusive reference...
 		$resultEntity = Nymph::getEntities(
-				array('class' => 'TestModel'),
-				array('|', 'ref' => array(array('reference', $arr['refGuid']), array('reference', $arr['refGuid'] + 1)))
+				['class' => 'TestModel'],
+				['|', 'ref' => [['reference', $arr['refGuid']], ['reference', $arr['refGuid'] + 1]]]
 			);
 		$this->assertTrue($testEntity->inArray($resultEntity));
 	}
@@ -887,8 +887,8 @@ This one's zip code is 92064.";
 
 		// Testing wrong inclusive reference...
 		$resultEntity = Nymph::getEntities(
-				array('class' => 'TestModel'),
-				array('|', 'ref' => array(array('reference', $arr['refGuid'] + 2), array('reference', $arr['refGuid'] + 1)))
+				['class' => 'TestModel'],
+				['|', 'ref' => [['reference', $arr['refGuid'] + 2], ['reference', $arr['refGuid'] + 1]]]
 			);
 		$this->assertFalse($testEntity->inArray($resultEntity));
 	}
@@ -901,8 +901,8 @@ This one's zip code is 92064.";
 
 		// Retrieving entity by array reference...
 		$resultEntity = Nymph::getEntities(
-				array('class' => 'TestModel'),
-				array('&', 'ref' => array('ref_array', $arr['refGuid']))
+				['class' => 'TestModel'],
+				['&', 'ref' => ['ref_array', $arr['refGuid']]]
 			);
 		$this->assertTrue($testEntity->inArray($resultEntity));
 	}
@@ -915,8 +915,8 @@ This one's zip code is 92064.";
 
 		// Testing wrong array reference...
 		$resultEntity = Nymph::getEntities(
-				array('class' => 'TestModel'),
-				array('&', 'ref' => array(array('ref_array', $arr['refGuid']), array('ref_array', $arr['refGuid'] + 1)))
+				['class' => 'TestModel'],
+				['&', 'ref' => [['ref_array', $arr['refGuid']], ['ref_array', $arr['refGuid'] + 1]]]
 			);
 		$this->assertFalse($testEntity->inArray($resultEntity));
 	}
@@ -929,38 +929,38 @@ This one's zip code is 92064.";
 
 		// Testing logic operations...
 		$resultEntity = Nymph::getEntities(
-				array('class' => 'TestModel'),
-				array('&',
-					'!ref' => array(
-						array('ref_array', $arr['refGuid'] + 1),
-						array('ref_array', $arr['refGuid'] + 2)
-					),
-					'!lte' => array('number', 29.99)
-				),
-				array('|',
-					'!lte' => array(
-						array('number', 29.99),
-						array('number', 30)
-					)
-				),
-				array('!&',
-					'!strict' => array('string', 'test'),
-					'!array' => array(
-						array('array', 'full'),
-						array('array', 'of'),
-						array('array', 'values'),
-						array('array', 500)
-					)
-				),
-				array('!|',
-					'!strict' => array('string', 'test'),
-					'array' => array(
-						array('array', 'full'),
-						array('array', 'of'),
-						array('array', 'values'),
-						array('array', 500)
-					)
-				)
+				['class' => 'TestModel'],
+				['&',
+					'!ref' => [
+						['ref_array', $arr['refGuid'] + 1],
+						['ref_array', $arr['refGuid'] + 2]
+					],
+					'!lte' => ['number', 29.99]
+				],
+				['|',
+					'!lte' => [
+						['number', 29.99],
+						['number', 30]
+					]
+				],
+				['!&',
+					'!strict' => ['string', 'test'],
+					'!array' => [
+						['array', 'full'],
+						['array', 'of'],
+						['array', 'values'],
+						['array', 500]
+					]
+				],
+				['!|',
+					'!strict' => ['string', 'test'],
+					'array' => [
+						['array', 'full'],
+						['array', 'of'],
+						['array', 'values'],
+						['array', 500]
+					]
+				]
 			);
 		$this->assertTrue($testEntity->inArray($resultEntity));
 	}
@@ -988,7 +988,7 @@ This one's zip code is 92064.";
 		$this->assertTrue($testEntity->delete());
 		$this->assertNull($testEntity->guid);
 
-		$entity = Nymph::getEntity(array('class' => 'TestModel'), array('&', 'guid' => $guid));
+		$entity = Nymph::getEntity(['class' => 'TestModel'], ['&', 'guid' => $guid]);
 
 		$this->assertNull($entity);
 	}

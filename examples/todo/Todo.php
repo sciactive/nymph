@@ -7,10 +7,10 @@
  */
 class Todo extends \Nymph\Entity {
 	const etype = 'todo';
-	protected $clientEnabledMethods = array('archive');
-	protected $whitelistData = array('name', 'done');
-	protected $protectedTags = array('archived');
-	protected $whitelistTags = array();
+	protected $clientEnabledMethods = ['archive'];
+	protected $whitelistData = ['name', 'done'];
+	protected $protectedTags = ['archived'];
+	protected $whitelistTags = [];
 
 	public function __construct($id = 0) {
 		$this->done = false;

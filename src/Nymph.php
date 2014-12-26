@@ -13,7 +13,7 @@
  */
 use SciActive\R as R;
 
-R::_('Nymph', array('NymphConfig'), function($NymphConfig){
+R::_('Nymph', ['NymphConfig'], function($NymphConfig){
 	$class = '\\Nymph\\Drivers\\'.$NymphConfig->driver['value'].'Driver';
 
 	$Nymph = new $class($NymphConfig);
@@ -208,7 +208,7 @@ class Nymph {
 	 * The rest of the entries in the selector are associative entries called
 	 * selector clauses, which can be any of the following (in the form
 	 * $selector['name'] = value, or
-	 * $selector['name'] = array(value1, value2,...)):
+	 * $selector['name'] = [value1, value2,...]:
 	 *
 	 * - guid - A GUID. True if the entity's GUID is equal.
 	 * - tag - A tag. True if the entity has the tag.
@@ -254,37 +254,37 @@ class Nymph {
 	 *
 	 * <pre>
 	 * $entities = \Nymph\Nymph::getEntities(
-	 *	array('reverse' => true, 'limit' => 2),
-	 *	array(
+	 *	['reverse' => true, 'limit' => 2],
+	 *	[
 	 *		'&', // all must be true
 	 *		'tag' => 'person',
 	 *		'isset' => 'spouse',
-	 *		'data' => array(
-	 *			array('gender', 'male'),
-	 *			array('lname', 'Smith')
-	 *		),
-	 *		'!strict' => array('warnings', 0)
-	 *	),
-	 *	array(
+	 *		'data' => [
+	 *			['gender', 'male'],
+	 *			['lname', 'Smith']
+	 *		],
+	 *		'!strict' => ['warnings', 0]
+	 *	],
+	 *	[
 	 *		'|', // at least one must be true
-	 *		'tag' => array('employee', 'manager')
-	 *	),
-	 *	array(
+	 *		'tag' => ['employee', 'manager']
+	 *	],
+	 *	[
 	 *		'|',
-	 *		'data' => array(
-	 *			array('name', 'Clark'),
-	 *			array('name', 'James')
-	 *		),
-	 *		'pmatch' => array(
-	 *			array('name', 'Chris(topher)?'),
-	 *			array('name', 'Ja(ke|cob)')
-	 *		)
-	 *	),
-	 *	array(
+	 *		'data' => [
+	 *			['name', 'Clark'],
+	 *			['name', 'James']
+	 *		],
+	 *		'pmatch' => [
+	 *			['name', 'Chris(topher)?'],
+	 *			['name', 'Ja(ke|cob)']
+	 *		]
+	 *	],
+	 *	[
 	 *		'!|', // at least one must be false
-	 *		'gte' => array('age', 22),
-	 *		'gt' => array('pay', 8)
-	 *	)
+	 *		'gte' => ['age', 22],
+	 *		'gt' => ['pay', 8]
+	 *	]
 	 * );
 	 * </pre>
 	 *

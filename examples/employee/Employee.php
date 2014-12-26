@@ -17,15 +17,15 @@ define('IS_MANAGER', true);
  */
 class Employee extends \Nymph\Entity {
 	const etype = 'employee';
-	protected $protectedTags = array('employee');
-	protected $whitelistTags = array('boss', 'bigcheese');
-	protected $whitelistData = array('name', 'id', 'title', 'department', 'subordinates', 'salary', 'current', 'start_date', 'end_date', 'phone', 'manager');
+	protected $protectedTags = ['employee'];
+	protected $whitelistTags = ['boss', 'bigcheese'];
+	protected $whitelistData = ['name', 'id', 'title', 'department', 'subordinates', 'salary', 'current', 'start_date', 'end_date', 'phone', 'manager'];
 
 	public function __construct($id = 0) {
 		$this->addTag('employee');
 		$this->current = true;
 		$this->start_date = time();
-		$this->subordinates = array();
+		$this->subordinates = [];
 		parent::__construct($id);
 		if (!IS_MANAGER) {
 			$this->privateData[] = 'salary';

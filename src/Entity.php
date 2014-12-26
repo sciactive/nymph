@@ -34,21 +34,21 @@ class Entity implements EntityInterface {
 	 * @var array
 	 * @access protected
 	 */
-	protected $tags = array();
+	protected $tags = [];
 	/**
 	 * The array used to store each variable assigned to an entity.
 	 *
 	 * @var array
 	 * @access protected
 	 */
-	protected $data = array();
+	protected $data = [];
 	/**
 	 * Same as $data, but hasn't been unserialized.
 	 *
 	 * @var array
 	 * @access protected
 	 */
-	protected $sdata = array();
+	protected $sdata = [];
 	/**
 	 * The array used to store referenced entities.
 	 *
@@ -58,7 +58,7 @@ class Entity implements EntityInterface {
 	 * @var array
 	 * @access protected
 	 */
-	protected $entityCache = array();
+	protected $entityCache = [];
 	/**
 	 * Whether this instance is a sleeping reference.
 	 *
@@ -80,7 +80,7 @@ class Entity implements EntityInterface {
 	 * @var array
 	 * @access public
 	 */
-	public $objectData = array('ac');
+	public $objectData = ['ac'];
 	/**
 	 * The entries listed here correspond to properties that will not be
 	 * serialized into JSON with json_encode(). This can also be considered a
@@ -89,7 +89,7 @@ class Entity implements EntityInterface {
 	 * @var array
 	 * @access protected
 	 */
-	protected $privateData = array();
+	protected $privateData = [];
 	/**
 	 * The entries listed here correspond to properties that can only be
 	 * modified by server side code. They will still be visible on the frontend,
@@ -99,7 +99,7 @@ class Entity implements EntityInterface {
 	 * @var array
 	 * @access protected
 	 */
-	protected $protectedData = array();
+	protected $protectedData = [];
 	/**
 	 * If this is an array, then entries listed here correspond to the only
 	 * properties that will be accepted from incoming JSON. Any other properties
@@ -121,7 +121,7 @@ class Entity implements EntityInterface {
 	 * @var array
 	 * @access protected
 	 */
-	protected $protectedTags = array();
+	protected $protectedTags = [];
 	/**
 	 * If this is an array, then tags listed here are the only tags that will be
 	 * accepted from incoming JSON. Any other tags will be ignored.
@@ -137,7 +137,7 @@ class Entity implements EntityInterface {
 	 * @var array
 	 * @access protected
 	 */
-	protected $clientEnabledMethods = array();
+	protected $clientEnabledMethods = [];
 	/**
 	 * The name of the corresponding class on the client side. Leave null to use
 	 * the same name.
@@ -160,7 +160,7 @@ class Entity implements EntityInterface {
 	 */
 	public function __construct($id = 0) {
 		if ($id > 0) {
-			$entity = Nymph::getEntity(array('class' => get_class($this)), array('&', 'guid' => $id));
+			$entity = Nymph::getEntity(['class' => get_class($this)], ['&', 'guid' => $id]);
 			if (isset($entity)) {
 				$this->guid = $entity->guid;
 				$this->tags = $entity->tags;
@@ -199,7 +199,7 @@ class Entity implements EntityInterface {
 	 */
 	public static function factoryReference($reference) {
 		$class = $reference[2];
-		$entity = call_user_func(array($class, 'factory'));
+		$entity = call_user_func([$class, 'factory']);
 		$entity->referenceSleep($reference);
 		return $entity;
 	}
@@ -251,8 +251,8 @@ class Entity implements EntityInterface {
 		// If it's not an entity, return the regular value.
 		if ((array) $this->data[$name] === $this->data[$name]) {
 			// But, if it's an array, check all the values for entity references, and change them.
-			array_walk($this->data[$name], array($this, 'referenceToEntity'));
-		} elseif ((object) $this->data[$name] === $this->data[$name] && !(((is_a($this->data[$name], '\\Nymph\\Entity') || is_a($this->data[$name], '\\SciActive\\HookOverride'))) && is_callable(array($this->data[$name], 'toReference')))) {
+			array_walk($this->data[$name], [$this, 'referenceToEntity']);
+		} elseif ((object) $this->data[$name] === $this->data[$name] && !(((is_a($this->data[$name], '\\Nymph\\Entity') || is_a($this->data[$name], '\\SciActive\\HookOverride'))) && is_callable([$this->data[$name], 'toReference']))) {
 			// Only do this for non-entity objects.
 			foreach ($this->data[$name] as &$cur_property) {
 				$this->referenceToEntity($cur_property, null);
@@ -315,7 +315,7 @@ class Entity implements EntityInterface {
 		if (isset($this->sdata[$name])) {
 			unset($this->sdata[$name]);
 		}
-		if ((is_a($value, '\\Nymph\\Entity') || is_a($value, '\\SciActive\\HookOverride')) && is_callable(array($value, 'toReference'))) {
+		if ((is_a($value, '\\Nymph\\Entity') || is_a($value, '\\SciActive\\HookOverride')) && is_callable([$value, 'toReference'])) {
 			// Store a reference to the entity (its GUID and the class it was loaded as).
 			// We don't want to manipulate $value itself, because it could be a variable that the program is still using.
 			$save_value = $value->toReference();
@@ -338,7 +338,7 @@ class Entity implements EntityInterface {
 			$save_value = $value;
 			// If the variable is an array, look through it and change entities to references.
 			if ((array) $save_value === $save_value) {
-				array_walk_recursive($save_value, array($this, 'entityToReference'));
+				array_walk_recursive($save_value, [$this, 'entityToReference']);
 			}
 			return ($this->data[$name] = $save_value);
 		}
@@ -361,7 +361,7 @@ class Entity implements EntityInterface {
 			return;
 		}
 		if ($name === 'tags') {
-			$this->$name = array();
+			$this->$name = [];
 			return;
 		}
 		if (isset($this->entityCache[$name])) {
@@ -410,7 +410,7 @@ class Entity implements EntityInterface {
 		// Convert entities in arrays.
 		foreach ($this->data as &$value) {
 			if ((array) $value === $value) {
-				array_walk_recursive($value, array($this, 'entityToReference'));
+				array_walk_recursive($value, [$this, 'entityToReference']);
 			}
 		}
 		unset($value);
@@ -450,7 +450,7 @@ class Entity implements EntityInterface {
 		if ($this->isASleepingReference) {
 			$this->referenceWake();
 		}
-		if ((is_a($item, '\\Nymph\\Entity') || is_a($item, '\\SciActive\\HookOverride')) && isset($item->guid) && is_callable(array($item, 'toReference'))) {
+		if ((is_a($item, '\\Nymph\\Entity') || is_a($item, '\\SciActive\\HookOverride')) && isset($item->guid) && is_callable([$item, 'toReference'])) {
 			// This is an entity, so we should put it in the entity cache.
 			if (!isset($this->entityCache["reference_guid: {$item->guid}"])) {
 				$this->entityCache["reference_guid: {$item->guid}"] = clone $item;
@@ -491,7 +491,7 @@ class Entity implements EntityInterface {
 			}
 		}
 		// Convert any entities to references.
-		return array_map(array($this, 'getDataReference'), $this->data);
+		return array_map([$this, 'getDataReference'], $this->data);
 	}
 
 	/**
@@ -504,12 +504,12 @@ class Entity implements EntityInterface {
 		if ($this->isASleepingReference) {
 			$this->referenceWake();
 		}
-		if ((is_a($item, '\\Nymph\\Entity') || is_a($item, '\\SciActive\\HookOverride')) && is_callable(array($item, 'toReference'))) {
+		if ((is_a($item, '\\Nymph\\Entity') || is_a($item, '\\SciActive\\HookOverride')) && is_callable([$item, 'toReference'])) {
 			// Convert entities to references.
 			return $item->toReference();
 		} elseif ((array) $item === $item) {
 			// Recurse into lower arrays.
-			return array_map(array($this, 'getDataReference'), $item);
+			return array_map([$this, 'getDataReference'], $item);
 		} elseif ((object) $item === $item) {
 			foreach ($item as &$cur_property) {
 				$cur_property = $this->getDataReference($cur_property);
@@ -585,7 +585,7 @@ class Entity implements EntityInterface {
 		}
 		if (isset($this->guid) || isset($object->guid)) {
 			return ($this->guid == $object->guid);
-		} elseif (!is_callable(array($object, 'getData'))) {
+		} elseif (!is_callable([$object, 'getData'])) {
 			return false;
 		} else {
 			$ob_data = $object->getData();
@@ -595,7 +595,7 @@ class Entity implements EntityInterface {
 	}
 
 	public function jsonSerialize() {
-		$object = (object) array();
+		$object = (object) [];
 		if ($this->isASleepingReference) {
 			return $this->sleepingReference;
 		}
@@ -603,11 +603,11 @@ class Entity implements EntityInterface {
 		$object->cdate = $this->cdate;
 		$object->mdate = $this->mdate;
 		$object->tags = $this->tags;
-		$object->info = array(
+		$object->info = [
 			'name' => $this->info('name'),
 			'type' => $this->info('type'),
 			'types' => $this->info('types')
-		);
+		];
 		if ($this->info('url_view')) {
 			$object->info['url_view'] = $this->info('url_view');
 		}
@@ -623,7 +623,7 @@ class Entity implements EntityInterface {
 		if ($this->info('image')) {
 			$object->info['image'] = $this->info('image');
 		}
-		$object->data = array();
+		$object->data = [];
 		foreach ($this->getData() as $key => $val) {
 			if ($key !== 'cdate' && $key !== 'mdate' && !in_array($key, $this->privateData)) {
 				$object->data[$key] = $val;
@@ -666,7 +666,7 @@ class Entity implements EntityInterface {
 			}
 		}
 
-		$privateData = array();
+		$privateData = [];
 		foreach ($this->privateData as $var) {
 			if (key_exists($var, $this->data) || key_exists($var, $this->sdata)) {
 				$privateData[$var] = $this->$var;
@@ -676,7 +676,7 @@ class Entity implements EntityInterface {
 			}
 		}
 
-		$protectedData = array();
+		$protectedData = [];
 		foreach ($this->protectedData as $var) {
 			if (key_exists($var, $this->data) || key_exists($var, $this->sdata)) {
 				$protectedData[$var] = $this->$var;
@@ -686,7 +686,7 @@ class Entity implements EntityInterface {
 			}
 		}
 
-		$nonWhitelistData = array();
+		$nonWhitelistData = [];
 		if ($this->whitelistData !== false) {
 			$nonWhitelistData = $this->getData(true);
 			foreach ($data as $var => $val) {
@@ -708,15 +708,15 @@ class Entity implements EntityInterface {
 		$this->putData($data);
 	}
 
-	public function putData($data, $sdata = array()) {
+	public function putData($data, $sdata = []) {
 		if ($this->isASleepingReference) {
 			$this->referenceWake();
 		}
 		if ((array) $data !== $data) {
-			$data = array();
+			$data = [];
 		}
 		// Erase the entity cache.
-		$this->entityCache = array();
+		$this->entityCache = [];
 		foreach ($data as $name => $value) {
 			if ((array) $value === $value && isset($value[0]) && $value[0] === 'nymph_entity_reference') {
 				// Don't load the entity yet, but make the entry in the array,
@@ -764,13 +764,13 @@ class Entity implements EntityInterface {
 		if ((array) $item === $item) {
 			if (isset($item[0]) && $item[0] === 'nymph_entity_reference') {
 				if (!isset($this->entityCache["reference_guid: {$item[1]}"])) {
-					$this->entityCache["reference_guid: {$item[1]}"] = call_user_func(array($item[2], 'factoryReference'), $item);
+					$this->entityCache["reference_guid: {$item[1]}"] = call_user_func([$item[2], 'factoryReference'], $item);
 				}
 				$item = $this->entityCache["reference_guid: {$item[1]}"];
 			} else {
-				array_walk($item, array($this, 'referenceToEntity'));
+				array_walk($item, [$this, 'referenceToEntity']);
 			}
-		} elseif ((object) $item === $item && !(((is_a($item, '\\Nymph\\Entity') || is_a($item, '\\SciActive\\HookOverride'))) && is_callable(array($item, 'toReference')))) {
+		} elseif ((object) $item === $item && !(((is_a($item, '\\Nymph\\Entity') || is_a($item, '\\SciActive\\HookOverride'))) && is_callable([$item, 'toReference']))) {
 			// Only do this for non-entity objects.
 			foreach ($item as &$cur_property) {
 				$this->referenceToEntity($cur_property, null);
@@ -788,7 +788,7 @@ class Entity implements EntityInterface {
 		if (!$this->isASleepingReference) {
 			return true;
 		}
-		$entity = Nymph::getEntity(array('class' => $this->sleepingReference[2], 'skip_ac' => (bool) $this->_nUseSkipAC), array('&', 'guid' => $this->sleepingReference[1]));
+		$entity = Nymph::getEntity(['class' => $this->sleepingReference[2], 'skip_ac' => (bool) $this->_nUseSkipAC], ['&', 'guid' => $this->sleepingReference[1]]);
 		if (!isset($entity)) {
 			return false;
 		}
@@ -807,7 +807,7 @@ class Entity implements EntityInterface {
 		if (!isset($this->guid)) {
 			return false;
 		}
-		$refresh = Nymph::getEntity(array('class' => get_class($this)), array('&', 'guid' => $this->guid));
+		$refresh = Nymph::getEntity(['class' => get_class($this)], ['&', 'guid' => $this->guid]);
 		if (!isset($refresh)) {
 			return 0;
 		}
@@ -850,6 +850,6 @@ class Entity implements EntityInterface {
 		if (!isset($this->guid)) {
 			return $this;
 		}
-		return array('nymph_entity_reference', $this->guid, get_class($this));
+		return ['nymph_entity_reference', $this->guid, get_class($this)];
 	}
 }

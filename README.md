@@ -49,7 +49,7 @@ $mysqli = new mysqli();
 
 $title = $_GET['title'];
 $deleted = ($_GET['deleted'] == "true" ? 'TRUE' : 'FALSE');
-$entities = array();
+$entities = [];
 if ($stmt = $mysqli->prepare("SELECT * FROM BlogPosts WHERE title LIKE '?' AND deleted=?")) {
   $stmt->bind_param("ss", $title, $deleted);
   $stmt->execute();
@@ -104,7 +104,7 @@ composer require sciactive/nymph
 ```php
 require 'vendor/autoload.php';
 use Nymph\Nymph as Nymph;
-\SciActive\R::_('NymphConfig', array(), function(){
+\SciActive\R::_('NymphConfig', [], function(){
 	$config = include('vendor/sciactive/nymph/conf/defaults.php');
 	$config->MySQL->host['value'] = '127.0.0.1';
 	$config->MySQL->database['value'] = 'my_database';
@@ -121,7 +121,7 @@ $myEntity = new MyEntity();
 $myEntity->myVar = "myValue";
 $myEntity->save();
 
-$allMyEntities = Nymph::getEntities(array('class' => 'MyEntity'));
+$allMyEntities = Nymph::getEntities(['class' => 'MyEntity']);
 ```
 
 For a thorough step by step guide to setting up Nymph on your own server, visit the [Setup Guide](https://github.com/sciactive/nymph/wiki/Setup-Guide).

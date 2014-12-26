@@ -146,7 +146,7 @@ interface EntityInterface extends DataObjectInterface, \JsonSerializable {
 	 * @param array $data The data array.
 	 * @param array $sdata The serialized data array.
 	 */
-	public function putData($data, $sdata = array());
+	public function putData($data, $sdata = []);
 	/**
 	 * Remove one or more tags.
 	 *

@@ -32,23 +32,23 @@ class REST {
 	 */
 	public function run($method, $action, $data) {
 		$method = strtoupper($method);
-		if (is_callable(array($this, $method))) {
+		if (is_callable([$this, $method])) {
 			return $this->$method($action, $data);
 		}
 		return $this->httpError(405, "Method Not Allowed");
 	}
 
 	protected function DELETE($action = '', $data = '') {
-		if (!in_array($action, array('entity', 'entities', 'uid'))) {
+		if (!in_array($action, ['entity', 'entities', 'uid'])) {
 			return $this->httpError(400, "Bad Request");
 		}
 		ob_start();
-		if (in_array($action, array('entity', 'entities'))) {
+		if (in_array($action, ['entity', 'entities'])) {
 			$ents = json_decode($data, true);
 			if ($action === 'entity') {
-				$ents = array($ents);
+				$ents = [$ents];
 			}
-			$deleted = array();
+			$deleted = [];
 			$failures = false;
 			foreach ($ents as $delEnt) {
 				$guid = (int) $delEnt['guid'];
@@ -87,16 +87,16 @@ class REST {
 	}
 
 	protected function PUT($action = '', $data = '') {
-		if (!in_array($action, array('entity', 'entities', 'uid'))) {
+		if (!in_array($action, ['entity', 'entities', 'uid'])) {
 			return $this->httpError(400, "Bad Request");
 		}
 		ob_start();
-		if (in_array($action, array('entity', 'entities'))) {
+		if (in_array($action, ['entity', 'entities'])) {
 			$ents = json_decode($data, true);
 			if ($action === 'entity') {
-				$ents = array($ents);
+				$ents = [$ents];
 			}
-			$created = array();
+			$created = [];
 			$invalidData = false;
 			foreach ($ents as $newEnt) {
 				if ((int)$newEnt['guid'] > 0) {
@@ -141,32 +141,32 @@ class REST {
 	}
 
 	protected function POST($action = '', $data = '') {
-		if (!in_array($action, array('entity', 'entities', 'method'))) {
+		if (!in_array($action, ['entity', 'entities', 'method'])) {
 			return $this->httpError(400, "Bad Request");
 		}
 		ob_start();
 		if ($action === 'method') {
 			$args = json_decode($data, true);
-			array_walk($args['params'], array($this, 'referenceToEntity'));
+			array_walk($args['params'], [$this, 'referenceToEntity']);
 			$entity = $this->loadEntity($args['entity']);
 			if (!in_array($args['method'], $entity->clientEnabledMethods())) {
 				return $this->httpError(403, "Forbidden");
 			}
-			if (!$entity || ((int)$args['entity']['guid'] > 0 && !$entity->guid) || !is_callable(array($entity, $args['method']))) {
+			if (!$entity || ((int)$args['entity']['guid'] > 0 && !$entity->guid) || !is_callable([$entity, $args['method']])) {
 				return $this->httpError(400, "Bad Request");
 			}
 			try {
-				$return = call_user_func_array(array($entity, $args['method']), $args['params']);
-				echo json_encode(array('entity' => $entity, 'return' => $return));
+				$return = call_user_func_array([$entity, $args['method']], $args['params']);
+				echo json_encode(['entity' => $entity, 'return' => $return]);
 			} catch (\Exception $e) {
 				return $this->httpError(500, "Internal Server Error");
 			}
 		} else {
 			$ents = json_decode($data, true);
 			if ($action === 'entity') {
-				$ents = array($ents);
+				$ents = [$ents];
 			}
-			$saved = array();
+			$saved = [];
 			$invalidData = false;
 			$notfound = false;
 			foreach ($ents as $newEnt) {
@@ -208,16 +208,16 @@ class REST {
 	}
 
 	protected function GET($action = '', $data = '') {
-		if (!in_array($action, array('entity', 'entities', 'uid'))) {
+		if (!in_array($action, ['entity', 'entities', 'uid'])) {
 			return $this->httpError(400, "Bad Request");
 		}
-		$actionMap = array(
+		$actionMap = [
 			'entity' => 'getEntity',
 			'entities' => 'getEntities',
 			'uid' => 'getUID'
-		);
+		];
 		$method = $actionMap[$action];
-		if (in_array($action, array('entity', 'entities'))) {
+		if (in_array($action, ['entity', 'entities'])) {
 			$args = json_decode($data, true);
 			if (is_int($args)) {
 				$result = Nymph::$method($args);
@@ -228,8 +228,8 @@ class REST {
 						if (!isset($args[$i]['type'])) {
 							return $this->httpError(400, "Bad Request");
 						}
-						// Translate JS {type: '&', ...} to PHP array('&', ...)
-						$newArg = array($args[$i]['type']);
+						// Translate JS {type: '&', ...} to PHP ['&', ...]
+						$newArg = [$args[$i]['type']];
 						unset($args[$i]['type']);
 						$newArg = array_merge($newArg, $args[$i]);
 						$args[$i] = $newArg;
@@ -262,10 +262,10 @@ class REST {
 		}
 		if ((int)$entityData['guid'] > 0) {
 			$entity = Nymph::getEntity(
-					array('class' => $entityData['class']),
-					array('&',
+					['class' => $entityData['class']],
+					['&',
 						'guid' => (int)$entityData['guid']
-					)
+					]
 				);
 			if ($entity === null) {
 				return false;
@@ -310,11 +310,11 @@ class REST {
 	private function referenceToEntity(&$item, $key) {
 		if ((array) $item === $item) {
 			if (isset($item[0]) && $item[0] === 'nymph_entity_reference') {
-				$item = call_user_func(array($item[2], 'factoryReference'), $item);
+				$item = call_user_func([$item[2], 'factoryReference'], $item);
 			} else {
-				array_walk($item, array($this, 'referenceToEntity'));
+				array_walk($item, [$this, 'referenceToEntity']);
 			}
-		} elseif ((object) $item === $item && !(((is_a($item, '\\Nymph\\Entity') || is_a($item, '\\SciActive\\HookOverride'))) && is_callable(array($item, 'toReference')))) {
+		} elseif ((object) $item === $item && !(((is_a($item, '\\Nymph\\Entity') || is_a($item, '\\SciActive\\HookOverride'))) && is_callable([$item, 'toReference']))) {
 			// Only do this for non-entity objects.
 			foreach ($item as &$cur_property) {
 				$this->referenceToEntity($cur_property, null);

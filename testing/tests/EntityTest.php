@@ -22,13 +22,13 @@ class EntityTest extends PHPUnit_Framework_TestCase {
 		$testEntity->name = 'Entity Test';
 		$testEntity->null = null;
 		$testEntity->string = 'test';
-		$testEntity->array = array('full', 'of', 'values', 500);
+		$testEntity->array = ['full', 'of', 'values', 500];
 		$testEntity->number = 30;
 
 		$this->assertSame('Entity Test', $testEntity->name);
 		$this->assertNull($testEntity->null);
 		$this->assertSame('test', $testEntity->string);
-		$this->assertSame(array('full', 'of', 'values', 500), $testEntity->array);
+		$this->assertSame(['full', 'of', 'values', 500], $testEntity->array);
 		$this->assertSame(30, $testEntity->number);
 
 		$this->assertTrue($testEntity->save());
@@ -38,14 +38,14 @@ class EntityTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue($entity_reference_test->save());
 		$entity_reference_guid = $entity_reference_test->guid;
 		$testEntity->reference = $entity_reference_test;
-		$testEntity->ref_array = array(0 => array('entity' => $entity_reference_test));
-		$testEntity->ref_object = (object) array('thing' => (object) array('entity' => $entity_reference_test));
+		$testEntity->ref_array = [0 => ['entity' => $entity_reference_test]];
+		$testEntity->ref_object = (object) ['thing' => (object) ['entity' => $entity_reference_test]];
 		$this->assertTrue($testEntity->save());
 
 		$entity_reference_test->test = 'good';
 		$this->assertTrue($entity_reference_test->save());
 
-		return array('entity' => $testEntity, 'refGuid' => $entity_reference_guid);
+		return ['entity' => $testEntity, 'refGuid' => $entity_reference_guid];
 	}
 
 	/**
@@ -71,14 +71,14 @@ class EntityTest extends PHPUnit_Framework_TestCase {
 	 */
 	public function testArraySearching($arr) {
 		$testEntity = $arr['entity'];
-		$array = array('thing', TestModel::factory($testEntity->guid));
+		$array = ['thing', TestModel::factory($testEntity->guid)];
 
 		$this->assertTrue($testEntity->inArray($array));
 		$testEntity->refresh();
 		$array[1]->refresh();
 		$this->assertTrue($testEntity->inArray($array, true));
-		$this->assertFalse($testEntity->inArray(array(0, 1, 2, 3, 4, 5)));
-		$this->assertFalse($testEntity->inArray(array(0, 1, 2, 3, 4, 5), true));
+		$this->assertFalse($testEntity->inArray([0, 1, 2, 3, 4, 5]));
+		$this->assertFalse($testEntity->inArray([0, 1, 2, 3, 4, 5], true));
 
 		$array[1]->string = 'different';
 
@@ -89,8 +89,8 @@ class EntityTest extends PHPUnit_Framework_TestCase {
 		$testEntity->refresh();
 		$array[1]->refresh();
 		$this->assertSame(1, $testEntity->arraySearch($array, true));
-		$this->assertSame(false, $testEntity->arraySearch(array(0, 1, 2, 3, 4, 5)));
-		$this->assertSame(false, $testEntity->arraySearch(array(0, 1, 2, 3, 4, 5), true));
+		$this->assertSame(false, $testEntity->arraySearch([0, 1, 2, 3, 4, 5]));
+		$this->assertSame(false, $testEntity->arraySearch([0, 1, 2, 3, 4, 5], true));
 
 		$array[1]->string = 'different';
 
@@ -139,7 +139,7 @@ class EntityTest extends PHPUnit_Framework_TestCase {
 
 		$reference = $testEntity->toReference();
 
-		$this->assertEquals(array('nymph_entity_reference', $testEntity->guid, 'TestModel'), $reference);
+		$this->assertEquals(['nymph_entity_reference', $testEntity->guid, 'TestModel'], $reference);
 	}
 
 	/**
@@ -152,14 +152,14 @@ class EntityTest extends PHPUnit_Framework_TestCase {
 		$testEntity->addTag('test', 'test2');
 		$this->assertTrue($testEntity->hasTag('test', 'test2'));
 		$testEntity->addTag(['test', 'test3', 'test4', 'test5', 'test6']);
-		$this->assertTrue($testEntity->hasTag(array('test', 'test3', 'test4', 'test5', 'test6')));
+		$this->assertTrue($testEntity->hasTag(['test', 'test3', 'test4', 'test5', 'test6']));
 		$testEntity->removeTag('test2');
 		$this->assertFalse($testEntity->hasTag('test2'));
 		$testEntity->removeTag('test3', 'test4');
 		$this->assertFalse($testEntity->hasTag('test3', 'test4'));
 		$testEntity->removeTag(['test5', 'test6']);
-		$this->assertFalse($testEntity->hasTag(array('test5', 'test6')));
-		$this->assertEquals(array('test'), $testEntity->getTags());
+		$this->assertFalse($testEntity->hasTag(['test5', 'test6']));
+		$this->assertEquals(['test'], $testEntity->getTags());
 	}
 
 	/**
@@ -187,12 +187,12 @@ class EntityTest extends PHPUnit_Framework_TestCase {
 	public function testSleepingReferences($arr) {
 		$testEntity = $arr['entity'];
 
-		$entity = TestModel::factoryReference(array('nymph_sleeping_reference', $testEntity->guid, 'TestModel'));
+		$entity = TestModel::factoryReference(['nymph_sleeping_reference', $testEntity->guid, 'TestModel']);
 
 		$this->assertSame('Entity Test', $entity->name);
 		$this->assertNull($entity->null);
 		$this->assertSame('test', $entity->string);
-		$this->assertSame(array('full', 'of', 'values', 500), $entity->array);
+		$this->assertSame(['full', 'of', 'values', 500], $entity->array);
 		$this->assertSame(30, $entity->number);
 		$this->assertSame($arr['refGuid'], $entity->reference->guid);
 		$this->assertSame($arr['refGuid'], $entity->ref_array[0]['entity']->guid);
@@ -223,18 +223,18 @@ class EntityTest extends PHPUnit_Framework_TestCase {
 
 		$entityData = json_decode($json, true);
 
-		$entityData['tags'] = array('test', 'notag', 'newtag');
+		$entityData['tags'] = ['test', 'notag', 'newtag'];
 		$testEntity->jsonAcceptTags($entityData['tags']);
 		$entityData['data']['cdate'] = 13;
 		$entityData['data']['mdate'] = 14;
 		$entityData['data']['name'] = 'bad';
 		$entityData['data']['string'] = 'good';
 		$entityData['data']['null'] = true;
-		$entityData['data']['array'] = array('imanarray');
+		$entityData['data']['array'] = ['imanarray'];
 		$entityData['data']['number'] = 4;
 		$entityData['data']['reference'] = false;
-		$entityData['data']['ref_array'] = array(false);
-		$entityData['data']['ref_object'] = (object) array("thing"=>false);
+		$entityData['data']['ref_array'] = [false];
+		$entityData['data']['ref_object'] = (object) ["thing"=>false];
 		$testEntity->jsonAcceptData($entityData['data']);
 
 		$this->assertFalse($testEntity->hasTag('notag'));
@@ -244,7 +244,7 @@ class EntityTest extends PHPUnit_Framework_TestCase {
 		$this->assertSame('Entity Test', $testEntity->name);
 		$this->assertNull($testEntity->null);
 		$this->assertSame('good', $testEntity->string);
-		$this->assertSame(array('imanarray'), $testEntity->array);
+		$this->assertSame(['imanarray'], $testEntity->array);
 		$this->assertSame(30, $testEntity->number);
 		$this->assertSame($arr['refGuid'], $testEntity->reference->guid);
 		$this->assertSame($arr['refGuid'], $testEntity->ref_array[0]['entity']->guid);
@@ -263,11 +263,11 @@ class EntityTest extends PHPUnit_Framework_TestCase {
 		$this->assertSame('bad', $testEntity->name);
 		$this->assertTrue($testEntity->null);
 		$this->assertSame('good', $testEntity->string);
-		$this->assertSame(array('imanarray'), $testEntity->array);
+		$this->assertSame(['imanarray'], $testEntity->array);
 		$this->assertSame(30, $testEntity->number);
 		$this->assertFalse($testEntity->reference);
-		$this->assertSame(array(false), $testEntity->ref_array);
-		$this->assertEquals((object) array("thing"=>false), $testEntity->ref_object);
+		$this->assertSame([false], $testEntity->ref_array);
+		$this->assertEquals((object) ["thing"=>false], $testEntity->ref_object);
 
 		$this->assertTrue($testEntity->refresh());
 	}

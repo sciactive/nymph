@@ -10,11 +10,11 @@ if (getenv('DATABASE_URL')) {
 require '../../lib/require.php';
 
 require '../../src/autoload.php';
-\SciActive\R::_('NymphConfig', array(), function(){
+\SciActive\R::_('NymphConfig', [], function(){
 	return include '../config.php';
 });
 
-\SciActive\R::_(array('Nymph'), function(){
+\SciActive\R::_(['Nymph'], function(){
 	require '../employee/Employee.php';
 	require '../sudoku/Game.php';
 	require '../todo/Todo.php';

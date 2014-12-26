@@ -255,7 +255,7 @@ class PostgreSQLDriver implements DriverInterface {
 
 		// Get the etypes.
 		$result = $this->query("SELECT relname FROM pg_stat_user_tables ORDER BY relname;");
-		$etypes = array();
+		$etypes = [];
 		$row = pg_fetch_array($result);
 		while ($row) {
 			if (strpos($row[0], $this->prefix.'entities_') === 0) {
@@ -324,7 +324,7 @@ class PostgreSQLDriver implements DriverInterface {
 
 		// Get the etypes.
 		$result = $this->query("SELECT relname FROM pg_stat_user_tables ORDER BY relname;");
-		$etypes = array();
+		$etypes = [];
 		$row = pg_fetch_array($result);
 		while ($row) {
 			if (strpos($row[0], $this->prefix.'entities_') === 0) {
@@ -368,22 +368,22 @@ class PostgreSQLDriver implements DriverInterface {
 		// Set up options and selectors.
 		$selectors = func_get_args();
 		if (!$selectors) {
-			$options = $selectors = array();
+			$options = $selectors = [];
 		} else {
 			$options = $selectors[0];
 			unset($selectors[0]);
 		}
 		foreach ($selectors as $key => $selector) {
-			if (!$selector || (count($selector) === 1 && isset($selector[0]) && in_array($selector[0], array('&', '!&', '|', '!|')))) {
+			if (!$selector || (count($selector) === 1 && isset($selector[0]) && in_array($selector[0], ['&', '!&', '|', '!|']))) {
 				unset($selectors[$key]);
 				continue;
 			}
-			if (!isset($selector[0]) || !in_array($selector[0], array('&', '!&', '|', '!|'))) {
+			if (!isset($selector[0]) || !in_array($selector[0], ['&', '!&', '|', '!|'])) {
 				throw new Exceptions\InvalidParametersException('Invalid query selector passed: '.print_r($selector, true));
 			}
 		}
 
-		$entities = array();
+		$entities = [];
 		$class = isset($options['class']) ? $options['class'] : Entity;
 		if (isset($options['etype'])) {
 			$etype_dirty = $options['etype'];
@@ -409,12 +409,12 @@ class PostgreSQLDriver implements DriverInterface {
 				$entity = $this->pull_cache($selectors[1]['guid'], $class);
 				if (isset($entity) && (!isset($selectors[1]['tag']) || $entity->hasTag($selectors[1]['tag']))) {
 					$entity->_nUseSkipAC = (bool) $options['skip_ac'];
-					return array($entity);
+					return [$entity];
 				}
 			}
 		}
 
-		$query_parts = array();
+		$query_parts = [];
 		foreach ($selectors as &$cur_selector) {
 			$cur_selector_query = '';
 			foreach ($cur_selector as $key => &$value) {
@@ -427,9 +427,9 @@ class PostgreSQLDriver implements DriverInterface {
 				$clause_not = $key[0] === '!';
 				$cur_query = '';
 				if ((array) $value !== $value) {
-					$value = array(array($value));
+					$value = [[$value]];
 				} elseif ((array) $value[0] !== $value[0]) {
-					$value = array($value);
+					$value = [$value];
 				}
 				// Any options having to do with data only return if the entity has
 				// the specified variables.
@@ -468,7 +468,7 @@ class PostgreSQLDriver implements DriverInterface {
 							break;
 						case 'ref':
 						case '!ref':
-							$guids = array();
+							$guids = [];
 							if ((array) $cur_value[1] === $cur_value[1]) {
 								foreach ($cur_value[1] as $cur_entity) {
 									if ((object) $cur_entity === $cur_entity) {
@@ -518,7 +518,7 @@ class PostgreSQLDriver implements DriverInterface {
 								if ( $cur_query ) {
 									$cur_query .= ($type_is_or ? ' OR ' : ' AND ');
 								}
-								if (is_callable(array($cur_value[1], 'toReference'))) {
+								if (is_callable([$cur_value[1], 'toReference'])) {
 									$svalue = serialize($cur_value[1]->toReference());
 								} else {
 									$svalue = serialize($cur_value[1]);
@@ -643,7 +643,7 @@ class PostgreSQLDriver implements DriverInterface {
 								}
 								$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'e."guid" IN (SELECT "guid" FROM "'.$this->prefix.'data'.$etype.'" WHERE "name"=\''.pg_escape_string($this->link, $cur_value[0]).'\' AND "compare_negone"=TRUE)';
 								break;
-							} elseif ($cur_value[1] === array()) {
+							} elseif ($cur_value[1] === []) {
 								if ( $cur_query ) {
 									$cur_query .= ($type_is_or ? ' OR ' : ' AND ');
 								}
@@ -758,9 +758,9 @@ class PostgreSQLDriver implements DriverInterface {
 		while ($row) {
 			$guid = (int) $row[0];
 			$tags = $row[1];
-			$data = array('cdate' => (float) $row[2], 'mdate' => (float) $row[3]);
+			$data = ['cdate' => (float) $row[2], 'mdate' => (float) $row[3]];
 			// Serialized data.
-			$sdata = array();
+			$sdata = [];
 			if (isset($row[4])) {
 				// This do will keep going and adding the data until the
 				// next entity is reached. $row will end on the next entity.
@@ -810,7 +810,7 @@ class PostgreSQLDriver implements DriverInterface {
 						// Check if it doesn't pass any for &, check if it
 						// passes any for |.
 						foreach ($value as $cur_value) {
-							if (($key === 'data' || $key === '!data') && ($cur_value[1] === true || $cur_value[1] === false || $cur_value[1] === 1 || $cur_value[1] === 0 || $cur_value[1] === -1 || $cur_value[1] === array())) {
+							if (($key === 'data' || $key === '!data') && ($cur_value[1] === true || $cur_value[1] === false || $cur_value[1] === 1 || $cur_value[1] === 0 || $cur_value[1] === -1 || $cur_value[1] === [])) {
 								// Handled by the query.
 								$pass = true;
 							} else {
@@ -881,7 +881,7 @@ class PostgreSQLDriver implements DriverInterface {
 					$entity = null;
 				}
 				if (!isset($entity) || $data['mdate'] > $entity->mdate) {
-					$entity = call_user_func(array($class, 'factory'));
+					$entity = call_user_func([$class, 'factory']);
 					$entity->guid = $guid;
 					if (strlen($tags) > 2) {
 						$entity->tags = explode(',', substr($tags, 1, -1));
@@ -922,7 +922,7 @@ class PostgreSQLDriver implements DriverInterface {
 			throw new Exceptions\InvalidParametersException('Provided filename is unreadable.');
 		}
 		$line = '';
-		$data = array();
+		$data = [];
 		$this->query('BEGIN;');
 		while (!feof($fhandle)) {
 			$line .= fgets($fhandle, 8192);
@@ -933,7 +933,7 @@ class PostgreSQLDriver implements DriverInterface {
 				$line = '';
 				continue;
 			}
-			$matches = array();
+			$matches = [];
 			if (preg_match('/^\s*{(\d+)}<([\w-_]+)>\[([\w,]+)\]\s*$/S', $line, $matches)) {
 				// Save the current entity.
 				if ($guid) {
@@ -956,14 +956,14 @@ class PostgreSQLDriver implements DriverInterface {
 								(!is_object($uvalue) && $uvalue == 1) ? 'TRUE' : 'FALSE',
 								(!is_object($uvalue) && $uvalue == 0) ? 'TRUE' : 'FALSE',
 								(!is_object($uvalue) && $uvalue == -1) ? 'TRUE' : 'FALSE',
-								$uvalue == array() ? 'TRUE' : 'FALSE',
+								$uvalue == [] ? 'TRUE' : 'FALSE',
 								is_string($uvalue) ? '\''.pg_escape_string($this->link, $uvalue).'\'' : 'NULL');
 						}
 						$this->query($query);
 					}
 					$guid = null;
-					$tags = array();
-					$data = array();
+					$tags = [];
+					$data = [];
 				}
 				// Record the new entity's info.
 				$guid = (int) $matches[1];
@@ -980,7 +980,7 @@ class PostgreSQLDriver implements DriverInterface {
 			}
 			$line = '';
 			// Clear the entity cache.
-			$this->entityCache = array();
+			$this->entityCache = [];
 		}
 		// Save the last entity.
 		if ($guid) {
@@ -1003,7 +1003,7 @@ class PostgreSQLDriver implements DriverInterface {
 						(!is_object($uvalue) && $uvalue == 1) ? 'TRUE' : 'FALSE',
 						(!is_object($uvalue) && $uvalue == 0) ? 'TRUE' : 'FALSE',
 						(!is_object($uvalue) && $uvalue == -1) ? 'TRUE' : 'FALSE',
-						$uvalue == array() ? 'TRUE' : 'FALSE',
+						$uvalue == [] ? 'TRUE' : 'FALSE',
 						is_string($uvalue) ? '\''.pg_escape_string($this->link, $uvalue).'\'' : 'NULL');
 				}
 				$this->query($query);
@@ -1071,9 +1071,9 @@ class PostgreSQLDriver implements DriverInterface {
 			}
 			$entity->guid = $new_id;
 			$this->query("INSERT INTO \"{$this->prefix}guids\" (\"guid\") VALUES ({$new_id});");
-			$this->query("INSERT INTO \"{$this->prefix}entities{$etype}\" (\"guid\", \"tags\", \"varlist\", \"cdate\", \"mdate\") VALUES ({$entity->guid}, '".pg_escape_string($this->link, '{'.implode(',', array_diff($entity->tags, array(''))).'}')."', '".pg_escape_string($this->link, '{'.implode(',', $varlist).'}')."', ".((float) $data['cdate']).", ".((float) $data['mdate']).");", $etype_dirty);
+			$this->query("INSERT INTO \"{$this->prefix}entities{$etype}\" (\"guid\", \"tags\", \"varlist\", \"cdate\", \"mdate\") VALUES ({$entity->guid}, '".pg_escape_string($this->link, '{'.implode(',', array_diff($entity->tags, [''])).'}')."', '".pg_escape_string($this->link, '{'.implode(',', $varlist).'}')."', ".((float) $data['cdate']).", ".((float) $data['mdate']).");", $etype_dirty);
 			unset($data['cdate'], $data['mdate']);
-			$values = array();
+			$values = [];
 			foreach ($data as $name => $value) {
 				$svalue = serialize($value);
 				preg_match_all('/a:3:\{i:0;s:22:"nymph_entity_reference";i:1;i:(\d+);/', $svalue, $references, PREG_PATTERN_ORDER);
@@ -1087,7 +1087,7 @@ class PostgreSQLDriver implements DriverInterface {
 						(!is_object($value) && $value == 1) ? 'TRUE' : 'FALSE',
 						(!is_object($value) && $value == 0) ? 'TRUE' : 'FALSE',
 						(!is_object($value) && $value == -1) ? 'TRUE' : 'FALSE',
-						$value == array() ? 'TRUE' : 'FALSE',
+						$value == [] ? 'TRUE' : 'FALSE',
 						is_string($value) ? '\''.pg_escape_string($this->link, $value).'\'' : 'NULL'
 					);
 			}
@@ -1104,7 +1104,7 @@ class PostgreSQLDriver implements DriverInterface {
 						(!is_object($uvalue) && $uvalue == 1) ? 'TRUE' : 'FALSE',
 						(!is_object($uvalue) && $uvalue == 0) ? 'TRUE' : 'FALSE',
 						(!is_object($uvalue) && $uvalue == -1) ? 'TRUE' : 'FALSE',
-						$uvalue == array() ? 'TRUE' : 'FALSE',
+						$uvalue == [] ? 'TRUE' : 'FALSE',
 						is_string($uvalue) ? '\''.pg_escape_string($this->link, $uvalue).'\'' : 'NULL'
 					);
 			}
@@ -1114,10 +1114,10 @@ class PostgreSQLDriver implements DriverInterface {
 			if ($this->config->cache['value']) {
 				$this->cleanCache($entity->guid);
 			}
-			$this->query("UPDATE \"{$this->prefix}entities{$etype}\" SET \"tags\"='".pg_escape_string($this->link, '{'.implode(',', array_diff($entity->tags, array(''))).'}')."', \"varlist\"='".pg_escape_string($this->link, '{'.implode(',', $varlist).'}')."', \"cdate\"=".((float) $data['cdate']).", \"mdate\"=".((float) $data['mdate'])." WHERE \"guid\"={$entity->guid};", $etype_dirty);
+			$this->query("UPDATE \"{$this->prefix}entities{$etype}\" SET \"tags\"='".pg_escape_string($this->link, '{'.implode(',', array_diff($entity->tags, [''])).'}')."', \"varlist\"='".pg_escape_string($this->link, '{'.implode(',', $varlist).'}')."', \"cdate\"=".((float) $data['cdate']).", \"mdate\"=".((float) $data['mdate'])." WHERE \"guid\"={$entity->guid};", $etype_dirty);
 			$this->query("DELETE FROM \"{$this->prefix}data{$etype}\" WHERE \"guid\"={$entity->guid};");
 			unset($data['cdate'], $data['mdate']);
-			$values = array();
+			$values = [];
 			foreach ($data as $name => $value) {
 				$svalue = serialize($value);
 				preg_match_all('/a:3:\{i:0;s:22:"nymph_entity_reference";i:1;i:(\d+);/', $svalue, $references, PREG_PATTERN_ORDER);
@@ -1131,7 +1131,7 @@ class PostgreSQLDriver implements DriverInterface {
 						(!is_object($value) && $value == 1) ? 'TRUE' : 'FALSE',
 						(!is_object($value) && $value == 0) ? 'TRUE' : 'FALSE',
 						(!is_object($value) && $value == -1) ? 'TRUE' : 'FALSE',
-						$value == array() ? 'TRUE' : 'FALSE',
+						$value == [] ? 'TRUE' : 'FALSE',
 						is_string($value) ? '\''.pg_escape_string($this->link, $value).'\'' : 'NULL'
 					);
 			}
@@ -1148,7 +1148,7 @@ class PostgreSQLDriver implements DriverInterface {
 						(!is_object($uvalue) && $uvalue == 1) ? 'TRUE' : 'FALSE',
 						(!is_object($uvalue) && $uvalue == 0) ? 'TRUE' : 'FALSE',
 						(!is_object($uvalue) && $uvalue == -1) ? 'TRUE' : 'FALSE',
-						$uvalue == array() ? 'TRUE' : 'FALSE',
+						$uvalue == [] ? 'TRUE' : 'FALSE',
 						is_string($uvalue) ? '\''.pg_escape_string($this->link, $uvalue).'\'' : 'NULL'
 					);
 			}

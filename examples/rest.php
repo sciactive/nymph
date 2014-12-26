@@ -5,7 +5,7 @@ error_reporting(E_ALL);
 require '../lib/require.php';
 
 require '../src/autoload.php';
-\SciActive\R::_('NymphConfig', array(), function(){
+\SciActive\R::_('NymphConfig', [], function(){
 	return include 'config.php';
 });
 
@@ -16,7 +16,7 @@ require 'todo/Todo.php';
 require 'sudoku/Game.php';
 
 try {
-	if (in_array($_SERVER['REQUEST_METHOD'], array('PUT', 'DELETE'))) {
+	if (in_array($_SERVER['REQUEST_METHOD'], ['PUT', 'DELETE'])) {
 		parse_str(file_get_contents("php://input"), $args);
 		$NymphREST->run($_SERVER['REQUEST_METHOD'], $args['action'], $args['data']);
 	} else {

@@ -10,7 +10,7 @@
  */
 
 class EntityInvalidDataException extends \Exception {
-	private $fields = array();
+	private $fields = [];
 
 	/**
 	 * @param string $message
@@ -18,11 +18,11 @@ class EntityInvalidDataException extends \Exception {
 	 * @param \Exception $previous
 	 * @param array|string $fields A field, or an array of fields, which fail validation checking.
 	 */
-	public function __construct($message = '', $code = 0, $previous = null, $fields = array()) {
+	public function __construct($message = '', $code = 0, $previous = null, $fields = []) {
 		parent::__construct($message, $code, $previous);
 		if (!empty($fields)) {
 			if ((array) $fields !== $fields) {
-				$fields = array((string) $fields);
+				$fields = [(string) $fields];
 			}
 			$this->fields = $fields;
 		}

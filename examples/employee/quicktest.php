@@ -6,11 +6,11 @@
 require '../../lib/require.php';
 
 require '../../src/autoload.php';
-\SciActive\R::_('NymphConfig', array(), function(){
+\SciActive\R::_('NymphConfig', [], function(){
 	return include '../config.php';
 });
 
-\SciActive\R::_(array('Nymph'), function(){
+\SciActive\R::_(['Nymph'], function(){
 	require 'Employee.php';
 });
 
@@ -27,7 +27,7 @@ $newEntity2->salary = 8000000;
 $newEntity2->subordinates[] = $newEntity;
 $newEntity2->save();
 
-$entity = \Nymph\Nymph::getEntity(array('class' => Employee), array('&', 'guid' => $newEntity2->guid));
+$entity = \Nymph\Nymph::getEntity(['class' => Employee], ['&', 'guid' => $newEntity2->guid]);
 
 ?>
 <!DOCTYPE html>

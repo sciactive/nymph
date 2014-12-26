@@ -35,13 +35,13 @@ trait DriverTrait {
 	 * @access protected
 	 * @var array
 	 */
-	protected $entityCache = array();
+	protected $entityCache = [];
 	/**
 	 * A counter for the entity cache to determine the most accessed entities.
 	 * @access protected
 	 * @var array
 	 */
-	protected $entityCount = array();
+	protected $entityCount = [];
 	/**
 	 * Sort case sensitively.
 	 * @access protected
@@ -106,9 +106,9 @@ trait DriverTrait {
 			}
 			unset($cur_entity);
 		} elseif ((object) $entity === $entity) {
-			$entity = array($entity->guid);
+			$entity = [$entity->guid];
 		} else {
-			$entity = array((int) $entity);
+			$entity = [(int) $entity];
 		}
 		if ($value[0] == 'nymph_entity_reference') {
 			return in_array($value[1], $entity);
@@ -127,13 +127,13 @@ trait DriverTrait {
 		// Set up options and selectors.
 		$args = func_get_args();
 		if (!$args) {
-			$args = array(array());
+			$args = [[]];
 		}
 		if ((array) $args[0] === $args[0] && ((int) $args[1] === $args[1] || is_numeric($args[1]))) {
-			$args = array($args[0], array('&', 'guid' => (int) $args[1]));
+			$args = [$args[0], ['&', 'guid' => (int) $args[1]]];
 		}
 		$args[0]['limit'] = 1;
-		$entities = call_user_func_array(array($this, 'getEntities'), $args);
+		$entities = call_user_func_array([$this, 'getEntities'], $args);
 		if (!$entities) {
 			return null;
 		}
@@ -147,7 +147,7 @@ trait DriverTrait {
 			return;
 		}
 		// Now sort by children.
-		$new_array = array();
+		$new_array = [];
 		while ($array) {
 			// Look for entities ready to go in order.
 			$changed = false;
@@ -165,7 +165,7 @@ trait DriverTrait {
 					if ($pkey !== false) {
 						// And insert after the parent.
 						// This makes entities go to the end of the child list.
-						$ancestry = array($array[$key]->$parentProperty);
+						$ancestry = [$array[$key]->$parentProperty];
 						$new_key = $pkey;
 						while (
 								isset($new_array[$new_key + 1]) &&
@@ -179,7 +179,7 @@ trait DriverTrait {
 						$new_key += 1;
 						if (isset($new_array[$new_key])) {
 							// If it already exists, we have to splice it in.
-							array_splice($new_array, $new_key, 0, array($cur_entity));
+							array_splice($new_array, $new_key, 0, [$cur_entity]);
 							$new_array = array_values($new_array);
 						} else {
 							// Else just add it.
@@ -208,7 +208,7 @@ trait DriverTrait {
 			$this->sortProperty = $property;
 			$this->sortParent = $parentProperty;
 			$this->sortCaseSensitive = $caseSensitive;
-			\usort($array, array($this, 'sortProperty'));
+			\usort($array, [$this, 'sortProperty']);
 		}
 		if ($reverse) {
 			$array = array_reverse($array);
@@ -272,7 +272,7 @@ trait DriverTrait {
 					unset($this->entityCache[$key]);
 				}
 			}
-			$this->entityCache[$entity->guid] = array($class => (clone $entity));
+			$this->entityCache[$entity->guid] = [$class => (clone $entity)];
 		}
 		$this->entityCache[$entity->guid][$class]->clearCache();
 	}
@@ -283,7 +283,7 @@ trait DriverTrait {
 			$this->sortProperty = $property;
 			$this->sortParent = null;
 			$this->sortCaseSensitive = $caseSensitive;
-			\usort($array, array($this, 'sortProperty'));
+			\usort($array, [$this, 'sortProperty']);
 		}
 		if ($reverse) {
 			$array = array_reverse($array);

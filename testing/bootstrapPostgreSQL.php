@@ -7,7 +7,7 @@ R::undef('Nymph');
 
 include '../src/autoload.php';
 
-R::_('NymphConfig', array(), function(){
+R::_('NymphConfig', [], function(){
 	// Nymph's configuration.
 
 	$nymph_config = include(__DIR__.DIRECTORY_SEPARATOR.'../conf/defaults.php');
