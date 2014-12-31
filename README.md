@@ -19,7 +19,7 @@ bower install https://github.com/sciactive/nymph.git
 #### Nymph Query from Frontend
 
 ```js
-Nymph.getEntities({"class":"BlogPost"}, {"type":"&", "like":["title","%easy%"], "data":["deleted",false]}).then(function(entities){
+Nymph.getEntities({"class":"BlogPost"}, {"type":"&", "like":["title","%easy%"], "data":["archived",false]}).then(function(entities){
   console.log(entities);
 }, function(){
   alert("Error");
@@ -32,7 +32,7 @@ Nymph.getEntities({"class":"BlogPost"}, {"type":"&", "like":["title","%easy%"], 
 ```js
 $.ajax({
   "url": "titlesearch.php",
-  "data": {"title":"%not as easy%","deleted":"false"},
+  "data": {"title":"%not as easy%","archived":"false"},
   "dataType": "JSON",
   "success": function(entities){
     console.log(entities);
@@ -48,10 +48,10 @@ $.ajax({
 $mysqli = new mysqli();
 
 $title = $_GET['title'];
-$deleted = ($_GET['deleted'] == "true" ? 'TRUE' : 'FALSE');
-$entities = [];
-if ($stmt = $mysqli->prepare("SELECT * FROM BlogPosts WHERE title LIKE '?' AND deleted=?")) {
-  $stmt->bind_param("ss", $title, $deleted);
+$archived = ($_GET['archived'] == "true" ? 'TRUE' : 'FALSE');
+$entities = array();
+if ($stmt = $mysqli->prepare("SELECT * FROM BlogPosts WHERE title LIKE '?' AND archived=?")) {
+  $stmt->bind_param("ss", $title, $archived);
   $stmt->execute();
   $result = $stmt->get_result();
   while ($row = $result->fetch_assoc()) {
