@@ -1,6 +1,6 @@
 # <img alt="logo" src="https://raw.githubusercontent.com/sciactive/2be-extras/master/logo/product-icon-40-bw.png" align="top" /> Nymph - a PHP and JS ORM
 
-[![Build Status](https://img.shields.io/travis/sciactive/nymph/master.svg?style=flat)](http://travis-ci.org/sciactive/nymph) [![Latest Stable Version](https://img.shields.io/packagist/v/sciactive/nymph.svg?style=flat)](https://packagist.org/packages/sciactive/nymph) [![License](https://img.shields.io/packagist/l/sciactive/nymph.svg?style=flat)](https://packagist.org/packages/sciactive/nymph) [![Total Downloads](https://img.shields.io/packagist/dt/sciactive/nymph.svg?style=flat)](https://packagist.org/packages/sciactive/nymph) [![Open Issues](https://img.shields.io/github/issues/sciactive/nymph.svg?style=flat)](http://waffle.io/sciactive/nymph)
+[![Build Status](https://img.shields.io/travis/sciactive/nymph/master.svg?style=flat)](http://travis-ci.org/sciactive/nymph) [![Latest Stable Version](https://img.shields.io/packagist/v/sciactive/nymph.svg?style=flat)](https://packagist.org/packages/sciactive/nymph) [![License](https://img.shields.io/packagist/l/sciactive/nymph.svg?style=flat)](https://packagist.org/packages/sciactive/nymph) [![Total Downloads](https://img.shields.io/packagist/dt/sciactive/nymph.svg?style=flat)](https://packagist.org/packages/sciactive/nymph) [![Open Issues](https://img.shields.io/github/issues/sciactive/nymph.svg?style=flat)](https://github.com/sciactive/nymph/issues)
 
 Nymph is an ORM that is simple to use in both JavaScript and PHP.
 
