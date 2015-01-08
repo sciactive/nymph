@@ -123,6 +123,34 @@ trait DriverTrait {
 		return false;
 	}
 
+	/**
+	 * Make all selectors in the format:
+	 *
+	 * [0 => '&', 'crit' => [
+	 *   ['value']
+	 * ], 'crit2' => [
+	 *   ['var', 'value']
+	 * ]]
+	 *
+	 * @param array $selectors
+	 */
+	protected function formatSelectors(&$selectors) {
+		foreach ($selectors as &$cur_selector) {
+			foreach ($cur_selector as $key => &$value) {
+				if ($key === 0) {
+					continue;
+				}
+				if ((array) $value !== $value) {
+					$value = [[$value]];
+				} elseif ((array) $value[0] !== $value[0]) {
+					$value = [$value];
+				}
+			}
+			unset($value);
+		}
+		unset($cur_selector);
+	}
+
 	public function getEntity() {
 		// Set up options and selectors.
 		$args = func_get_args();

@@ -361,63 +361,20 @@ class PostgreSQLDriver implements DriverInterface {
 		return true;
 	}
 
-	public function getEntities() {
-		if (!$this->connected) {
-			throw new Exceptions\UnableToConnectException();
-		}
-		// Set up options and selectors.
-		$selectors = func_get_args();
-		if (!$selectors) {
-			$options = $selectors = [];
-		} else {
-			$options = $selectors[0];
-			unset($selectors[0]);
-		}
-		foreach ($selectors as $key => $selector) {
-			if (!$selector || (count($selector) === 1 && isset($selector[0]) && in_array($selector[0], ['&', '!&', '|', '!|']))) {
-				unset($selectors[$key]);
-				continue;
-			}
-			if (!isset($selector[0]) || !in_array($selector[0], ['&', '!&', '|', '!|'])) {
-				throw new Exceptions\InvalidParametersException('Invalid query selector passed: '.print_r($selector, true));
-			}
-		}
-
-		$entities = [];
-		$class = isset($options['class']) ? $options['class'] : Entity;
-		if (isset($options['etype'])) {
-			$etype_dirty = $options['etype'];
-			$etype = '_'.pg_escape_string($this->link, $etype_dirty);
-		} else {
-			$etype_dirty = $class::etype;
-			$etype = '_'.pg_escape_string($this->link, $etype_dirty);
-		}
+	/**
+	 * Generate the PostgreSQL query.
+	 * @param array $options The options array.
+	 * @param array $selectors The formatted selector array.
+	 * @param string $etype_dirty
+	 * @return string The SQL query.
+	 */
+	private function makeEntityQuery($options, $selectors, $etype_dirty) {
 		$sort = isset($options['sort']) ? $options['sort'] : 'cdate';
-		$count = $ocount = 0;
-
-		// Check if the requested entity is cached.
-		if ($this->config->cache['value'] && is_int($selectors[1]['guid'])) {
-			// Only safe to use the cache option with no other selectors than a GUID and tags.
-			if (
-					count($selectors) == 1 &&
-					$selectors[1][0] == '&' &&
-					(
-						(count($selectors[1]) == 2) ||
-						(count($selectors[1]) == 3 && isset($selectors[1]['tag']))
-					)
-				) {
-				$entity = $this->pull_cache($selectors[1]['guid'], $class);
-				if (isset($entity) && (!isset($selectors[1]['tag']) || $entity->hasTag($selectors[1]['tag']))) {
-					$entity->_nUseSkipAC = (bool) $options['skip_ac'];
-					return [$entity];
-				}
-			}
-		}
-
+		$etype = '_'.pg_escape_string($this->link, $etype_dirty);
 		$query_parts = [];
-		foreach ($selectors as &$cur_selector) {
+		foreach ($selectors as $cur_selector) {
 			$cur_selector_query = '';
-			foreach ($cur_selector as $key => &$value) {
+			foreach ($cur_selector as $key => $value) {
 				if ($key === 0) {
 					$type = $value;
 					$type_is_not = ($type == '!&' || $type == '!|');
@@ -426,11 +383,6 @@ class PostgreSQLDriver implements DriverInterface {
 				}
 				$clause_not = $key[0] === '!';
 				$cur_query = '';
-				if ((array) $value !== $value) {
-					$value = [[$value]];
-				} elseif ((array) $value[0] !== $value[0]) {
-					$value = [$value];
-				}
 				// Any options having to do with data only return if the entity has
 				// the specified variables.
 				foreach ($value as $cur_value) {
@@ -571,6 +523,9 @@ class PostgreSQLDriver implements DriverInterface {
 						case 'match':
 						case '!match':
 							if ($this->usePLPerl) {
+								$lastslashpos = strrpos($cur_value[1], '/');
+								$regex = substr($cur_value[1], 1, $lastslashpos - 1);
+								$mods = substr($cur_value[1], $lastslashpos + 1) ?: '';
 								if ($cur_value[0] == 'cdate') {
 									if ( $cur_query ) {
 										$cur_query .= $type_is_or ? ' OR ' : ' AND ';
@@ -587,9 +542,6 @@ class PostgreSQLDriver implements DriverInterface {
 									if ( $cur_query ) {
 										$cur_query .= ($type_is_or ? ' OR ' : ' AND ');
 									}
-									$lastslashpos = strrpos($cur_value[1], '/');
-									$regex = substr($cur_value[1], 1, $lastslashpos - 1);
-									$mods = substr($cur_value[1], $lastslashpos + 1) ?: '';
 									$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'e."guid" IN (SELECT "guid" FROM "'.$this->prefix.'data'.$etype.'" WHERE "name"=\''.pg_escape_string($this->link, $cur_value[0]).'\' AND "compare_string" IS NOT NULL AND '.$this->prefix.'match_perl("compare_string", \''.pg_escape_string($this->link, $regex).'\', \''.pg_escape_string($this->link, $mods).'\'))';
 								}
 							} else {
@@ -728,12 +680,10 @@ class PostgreSQLDriver implements DriverInterface {
 					$cur_selector_query .= $cur_query;
 				}
 			}
-			unset($value);
 			if ($cur_selector_query) {
 				$query_parts[] = $cur_selector_query;
 			}
 		}
-		unset($cur_selector);
 
 		switch ($sort) {
 			case 'guid':
@@ -752,7 +702,59 @@ class PostgreSQLDriver implements DriverInterface {
 		} else {
 			$query = "SELECT e.\"guid\", e.\"tags\", e.\"cdate\", e.\"mdate\", d.\"name\", d.\"value\" FROM \"{$this->prefix}entities{$etype}\" e LEFT JOIN \"{$this->prefix}data{$etype}\" d USING (\"guid\") ORDER BY ".(isset($options['reverse']) && $options['reverse'] ? $sort.' DESC' : $sort).";";
 		}
-		$result = $this->query($query, $etype_dirty);
+
+		return $query;
+	}
+
+	public function getEntities() {
+		if (!$this->connected) {
+			throw new Exceptions\UnableToConnectException();
+		}
+		// Set up options and selectors.
+		$selectors = func_get_args();
+		if (!$selectors) {
+			$options = $selectors = [];
+		} else {
+			$options = $selectors[0];
+			unset($selectors[0]);
+		}
+		foreach ($selectors as $key => $selector) {
+			if (!$selector || (count($selector) === 1 && isset($selector[0]) && in_array($selector[0], ['&', '!&', '|', '!|']))) {
+				unset($selectors[$key]);
+				continue;
+			}
+			if (!isset($selector[0]) || !in_array($selector[0], ['&', '!&', '|', '!|'])) {
+				throw new Exceptions\InvalidParametersException('Invalid query selector passed: '.print_r($selector, true));
+			}
+		}
+
+		$entities = [];
+		$class = isset($options['class']) ? $options['class'] : Entity;
+		$etype_dirty = isset($options['etype']) ? $options['etype'] : $class::etype;
+
+		$count = $ocount = 0;
+
+		// Check if the requested entity is cached.
+		if ($this->config->cache['value'] && is_int($selectors[1]['guid'])) {
+			// Only safe to use the cache option with no other selectors than a GUID and tags.
+			if (
+					count($selectors) == 1 &&
+					$selectors[1][0] == '&' &&
+					(
+						(count($selectors[1]) == 2) ||
+						(count($selectors[1]) == 3 && isset($selectors[1]['tag']))
+					)
+				) {
+				$entity = $this->pull_cache($selectors[1]['guid'], $class);
+				if (isset($entity) && (!isset($selectors[1]['tag']) || $entity->hasTag($selectors[1]['tag']))) {
+					$entity->_nUseSkipAC = (bool) $options['skip_ac'];
+					return [$entity];
+				}
+			}
+		}
+
+		$this->formatSelectors($selectors);
+		$result = $this->query($this->makeEntityQuery($options, $selectors, $etype_dirty), $etype_dirty);
 
 		$row = pg_fetch_row($result);
 		while ($row) {

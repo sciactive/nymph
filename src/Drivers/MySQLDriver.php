@@ -283,64 +283,21 @@ class MySQLDriver implements DriverInterface {
 		return true;
 	}
 
-	public function getEntities() {
-		if (!$this->connected) {
-			throw new Exceptions\UnableToConnectException();
-		}
-		// Set up options and selectors.
-		$selectors = func_get_args();
-		if (!$selectors) {
-			$options = $selectors = [];
-		} else {
-			$options = $selectors[0];
-			unset($selectors[0]);
-		}
-		foreach ($selectors as $key => $selector) {
-			if (!$selector || (count($selector) === 1 && isset($selector[0]) && in_array($selector[0], ['&', '!&', '|', '!|']))) {
-				unset($selectors[$key]);
-				continue;
-			}
-			if (!isset($selector[0]) || !in_array($selector[0], ['&', '!&', '|', '!|'])) {
-				throw new Exceptions\InvalidParametersException('Invalid query selector passed: '.print_r($selector, true));
-			}
-		}
-
-		$entities = [];
-		$class = isset($options['class']) ? $options['class'] : Entity;
-		if (isset($options['etype'])) {
-			$etype_dirty = $options['etype'];
-			$etype = '_'.mysqli_real_escape_string($this->link, $etype_dirty);
-		} else {
-			$etype_dirty = $class::etype;
-			$etype = '_'.mysqli_real_escape_string($this->link, $etype_dirty);
-		}
+	/**
+	 * Generate the MySQL query.
+	 * @param array $options The options array.
+	 * @param array $selectors The formatted selector array.
+	 * @param string $etype_dirty
+	 * @return string The SQL query.
+	 */
+	private function makeEntityQuery($options, $selectors, $etype_dirty) {
 		$sort = isset($options['sort']) ? $options['sort'] : 'cdate';
-		$count = $ocount = 0;
-
-		// Check if the requested entity is cached.
-		if ($this->config->cache['value'] && is_int($selectors[1]['guid'])) {
-			// Only safe to use the cache option with no other selectors than a GUID and tags.
-			if (
-					count($selectors) == 1 &&
-					$selectors[1][0] == '&' &&
-					(
-						(count($selectors[1]) == 2) ||
-						(count($selectors[1]) == 3 && isset($selectors[1]['tag']))
-					)
-				) {
-				$entity = $this->pull_cache($selectors[1]['guid'], $class);
-				if (isset($entity) && (!isset($selectors[1]['tag']) || $entity->hasTag($selectors[1]['tag']))) {
-					$entity->_nUseSkipAC = (bool) $options['skip_ac'];
-					return [$entity];
-				}
-			}
-		}
-
+		$etype = '_'.mysqli_real_escape_string($this->link, $etype_dirty);
 		$query_parts = [];
 		$data_aliases = [];
-		foreach ($selectors as &$cur_selector) {
+		foreach ($selectors as $cur_selector) {
 			$cur_selector_query = '';
-			foreach ($cur_selector as $key => &$value) {
+			foreach ($cur_selector as $key => $value) {
 				if ($key === 0) {
 					$type = $value;
 					$type_is_not = ($type == '!&' || $type == '!|');
@@ -349,11 +306,6 @@ class MySQLDriver implements DriverInterface {
 				}
 				$clause_not = $key[0] === '!';
 				$cur_query = '';
-				if ((array) $value !== $value) {
-					$value = [[$value]];
-				} elseif ((array) $value[0] !== $value[0]) {
-					$value = [$value];
-				}
 				// Any options having to do with data only return if the entity has
 				// the specified variables.
 				foreach ($value as $cur_value) {
@@ -629,12 +581,10 @@ class MySQLDriver implements DriverInterface {
 					$cur_selector_query .= $cur_query;
 				}
 			}
-			unset($value);
 			if ($cur_selector_query) {
 				$query_parts[] = $cur_selector_query;
 			}
 		}
-		unset($cur_selector);
 
 		switch ($sort) {
 			case 'guid':
@@ -662,7 +612,59 @@ class MySQLDriver implements DriverInterface {
 		} else {
 			$query = "SELECT e.`guid`, e.`tags`, e.`cdate`, e.`mdate`, d.`name`, d.`value` FROM `{$this->prefix}entities{$etype}` e LEFT JOIN `{$this->prefix}data{$etype}` d ON e.`guid`=d.`guid` ORDER BY ".(isset($options['reverse']) && $options['reverse'] ? $sort.' DESC' : $sort).";";
 		}
-		$result = $this->query($query, $etype_dirty);
+
+		return $query;
+	}
+
+	public function getEntities() {
+		if (!$this->connected) {
+			throw new Exceptions\UnableToConnectException();
+		}
+		// Set up options and selectors.
+		$selectors = func_get_args();
+		if (!$selectors) {
+			$options = $selectors = [];
+		} else {
+			$options = $selectors[0];
+			unset($selectors[0]);
+		}
+		foreach ($selectors as $key => $selector) {
+			if (!$selector || (count($selector) === 1 && isset($selector[0]) && in_array($selector[0], ['&', '!&', '|', '!|']))) {
+				unset($selectors[$key]);
+				continue;
+			}
+			if (!isset($selector[0]) || !in_array($selector[0], ['&', '!&', '|', '!|'])) {
+				throw new Exceptions\InvalidParametersException('Invalid query selector passed: '.print_r($selector, true));
+			}
+		}
+
+		$entities = [];
+		$class = isset($options['class']) ? $options['class'] : Entity;
+		$etype_dirty = isset($options['etype']) ? $options['etype'] : $class::etype;
+
+		$count = $ocount = 0;
+
+		// Check if the requested entity is cached.
+		if ($this->config->cache['value'] && is_int($selectors[1]['guid'])) {
+			// Only safe to use the cache option with no other selectors than a GUID and tags.
+			if (
+					count($selectors) == 1 &&
+					$selectors[1][0] == '&' &&
+					(
+						(count($selectors[1]) == 2) ||
+						(count($selectors[1]) == 3 && isset($selectors[1]['tag']))
+					)
+				) {
+				$entity = $this->pull_cache($selectors[1]['guid'], $class);
+				if (isset($entity) && (!isset($selectors[1]['tag']) || $entity->hasTag($selectors[1]['tag']))) {
+					$entity->_nUseSkipAC = (bool) $options['skip_ac'];
+					return [$entity];
+				}
+			}
+		}
+
+		$this->formatSelectors($selectors);
+		$result = $this->query($this->makeEntityQuery($options, $selectors, $etype_dirty), $etype_dirty);
 
 		$row = mysqli_fetch_row($result);
 		while ($row) {
