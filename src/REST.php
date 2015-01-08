@@ -86,8 +86,8 @@ class REST {
 		return true;
 	}
 
-	protected function PUT($action = '', $data = '') {
-		if (!in_array($action, ['entity', 'entities', 'uid'])) {
+	protected function POST($action = '', $data = '') {
+		if (!in_array($action, ['entity', 'entities', 'uid', 'method'])) {
 			return $this->httpError(400, "Bad Request");
 		}
 		ob_start();
@@ -123,29 +123,13 @@ class REST {
 					return $this->httpError(500, "Internal Server Error");
 				}
 			}
+			header("HTTP/1.1 201 Created", true, 201);
 			if ($action === 'entity') {
 				echo json_encode($created[0]);
 			} else {
 				echo json_encode($created);
 			}
-		} else {
-			$result = Nymph::newUID("$data");
-			if (empty($result)) {
-				return $this->httpError(500, "Internal Server Error");
-			}
-			echo $result;
-		}
-		header("HTTP/1.1 201 Created", true, 201);
-		ob_end_flush();
-		return true;
-	}
-
-	protected function POST($action = '', $data = '') {
-		if (!in_array($action, ['entity', 'entities', 'method'])) {
-			return $this->httpError(400, "Bad Request");
-		}
-		ob_start();
-		if ($action === 'method') {
+		} elseif ($action === 'method') {
 			$args = json_decode($data, true);
 			array_walk($args['params'], [$this, 'referenceToEntity']);
 			$entity = $this->loadEntity($args['entity']);
@@ -161,6 +145,34 @@ class REST {
 			} catch (\Exception $e) {
 				return $this->httpError(500, "Internal Server Error");
 			}
+			header("HTTP/1.1 200 OK", true, 200);
+		} else {
+			$result = Nymph::newUID("$data");
+			if (empty($result)) {
+				return $this->httpError(500, "Internal Server Error");
+			}
+			header("HTTP/1.1 201 Created", true, 201);
+			echo $result;
+		}
+		ob_end_flush();
+		return true;
+	}
+
+	protected function PUT($action = '', $data = '') {
+		if (!in_array($action, ['entity', 'entities', 'uid'])) {
+			return $this->httpError(400, "Bad Request");
+		}
+		ob_start();
+		if ($action === 'uid') {
+			$args = json_decode($data, true);
+			if (!isset($args['name']) || !isset($args['value']) || !is_string($args['name']) || !is_numeric($args['value'])) {
+				return $this->httpError(400, "Bad Request");
+			}
+			$result = Nymph::setUID($args['name'], (int)$args['value']);
+			if (!$result) {
+				return $this->httpError(500, "Internal Server Error");
+			}
+			echo json_encode($result);
 		} else {
 			$ents = json_decode($data, true);
 			if ($action === 'entity') {

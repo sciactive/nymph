@@ -1,5 +1,5 @@
 /*
-Nymph 1.1.0 nymph.io
+Nymph 1.2.0 nymph.io
 (C) 2014 Hunter Perrin
 license LGPL
 */
@@ -121,26 +121,23 @@ license LGPL
 
 	Nymph = {
 		// The current version of Nymph.
-		version: "1.1.0",
+		version: "1.2.0",
 
 		// === Class Variables ===
-
 		restURL: null,
 
 		// === Events ===
-
 		init: function(NymphOptions){
 			this.restURL = NymphOptions.restURL;
 			return this;
 		},
 
 		// === Methods ===
-
 		newUID: function(name){
 			var that = this;
 			return new Promise(function(resolve, reject){
 				postputdelAjax({
-					type: 'PUT',
+					type: 'POST',
 					url: that.restURL,
 					dataType: 'text',
 					data: {'action': 'uid', 'data': name},
@@ -153,7 +150,23 @@ license LGPL
 				});
 			});
 		},
-
+		setUID: function(name, value){
+			var that = this;
+			return new Promise(function(resolve, reject){
+				postputdelAjax({
+					type: 'PUT',
+					url: that.restURL,
+					dataType: 'json',
+					data: {'action': 'uid', 'data': JSON.stringify({"name":name,"value":value})},
+					success: function(data) {
+						resolve(data);
+					},
+					error: function(errObj){
+						reject(errObj);
+					}
+				});
+			});
+		},
 		getUID: function(name){
 			var that = this;
 			return new Promise(function(resolve, reject){
@@ -170,7 +183,6 @@ license LGPL
 				});
 			});
 		},
-
 		deleteUID: function(name){
 			var that = this;
 			return new Promise(function(resolve, reject){
@@ -187,12 +199,11 @@ license LGPL
 				});
 			});
 		},
-
 		saveEntity: function(entity){
 			var that = this;
 			return new Promise(function(resolve, reject){
 				postputdelAjax({
-					type: entity.guid === null ? 'PUT' : 'POST',
+					type: entity.guid === null ? 'POST' : 'PUT',
 					url: that.restURL,
 					dataType: 'json',
 					data: {'action': 'entity', 'data': JSON.stringify(entity)},
@@ -209,7 +220,6 @@ license LGPL
 				});
 			});
 		},
-
 		getEntity: function(){
 			var that = this, args = Array.prototype.slice.call(arguments);
 			return new Promise(function(resolve, reject){
@@ -224,7 +234,6 @@ license LGPL
 				});
 			});
 		},
-
 		getEntityData: function(){
 			var that = this,
 				args = Array.prototype.slice.call(arguments);
@@ -246,7 +255,6 @@ license LGPL
 				});
 			});
 		},
-
 		getEntities: function(){
 			var that = this,
 				args = Array.prototype.slice.call(arguments);
@@ -264,7 +272,6 @@ license LGPL
 				});
 			});
 		},
-
 		initEntity: function(entityJSON){
 			var entity;
 			if (typeof entityJSON.class === "string" && typeof window[entityJSON.class] !== "undefined" && typeof window[entityJSON.class].prototype.init === "function") {
@@ -276,7 +283,6 @@ license LGPL
 			}
 			return entity.init(entityJSON);
 		},
-
 		deleteEntity: function(entity, plural){
 			var that = this, cur;
 			if (plural) {
@@ -305,11 +311,9 @@ license LGPL
 				});
 			});
 		},
-
 		deleteEntities: function(entities){
 			return this.deleteEntity(entities, true);
 		},
-
 
 		serverCall: function(entity, method, params) {
 			var that = this;
@@ -328,7 +332,6 @@ license LGPL
 				});
 			});
 		},
-
 
 		hsort: function(array, property, parentProperty, caseSensitive, reverse) {
 			// First sort by the requested property.

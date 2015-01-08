@@ -110,6 +110,18 @@ Promise.all([promise1, promise2]).then(function(entities){
 }, function(errObj){
 	$("#result").html(errObj.textStatus);
 });</pre>
+		<h4>Set UID value</h4>
+		<pre>Nymph.getUID('employee').then(function(uidValue){
+	if (confirm("Decrement UID employee to "+(uidValue-1))) {
+		Nymph.setUID('employee', uidValue-1).then(function(success){
+			$("#result").html(success);
+		}, function(errObj){
+			$("#result").html(errObj.textStatus);
+		});
+	}
+}, function(errObj){
+	$("#result").html(errObj.textStatus);
+});</pre>
 		<h4>Delete UID</h4>
 		<pre>Nymph.deleteUID('employee').then(function(data){
 	$("#result").html(data);
@@ -226,7 +238,7 @@ if (!(entity.tags&lt;["test"]||entity.tags&gt;["test"])) {
 	$("#result").html(errObj.textStatus);
 });</pre>
 		<h4>Change an entity</h4>
-		<pre>Nymph.getEntity({"class":"Employee"}, {"type":"&amp;","gt":["salary",1]}).then(function(employee){
+		<pre>Nymph.getEntity({"class":"Employee"}, {"type":"&amp;","strict":["current",true]}).then(function(employee){
 	$("#result").html(JSON.stringify(employee)+'&lt;br&gt;&lt;br&gt;');
 	delete employee.data.salary;
 	employee.set("current", false);
