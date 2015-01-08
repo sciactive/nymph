@@ -126,11 +126,21 @@ trait DriverTrait {
 	/**
 	 * Make all selectors in the format:
 	 *
-	 * [0 => '&', 'crit' => [
-	 *   ['value']
-	 * ], 'crit2' => [
-	 *   ['var', 'value']
-	 * ]]
+	 * [
+	 *   0 => '&',
+	 *   'crit' => [
+	 *     ['value']
+	 *   ],
+	 *   'crit2' => [
+	 *     ['var', 'value']
+	 *   ],
+	 *   [
+	 *     0 => '|',
+	 *     'crit' => [
+	 *       ['value2']
+	 *     ]
+	 *   ]
+	 * ]
 	 *
 	 * @param array $selectors
 	 */
@@ -140,10 +150,16 @@ trait DriverTrait {
 				if ($key === 0) {
 					continue;
 				}
-				if ((array) $value !== $value) {
-					$value = [[$value]];
-				} elseif ((array) $value[0] !== $value[0]) {
-					$value = [$value];
+				if (is_numeric($key)) {
+					$tmpArr = [$value];
+					$this->formatSelectors($tmpArr);
+					$value = $tmpArr[0];
+				} else {
+					if ((array) $value !== $value) {
+						$value = [[$value]];
+					} elseif ((array) $value[0] !== $value[0]) {
+						$value = [$value];
+					}
 				}
 			}
 			unset($value);

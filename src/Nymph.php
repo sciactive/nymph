@@ -205,10 +205,10 @@ class Nymph {
 	 * - !& - (not and) All values in the selector must be false.
 	 * - !| - (not or) At least one value in the selector must be false.
 	 *
-	 * The rest of the entries in the selector are associative entries called
-	 * selector clauses, which can be any of the following (in the form
-	 * $selector['name'] = value, or
-	 * $selector['name'] = [value1, value2,...]:
+	 * The rest of the entries in the selector are either more selectors or
+	 * associative entries called selector clauses, which can be any of the
+	 * following (in the form $selector['name'] = value, or
+	 * $selector['name'] = [value1, value2,...]):
 	 *
 	 * - guid - A GUID. True if the entity's GUID is equal.
 	 * - tag - A tag. True if the entity has the tag.
@@ -248,43 +248,55 @@ class Nymph {
 	 * - spouse exists and is not null.
 	 * - gender is male and lname is Smith.
 	 * - warnings is not an integer 0.
+	 * - It has 'level1' and 'level2' tags, or it has 'access1' and 'access2' tags.
 	 * - It has either 'employee' or 'manager' tag.
 	 * - name is either Clark, James, Chris, Christopher, Jake, or Jacob.
 	 * - If age is 22 or more, then pay is not greater than 8.
 	 *
 	 * <pre>
 	 * $entities = \Nymph\Nymph::getEntities(
-	 *	['reverse' => true, 'limit' => 2],
-	 *	[
-	 *		'&', // all must be true
-	 *		'tag' => 'person',
-	 *		'isset' => 'spouse',
-	 *		'data' => [
-	 *			['gender', 'male'],
-	 *			['lname', 'Smith']
-	 *		],
-	 *		'!strict' => ['warnings', 0]
-	 *	],
-	 *	[
-	 *		'|', // at least one must be true
-	 *		'tag' => ['employee', 'manager']
-	 *	],
-	 *	[
-	 *		'|',
-	 *		'data' => [
-	 *			['name', 'Clark'],
-	 *			['name', 'James']
-	 *		],
-	 *		'pmatch' => [
-	 *			['name', 'Chris(topher)?'],
-	 *			['name', 'Ja(ke|cob)']
-	 *		]
-	 *	],
-	 *	[
-	 *		'!|', // at least one must be false
-	 *		'gte' => ['age', 22],
-	 *		'gt' => ['pay', 8]
-	 *	]
+	 *   ['reverse' => true, 'limit' => 2],
+	 *   [
+	 *     '&', // all must be true
+	 *     'tag' => 'person',
+	 *     'isset' => 'spouse',
+	 *     'data' => [
+	 *       ['gender', 'male'],
+	 *       ['lname', 'Smith']
+	 *     ],
+	 *	   '!strict' => ['warnings', 0]
+	 *   ],
+	 *   [
+	 *     '|', // at least one of the selectors in this must evaluate to true
+	 *     [
+	 *       '&',
+	 *       'tag' => ['level1', 'level2']
+	 *     ],
+	 *     [
+	 *       '&',
+	 *       'tag' => ['access1', 'access2']
+	 *     ]
+	 *   ],
+	 *   [
+	 *     '|', // at least one must be true
+	 *     'tag' => ['employee', 'manager']
+	 *   ],
+	 *   [
+	 *     '|',
+	 *     'data' => [
+	 *       ['name', 'Clark'],
+	 *       ['name', 'James']
+	 *     ],
+	 *     'pmatch' => [
+	 *       ['name', 'Chris(topher)?'],
+	 *       ['name', 'Ja(ke|cob)']
+	 *     ]
+	 *   ],
+	 *   [
+	 *     '!|', // at least one must be false
+	 *     'gte' => ['age', 22],
+	 *     'gt' => ['pay', 8]
+	 *   ]
 	 * );
 	 * </pre>
 	 *

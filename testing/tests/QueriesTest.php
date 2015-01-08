@@ -445,7 +445,6 @@ This one's zip code is 92064.";
 	}
 
 	/**
-	 * @expectedException PHPUnit_Framework_Error_Notice
 	 * @depends testCreateEntity
 	 */
 	public function testNotDataInclusive($arr) {
@@ -546,7 +545,6 @@ This one's zip code is 92064.";
 	}
 
 	/**
-	 * @expectedException PHPUnit_Framework_Error_Notice
 	 * @depends testCreateEntity
 	 */
 	public function testNotArrayValue($arr) {
@@ -738,7 +736,6 @@ This one's zip code is 92064.";
 	}
 
 	/**
-	 * @expectedException PHPUnit_Framework_Error_Notice
 	 * @depends testCreateEntity
 	 */
 	public function testNotInequality($arr) {
@@ -963,6 +960,144 @@ This one's zip code is 92064.";
 				]
 			);
 		$this->assertTrue($testEntity->inArray($resultEntity));
+	}
+
+	/**
+	 * @depends testCreateEntity
+	 */
+	public function testDeepSelector($arr) {
+		$testEntity = $arr['entity'];
+
+		// Testing deep selectors...
+		$resultEntity = Nymph::getEntities(
+				['class' => 'TestModel'],
+				['&',
+					'!ref' => [
+						['ref_array', $arr['refGuid'] + 1],
+						['ref_array', $arr['refGuid'] + 2]
+					],
+					'!lte' => ['number', 29.99]
+				],
+				['&',
+					['|',
+						'!lte' => [
+							['number', 29.99],
+							['number', 30]
+						]
+					],
+					['!&',
+						'!strict' => ['string', 'test'],
+						'!array' => [
+							['array', 'full'],
+							['array', 'of'],
+							['array', 'values'],
+							['array', 500]
+						]
+					],
+					['!|',
+						'!strict' => ['string', 'test'],
+						'array' => [
+							['array', 'full'],
+							['array', 'of'],
+							['array', 'values'],
+							['array', 500]
+						]
+					]
+				]
+			);
+		$this->assertTrue($testEntity->inArray($resultEntity));
+
+		$resultEntity2 = Nymph::getEntities(
+				['class' => 'TestModel'],
+				['&',
+					'!ref' => [
+						['ref_array', $arr['refGuid'] + 1],
+						['ref_array', $arr['refGuid'] + 2]
+					],
+					'!lte' => ['number', 29.99]
+				],
+				['|',
+					['&',
+						'!lte' => [
+							['number', 29.99],
+							['number', 30]
+						]
+					],
+					['!&',
+						'!strict' => ['string', 'test'],
+						'!array' => [
+							['array', 'full'],
+							['array', 'of'],
+							['array', 'values'],
+							['array', 500]
+						]
+					],
+					['&',
+						'!strict' => ['string', 'test'],
+						'array' => [
+							['array', 'full'],
+							['array', 'of'],
+							['array', 'values'],
+							['array', 500]
+						]
+					]
+				]
+			);
+		$this->assertTrue($testEntity->inArray($resultEntity2));
+
+		$resultEntity3 = Nymph::getEntities(
+				['class' => 'TestModel'],
+				['|',
+					['&',
+						'!ref' => ['ref_array', $arr['refGuid'] + 2],
+						'!lte' => ['number', 29.99]
+					],
+					['&',
+						'gte' => ['number', 16000]
+					]
+				]
+			);
+		$this->assertTrue($testEntity->inArray($resultEntity3));
+
+		$resultEntity4 = Nymph::getEntities(
+				['class' => 'TestModel'],
+				['|',
+					['&',
+						'!ref' => ['ref_array', $arr['refGuid'] + 2],
+						'!lte' => ['number', 29.99]
+					],
+					['&',
+						['&',
+							['&',
+								'gte' => ['number', 16000]
+							]
+						]
+					]
+				]
+			);
+		$this->assertTrue($testEntity->inArray($resultEntity4));
+	}
+
+	/**
+	 * @depends testCreateEntity
+	 */
+	public function testWrongDeepSelector($arr) {
+		$testEntity = $arr['entity'];
+
+		// Testing wrong deep selectors...
+		$resultEntity = Nymph::getEntities(
+				['class' => 'TestModel'],
+				['&',
+					['&',
+						'!ref' => ['ref_array', $arr['refGuid'] + 2],
+						'!lte' => ['number', 29.99]
+					],
+					['&',
+						'gte' => ['number', 16000]
+					]
+				]
+			);
+		$this->assertFalse($testEntity->inArray($resultEntity));
 	}
 
 	/**

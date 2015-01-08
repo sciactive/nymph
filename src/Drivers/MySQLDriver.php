@@ -288,13 +288,14 @@ class MySQLDriver implements DriverInterface {
 	 * @param array $options The options array.
 	 * @param array $selectors The formatted selector array.
 	 * @param string $etype_dirty
+	 * @param bool $subquery Whether only a subquery should be returned.
+	 * @param array $data_aliases The data alias array to use for subqueries.
 	 * @return string The SQL query.
 	 */
-	private function makeEntityQuery($options, $selectors, $etype_dirty) {
+	private function makeEntityQuery($options, $selectors, $etype_dirty, $subquery = false, &$data_aliases = []) {
 		$sort = isset($options['sort']) ? $options['sort'] : 'cdate';
 		$etype = '_'.mysqli_real_escape_string($this->link, $etype_dirty);
 		$query_parts = [];
-		$data_aliases = [];
 		foreach ($selectors as $cur_selector) {
 			$cur_selector_query = '';
 			foreach ($cur_selector as $key => $value) {
@@ -304,274 +305,281 @@ class MySQLDriver implements DriverInterface {
 					$type_is_or = ($type == '|' || $type == '!|');
 					continue;
 				}
-				$clause_not = $key[0] === '!';
 				$cur_query = '';
-				// Any options having to do with data only return if the entity has
-				// the specified variables.
-				foreach ($value as $cur_value) {
-					switch ($key) {
-						case 'guid':
-						case '!guid':
-							foreach ($cur_value as $cur_guid) {
-								if ( $cur_query ) {
-									$cur_query .= $type_is_or ? ' OR ' : ' AND ';
-								}
-								$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'e.`guid`=\''.(int) $cur_guid.'\'';
-							}
-							break;
-						case 'tag':
-						case '!tag':
-							foreach ($cur_value as $cur_tag) {
-								if ( $cur_query ) {
-									$cur_query .= $type_is_or ? ' OR ' : ' AND ';
-								}
-								$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'LOCATE(\','.mysqli_real_escape_string($this->link, $cur_tag).',\', e.`tags`)';
-							}
-							break;
-						case 'isset':
-						case '!isset':
-							foreach ($cur_value as $cur_var) {
-								if ( $cur_query ) {
-									$cur_query .= $type_is_or ? ' OR ' : ' AND ';
-								}
-								$cur_query .= '('.(($type_is_not xor $clause_not) ? 'NOT ' : '' ).'LOCATE(\','.mysqli_real_escape_string($this->link, $cur_var).',\', e.`varlist`)';
-								if ($type_is_not xor $clause_not) {
-									$alias = $this->addDataAlias($data_aliases);
-									$cur_query .= ' OR (e.`guid`='.$alias.'.`guid` AND '.$alias.'.`name`=\''.mysqli_real_escape_string($this->link, $cur_var).'\' AND '.$alias.'.`value`=\'N;\')';
-								}
-								$cur_query .= ')';
-							}
-							break;
-						case 'ref':
-						case '!ref':
-							$guids = [];
-							if ((array) $cur_value[1] === $cur_value[1]) {
-								foreach ($cur_value[1] as $cur_entity) {
-									if ((object) $cur_entity === $cur_entity) {
-										$guids[] = (int) $cur_entity->guid;
-									} elseif ((array) $cur_entity === $cur_entity) {
-										$guids[] = (int) $cur_entity['guid'];
-									} else {
-										$guids[] = (int) $cur_entity;
+				if (is_numeric($key)) {
+					if ( $cur_query ) {
+						$cur_query .= $type_is_or ? ' OR ' : ' AND ';
+					}
+					$cur_query .= $this->makeEntityQuery($options, [$value], $etype_dirty, true, $data_aliases);
+				} else {
+					$clause_not = $key[0] === '!';
+					// Any options having to do with data only return if the
+					// entity has the specified variables.
+					foreach ($value as $cur_value) {
+						switch ($key) {
+							case 'guid':
+							case '!guid':
+								foreach ($cur_value as $cur_guid) {
+									if ( $cur_query ) {
+										$cur_query .= $type_is_or ? ' OR ' : ' AND ';
 									}
+									$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'e.`guid`=\''.(int) $cur_guid.'\'';
 								}
-							} elseif ((object) $cur_value[1] === $cur_value[1]) {
-								$guids[] = (int) $cur_value[1]->guid;
-							} elseif ((array) $cur_value[1] === $cur_value[1]) {
-								$guids[] = (int) $cur_value[1]['guid'];
-							} else {
-								$guids[] = (int) $cur_value[1];
-							}
-							foreach ($guids as $cur_qguid) {
-								if ( $cur_query ) {
-									$cur_query .= $type_is_or ? ' OR ' : ' AND ';
-								}
-								$alias = $this->addDataAlias($data_aliases);
-								$cur_query .= '('.(($type_is_not xor $clause_not) ? 'NOT LOCATE(\','.mysqli_real_escape_string($this->link, $cur_value[0]).',\', e.`varlist`) OR ' : '' ).'(e.`guid`='.$alias.'.`guid` AND '.$alias.'.`name`=\''.mysqli_real_escape_string($this->link, $cur_value[0]).'\' AND '.(($type_is_not xor $clause_not) ? 'NOT ' : '' ).'LOCATE(\','.mysqli_real_escape_string($this->link, $cur_qguid).',\', '.$alias.'.`references`)))';
-							}
-							break;
-						case 'strict':
-						case '!strict':
-							if ($cur_value[0] == 'cdate') {
-								if ( $cur_query ) {
-									$cur_query .= $type_is_or ? ' OR ' : ' AND ';
-								}
-								$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'e.`cdate`='.((float) $cur_value[1]);
 								break;
-							} elseif ($cur_value[0] == 'mdate') {
-								if ( $cur_query ) {
-									$cur_query .= $type_is_or ? ' OR ' : ' AND ';
+							case 'tag':
+							case '!tag':
+								foreach ($cur_value as $cur_tag) {
+									if ( $cur_query ) {
+										$cur_query .= $type_is_or ? ' OR ' : ' AND ';
+									}
+									$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'LOCATE(\','.mysqli_real_escape_string($this->link, $cur_tag).',\', e.`tags`)';
 								}
-								$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'e.`mdate`='.((float) $cur_value[1]);
 								break;
-							} else {
-								if ( $cur_query ) {
-									$cur_query .= ($type_is_or ? ' OR ' : ' AND ');
+							case 'isset':
+							case '!isset':
+								foreach ($cur_value as $cur_var) {
+									if ( $cur_query ) {
+										$cur_query .= $type_is_or ? ' OR ' : ' AND ';
+									}
+									$cur_query .= '('.(($type_is_not xor $clause_not) ? 'NOT ' : '' ).'LOCATE(\','.mysqli_real_escape_string($this->link, $cur_var).',\', e.`varlist`)';
+									if ($type_is_not xor $clause_not) {
+										$alias = $this->addDataAlias($data_aliases);
+										$cur_query .= ' OR (e.`guid`='.$alias.'.`guid` AND '.$alias.'.`name`=\''.mysqli_real_escape_string($this->link, $cur_var).'\' AND '.$alias.'.`value`=\'N;\')';
+									}
+									$cur_query .= ')';
 								}
-								if (is_callable([$cur_value[1], 'toReference'])) {
-									$svalue = serialize($cur_value[1]->toReference());
+								break;
+							case 'ref':
+							case '!ref':
+								$guids = [];
+								if ((array) $cur_value[1] === $cur_value[1]) {
+									foreach ($cur_value[1] as $cur_entity) {
+										if ((object) $cur_entity === $cur_entity) {
+											$guids[] = (int) $cur_entity->guid;
+										} elseif ((array) $cur_entity === $cur_entity) {
+											$guids[] = (int) $cur_entity['guid'];
+										} else {
+											$guids[] = (int) $cur_entity;
+										}
+									}
+								} elseif ((object) $cur_value[1] === $cur_value[1]) {
+									$guids[] = (int) $cur_value[1]->guid;
+								} elseif ((array) $cur_value[1] === $cur_value[1]) {
+									$guids[] = (int) $cur_value[1]['guid'];
 								} else {
-									$svalue = serialize($cur_value[1]);
+									$guids[] = (int) $cur_value[1];
 								}
-								$alias = $this->addDataAlias($data_aliases);
-								$cur_query .= '('.(($type_is_not xor $clause_not) ? 'NOT LOCATE(\','.mysqli_real_escape_string($this->link, $cur_value[0]).',\', e.`varlist`) OR ' : '' ).'(e.`guid`='.$alias.'.`guid` AND '.$alias.'.`name`=\''.mysqli_real_escape_string($this->link, $cur_value[0]).'\' AND '.(($type_is_not xor $clause_not) ? 'NOT ' : '' ).$alias.'.`value`=\''.mysqli_real_escape_string($this->link, $svalue).'\'))';
-							}
-							break;
-						case 'like':
-						case '!like':
-							if ($cur_value[0] == 'cdate') {
-								if ( $cur_query ) {
-									$cur_query .= $type_is_or ? ' OR ' : ' AND ';
+								foreach ($guids as $cur_qguid) {
+									if ( $cur_query ) {
+										$cur_query .= $type_is_or ? ' OR ' : ' AND ';
+									}
+									$alias = $this->addDataAlias($data_aliases);
+									$cur_query .= '('.(($type_is_not xor $clause_not) ? 'NOT LOCATE(\','.mysqli_real_escape_string($this->link, $cur_value[0]).',\', e.`varlist`) OR ' : '' ).'(e.`guid`='.$alias.'.`guid` AND '.$alias.'.`name`=\''.mysqli_real_escape_string($this->link, $cur_value[0]).'\' AND '.(($type_is_not xor $clause_not) ? 'NOT ' : '' ).'LOCATE(\','.mysqli_real_escape_string($this->link, $cur_qguid).',\', '.$alias.'.`references`)))';
 								}
-								$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'(e.`cdate` LIKE \''.mysqli_real_escape_string($this->link, $cur_value[1]).'\')';
 								break;
-							} elseif ($cur_value[0] == 'mdate') {
-								if ( $cur_query ) {
-									$cur_query .= $type_is_or ? ' OR ' : ' AND ';
+							case 'strict':
+							case '!strict':
+								if ($cur_value[0] == 'cdate') {
+									if ( $cur_query ) {
+										$cur_query .= $type_is_or ? ' OR ' : ' AND ';
+									}
+									$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'e.`cdate`='.((float) $cur_value[1]);
+									break;
+								} elseif ($cur_value[0] == 'mdate') {
+									if ( $cur_query ) {
+										$cur_query .= $type_is_or ? ' OR ' : ' AND ';
+									}
+									$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'e.`mdate`='.((float) $cur_value[1]);
+									break;
+								} else {
+									if ( $cur_query ) {
+										$cur_query .= ($type_is_or ? ' OR ' : ' AND ');
+									}
+									if (is_callable([$cur_value[1], 'toReference'])) {
+										$svalue = serialize($cur_value[1]->toReference());
+									} else {
+										$svalue = serialize($cur_value[1]);
+									}
+									$alias = $this->addDataAlias($data_aliases);
+									$cur_query .= '('.(($type_is_not xor $clause_not) ? 'NOT LOCATE(\','.mysqli_real_escape_string($this->link, $cur_value[0]).',\', e.`varlist`) OR ' : '' ).'(e.`guid`='.$alias.'.`guid` AND '.$alias.'.`name`=\''.mysqli_real_escape_string($this->link, $cur_value[0]).'\' AND '.(($type_is_not xor $clause_not) ? 'NOT ' : '' ).$alias.'.`value`=\''.mysqli_real_escape_string($this->link, $svalue).'\'))';
 								}
-								$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'(e.`mdate` LIKE \''.mysqli_real_escape_string($this->link, $cur_value[1]).'\')';
 								break;
-							} else {
-								if ( $cur_query ) {
-									$cur_query .= ($type_is_or ? ' OR ' : ' AND ');
+							case 'like':
+							case '!like':
+								if ($cur_value[0] == 'cdate') {
+									if ( $cur_query ) {
+										$cur_query .= $type_is_or ? ' OR ' : ' AND ';
+									}
+									$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'(e.`cdate` LIKE \''.mysqli_real_escape_string($this->link, $cur_value[1]).'\')';
+									break;
+								} elseif ($cur_value[0] == 'mdate') {
+									if ( $cur_query ) {
+										$cur_query .= $type_is_or ? ' OR ' : ' AND ';
+									}
+									$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'(e.`mdate` LIKE \''.mysqli_real_escape_string($this->link, $cur_value[1]).'\')';
+									break;
+								} else {
+									if ( $cur_query ) {
+										$cur_query .= ($type_is_or ? ' OR ' : ' AND ');
+									}
+									$alias = $this->addDataAlias($data_aliases);
+									$cur_query .= '('.(($type_is_not xor $clause_not) ? 'NOT LOCATE(\','.mysqli_real_escape_string($this->link, $cur_value[0]).',\', e.`varlist`) OR ' : '' ).'(e.`guid`='.$alias.'.`guid` AND '.$alias.'.`name`=\''.mysqli_real_escape_string($this->link, $cur_value[0]).'\' AND '.(($type_is_not xor $clause_not) ? 'NOT ' : '' ).$alias.'.`compare_string` LIKE \''.mysqli_real_escape_string($this->link, $cur_value[1]).'\'))';
 								}
-								$alias = $this->addDataAlias($data_aliases);
-								$cur_query .= '('.(($type_is_not xor $clause_not) ? 'NOT LOCATE(\','.mysqli_real_escape_string($this->link, $cur_value[0]).',\', e.`varlist`) OR ' : '' ).'(e.`guid`='.$alias.'.`guid` AND '.$alias.'.`name`=\''.mysqli_real_escape_string($this->link, $cur_value[0]).'\' AND '.(($type_is_not xor $clause_not) ? 'NOT ' : '' ).$alias.'.`compare_string` LIKE \''.mysqli_real_escape_string($this->link, $cur_value[1]).'\'))';
-							}
-							break;
-						case 'pmatch':
-						case '!pmatch':
-							if ($cur_value[0] == 'cdate') {
-								if ( $cur_query ) {
-									$cur_query .= $type_is_or ? ' OR ' : ' AND ';
-								}
-								$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'(e.`cdate` REGEXP \''.mysqli_real_escape_string($this->link, $cur_value[1]).'\')';
 								break;
-							} elseif ($cur_value[0] == 'mdate') {
-								if ( $cur_query ) {
-									$cur_query .= $type_is_or ? ' OR ' : ' AND ';
+							case 'pmatch':
+							case '!pmatch':
+								if ($cur_value[0] == 'cdate') {
+									if ( $cur_query ) {
+										$cur_query .= $type_is_or ? ' OR ' : ' AND ';
+									}
+									$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'(e.`cdate` REGEXP \''.mysqli_real_escape_string($this->link, $cur_value[1]).'\')';
+									break;
+								} elseif ($cur_value[0] == 'mdate') {
+									if ( $cur_query ) {
+										$cur_query .= $type_is_or ? ' OR ' : ' AND ';
+									}
+									$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'(e.`mdate` REGEXP \''.mysqli_real_escape_string($this->link, $cur_value[1]).'\')';
+									break;
+								} else {
+									if ( $cur_query ) {
+										$cur_query .= ($type_is_or ? ' OR ' : ' AND ');
+									}
+									$alias = $this->addDataAlias($data_aliases);
+									$cur_query .= '('.(($type_is_not xor $clause_not) ? 'NOT LOCATE(\','.mysqli_real_escape_string($this->link, $cur_value[0]).',\', e.`varlist`) OR ' : '' ).'(e.`guid`='.$alias.'.`guid` AND '.$alias.'.`name`=\''.mysqli_real_escape_string($this->link, $cur_value[0]).'\' AND '.(($type_is_not xor $clause_not) ? 'NOT ' : '' ).$alias.'.`compare_string` REGEXP \''.mysqli_real_escape_string($this->link, $cur_value[1]).'\'))';
 								}
-								$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'(e.`mdate` REGEXP \''.mysqli_real_escape_string($this->link, $cur_value[1]).'\')';
 								break;
-							} else {
-								if ( $cur_query ) {
-									$cur_query .= ($type_is_or ? ' OR ' : ' AND ');
+							case 'match':
+							case '!match':
+								if (!($type_is_not xor $clause_not)) {
+									if ( $cur_query ) {
+										$cur_query .= $type_is_or ? ' OR ' : ' AND ';
+									}
+									$cur_query .= 'LOCATE(\','.mysqli_real_escape_string($this->link, $cur_value[0]).',\', e.`varlist`)';
 								}
-								$alias = $this->addDataAlias($data_aliases);
-								$cur_query .= '('.(($type_is_not xor $clause_not) ? 'NOT LOCATE(\','.mysqli_real_escape_string($this->link, $cur_value[0]).',\', e.`varlist`) OR ' : '' ).'(e.`guid`='.$alias.'.`guid` AND '.$alias.'.`name`=\''.mysqli_real_escape_string($this->link, $cur_value[0]).'\' AND '.(($type_is_not xor $clause_not) ? 'NOT ' : '' ).$alias.'.`compare_string` REGEXP \''.mysqli_real_escape_string($this->link, $cur_value[1]).'\'))';
-							}
-							break;
-						case 'match':
-						case '!match':
-							if (!($type_is_not xor $clause_not)) {
-								if ( $cur_query ) {
-									$cur_query .= $type_is_or ? ' OR ' : ' AND ';
-								}
-								$cur_query .= 'LOCATE(\','.mysqli_real_escape_string($this->link, $cur_value[0]).',\', e.`varlist`)';
-							}
-							break;
-						// Cases after this point contains special values where
-						// it can be solved by the query, but if those values
-						// don't match, just check the variable exists.
-						case 'data':
-						case '!data':
-							if ($cur_value[0] == 'cdate') {
-								if ( $cur_query ) {
-									$cur_query .= $type_is_or ? ' OR ' : ' AND ';
-								}
-								$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'e."cdate"='.((float) $cur_value[1]);
 								break;
-							} elseif ($cur_value[0] == 'mdate') {
-								if ( $cur_query ) {
-									$cur_query .= $type_is_or ? ' OR ' : ' AND ';
+							// Cases after this point contains special values where
+							// it can be solved by the query, but if those values
+							// don't match, just check the variable exists.
+							case 'data':
+							case '!data':
+								if ($cur_value[0] == 'cdate') {
+									if ( $cur_query ) {
+										$cur_query .= $type_is_or ? ' OR ' : ' AND ';
+									}
+									$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'e."cdate"='.((float) $cur_value[1]);
+									break;
+								} elseif ($cur_value[0] == 'mdate') {
+									if ( $cur_query ) {
+										$cur_query .= $type_is_or ? ' OR ' : ' AND ';
+									}
+									$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'e."mdate"='.((float) $cur_value[1]);
+									break;
+								} elseif ($cur_value[1] === true || $cur_value[1] === false) {
+									if ( $cur_query ) {
+										$cur_query .= ($type_is_or ? ' OR ' : ' AND ');
+									}
+									$alias = $this->addDataAlias($data_aliases);
+									$cur_query .= '('.(($type_is_not xor $clause_not) ? 'NOT LOCATE(\','.mysqli_real_escape_string($this->link, $cur_value[0]).',\', e.`varlist`) OR ' : '' ).'(e.`guid`='.$alias.'.`guid` AND '.$alias.'.`name`=\''.mysqli_real_escape_string($this->link, $cur_value[0]).'\' AND '.(($type_is_not xor $clause_not) ? 'NOT ' : '' ).$alias.'.`compare_true`='.($cur_value[1] ? 'TRUE' : 'FALSE').'))';
+									break;
+								} elseif ($cur_value[1] === 1) {
+									if ( $cur_query ) {
+										$cur_query .= ($type_is_or ? ' OR ' : ' AND ');
+									}
+									$alias = $this->addDataAlias($data_aliases);
+									$cur_query .= '('.(($type_is_not xor $clause_not) ? 'NOT LOCATE(\','.mysqli_real_escape_string($this->link, $cur_value[0]).',\', e.`varlist`) OR ' : '' ).'(e.`guid`='.$alias.'.`guid` AND '.$alias.'.`name`=\''.mysqli_real_escape_string($this->link, $cur_value[0]).'\' AND '.(($type_is_not xor $clause_not) ? 'NOT ' : '' ).$alias.'.`compare_one`=TRUE))';
+									break;
+								} elseif ($cur_value[1] === 0) {
+									if ( $cur_query ) {
+										$cur_query .= ($type_is_or ? ' OR ' : ' AND ');
+									}
+									$alias = $this->addDataAlias($data_aliases);
+									$cur_query .= '('.(($type_is_not xor $clause_not) ? 'NOT LOCATE(\','.mysqli_real_escape_string($this->link, $cur_value[0]).',\', e.`varlist`) OR ' : '' ).'(e.`guid`='.$alias.'.`guid` AND '.$alias.'.`name`=\''.mysqli_real_escape_string($this->link, $cur_value[0]).'\' AND '.(($type_is_not xor $clause_not) ? 'NOT ' : '' ).$alias.'.`compare_zero`=TRUE))';
+									break;
+								} elseif ($cur_value[1] === -1) {
+									if ( $cur_query ) {
+										$cur_query .= ($type_is_or ? ' OR ' : ' AND ');
+									}
+									$alias = $this->addDataAlias($data_aliases);
+									$cur_query .= '('.(($type_is_not xor $clause_not) ? 'NOT LOCATE(\','.mysqli_real_escape_string($this->link, $cur_value[0]).',\', e.`varlist`) OR ' : '' ).'(e.`guid`='.$alias.'.`guid` AND '.$alias.'.`name`=\''.mysqli_real_escape_string($this->link, $cur_value[0]).'\' AND '.(($type_is_not xor $clause_not) ? 'NOT ' : '' ).$alias.'.`compare_negone`=TRUE))';
+									break;
+								} elseif ($cur_value[1] === []) {
+									if ( $cur_query ) {
+										$cur_query .= ($type_is_or ? ' OR ' : ' AND ');
+									}
+									$alias = $this->addDataAlias($data_aliases);
+									$cur_query .= '('.(($type_is_not xor $clause_not) ? 'NOT LOCATE(\','.mysqli_real_escape_string($this->link, $cur_value[0]).',\', e.`varlist`) OR ' : '' ).'(e.`guid`='.$alias.'.`guid` AND '.$alias.'.`name`=\''.mysqli_real_escape_string($this->link, $cur_value[0]).'\' AND '.(($type_is_not xor $clause_not) ? 'NOT ' : '' ).$alias.'.`compare_emptyarray`=TRUE))';
+									break;
 								}
-								$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'e."mdate"='.((float) $cur_value[1]);
+							case 'gt':
+							case '!gt':
+								if ($cur_value[0] == 'cdate') {
+									if ( $cur_query ) {
+										$cur_query .= $type_is_or ? ' OR ' : ' AND ';
+									}
+									$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'e.`cdate`>'.((float) $cur_value[1]);
+									break;
+								} elseif ($cur_value[0] == 'mdate') {
+									if ( $cur_query ) {
+										$cur_query .= $type_is_or ? ' OR ' : ' AND ';
+									}
+									$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'e.`mdate`>'.((float) $cur_value[1]);
+									break;
+								}
+							case 'gte':
+							case '!gte':
+								if ($cur_value[0] == 'cdate') {
+									if ( $cur_query ) {
+										$cur_query .= $type_is_or ? ' OR ' : ' AND ';
+									}
+									$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'e.`cdate`>='.((float) $cur_value[1]);
+									break;
+								} elseif ($cur_value[0] == 'mdate') {
+									if ( $cur_query ) {
+										$cur_query .= $type_is_or ? ' OR ' : ' AND ';
+									}
+									$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'e.`mdate`>='.((float) $cur_value[1]);
+									break;
+								}
+							case 'lt':
+							case '!lt':
+								if ($cur_value[0] == 'cdate') {
+									if ( $cur_query ) {
+										$cur_query .= $type_is_or ? ' OR ' : ' AND ';
+									}
+									$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'e.`cdate`<'.((float) $cur_value[1]);
+									break;
+								} elseif ($cur_value[0] == 'mdate') {
+									if ( $cur_query ) {
+										$cur_query .= $type_is_or ? ' OR ' : ' AND ';
+									}
+									$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'e.`mdate`<'.((float) $cur_value[1]);
+									break;
+								}
+							case 'lte':
+							case '!lte':
+								if ($cur_value[0] == 'cdate') {
+									if ( $cur_query ) {
+										$cur_query .= $type_is_or ? ' OR ' : ' AND ';
+									}
+									$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'e.`cdate`<='.((float) $cur_value[1]);
+									break;
+								} elseif ($cur_value[0] == 'mdate') {
+									if ( $cur_query ) {
+										$cur_query .= $type_is_or ? ' OR ' : ' AND ';
+									}
+									$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'e.`mdate`<='.((float) $cur_value[1]);
+									break;
+								}
+							case 'array':
+							case '!array':
+								if (!($type_is_not xor $clause_not)) {
+									if ( $cur_query ) {
+										$cur_query .= $type_is_or ? ' OR ' : ' AND ';
+									}
+									$cur_query .= 'LOCATE(\','.mysqli_real_escape_string($this->link, $cur_value[0]).',\', e.`varlist`)';
+								}
 								break;
-							} elseif ($cur_value[1] === true || $cur_value[1] === false) {
-								if ( $cur_query ) {
-									$cur_query .= ($type_is_or ? ' OR ' : ' AND ');
-								}
-								$alias = $this->addDataAlias($data_aliases);
-								$cur_query .= '('.(($type_is_not xor $clause_not) ? 'NOT LOCATE(\','.mysqli_real_escape_string($this->link, $cur_value[0]).',\', e.`varlist`) OR ' : '' ).'(e.`guid`='.$alias.'.`guid` AND '.$alias.'.`name`=\''.mysqli_real_escape_string($this->link, $cur_value[0]).'\' AND '.(($type_is_not xor $clause_not) ? 'NOT ' : '' ).$alias.'.`compare_true`='.($cur_value[1] ? 'TRUE' : 'FALSE').'))';
-								break;
-							} elseif ($cur_value[1] === 1) {
-								if ( $cur_query ) {
-									$cur_query .= ($type_is_or ? ' OR ' : ' AND ');
-								}
-								$alias = $this->addDataAlias($data_aliases);
-								$cur_query .= '('.(($type_is_not xor $clause_not) ? 'NOT LOCATE(\','.mysqli_real_escape_string($this->link, $cur_value[0]).',\', e.`varlist`) OR ' : '' ).'(e.`guid`='.$alias.'.`guid` AND '.$alias.'.`name`=\''.mysqli_real_escape_string($this->link, $cur_value[0]).'\' AND '.(($type_is_not xor $clause_not) ? 'NOT ' : '' ).$alias.'.`compare_one`=TRUE))';
-								break;
-							} elseif ($cur_value[1] === 0) {
-								if ( $cur_query ) {
-									$cur_query .= ($type_is_or ? ' OR ' : ' AND ');
-								}
-								$alias = $this->addDataAlias($data_aliases);
-								$cur_query .= '('.(($type_is_not xor $clause_not) ? 'NOT LOCATE(\','.mysqli_real_escape_string($this->link, $cur_value[0]).',\', e.`varlist`) OR ' : '' ).'(e.`guid`='.$alias.'.`guid` AND '.$alias.'.`name`=\''.mysqli_real_escape_string($this->link, $cur_value[0]).'\' AND '.(($type_is_not xor $clause_not) ? 'NOT ' : '' ).$alias.'.`compare_zero`=TRUE))';
-								break;
-							} elseif ($cur_value[1] === -1) {
-								if ( $cur_query ) {
-									$cur_query .= ($type_is_or ? ' OR ' : ' AND ');
-								}
-								$alias = $this->addDataAlias($data_aliases);
-								$cur_query .= '('.(($type_is_not xor $clause_not) ? 'NOT LOCATE(\','.mysqli_real_escape_string($this->link, $cur_value[0]).',\', e.`varlist`) OR ' : '' ).'(e.`guid`='.$alias.'.`guid` AND '.$alias.'.`name`=\''.mysqli_real_escape_string($this->link, $cur_value[0]).'\' AND '.(($type_is_not xor $clause_not) ? 'NOT ' : '' ).$alias.'.`compare_negone`=TRUE))';
-								break;
-							} elseif ($cur_value[1] === []) {
-								if ( $cur_query ) {
-									$cur_query .= ($type_is_or ? ' OR ' : ' AND ');
-								}
-								$alias = $this->addDataAlias($data_aliases);
-								$cur_query .= '('.(($type_is_not xor $clause_not) ? 'NOT LOCATE(\','.mysqli_real_escape_string($this->link, $cur_value[0]).',\', e.`varlist`) OR ' : '' ).'(e.`guid`='.$alias.'.`guid` AND '.$alias.'.`name`=\''.mysqli_real_escape_string($this->link, $cur_value[0]).'\' AND '.(($type_is_not xor $clause_not) ? 'NOT ' : '' ).$alias.'.`compare_emptyarray`=TRUE))';
-								break;
-							}
-						case 'gt':
-						case '!gt':
-							if ($cur_value[0] == 'cdate') {
-								if ( $cur_query ) {
-									$cur_query .= $type_is_or ? ' OR ' : ' AND ';
-								}
-								$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'e.`cdate`>'.((float) $cur_value[1]);
-								break;
-							} elseif ($cur_value[0] == 'mdate') {
-								if ( $cur_query ) {
-									$cur_query .= $type_is_or ? ' OR ' : ' AND ';
-								}
-								$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'e.`mdate`>'.((float) $cur_value[1]);
-								break;
-							}
-						case 'gte':
-						case '!gte':
-							if ($cur_value[0] == 'cdate') {
-								if ( $cur_query ) {
-									$cur_query .= $type_is_or ? ' OR ' : ' AND ';
-								}
-								$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'e.`cdate`>='.((float) $cur_value[1]);
-								break;
-							} elseif ($cur_value[0] == 'mdate') {
-								if ( $cur_query ) {
-									$cur_query .= $type_is_or ? ' OR ' : ' AND ';
-								}
-								$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'e.`mdate`>='.((float) $cur_value[1]);
-								break;
-							}
-						case 'lt':
-						case '!lt':
-							if ($cur_value[0] == 'cdate') {
-								if ( $cur_query ) {
-									$cur_query .= $type_is_or ? ' OR ' : ' AND ';
-								}
-								$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'e.`cdate`<'.((float) $cur_value[1]);
-								break;
-							} elseif ($cur_value[0] == 'mdate') {
-								if ( $cur_query ) {
-									$cur_query .= $type_is_or ? ' OR ' : ' AND ';
-								}
-								$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'e.`mdate`<'.((float) $cur_value[1]);
-								break;
-							}
-						case 'lte':
-						case '!lte':
-							if ($cur_value[0] == 'cdate') {
-								if ( $cur_query ) {
-									$cur_query .= $type_is_or ? ' OR ' : ' AND ';
-								}
-								$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'e.`cdate`<='.((float) $cur_value[1]);
-								break;
-							} elseif ($cur_value[0] == 'mdate') {
-								if ( $cur_query ) {
-									$cur_query .= $type_is_or ? ' OR ' : ' AND ';
-								}
-								$cur_query .= (($type_is_not xor $clause_not) ? 'NOT ' : '' ).'e.`mdate`<='.((float) $cur_value[1]);
-								break;
-							}
-						case 'array':
-						case '!array':
-							if (!($type_is_not xor $clause_not)) {
-								if ( $cur_query ) {
-									$cur_query .= $type_is_or ? ' OR ' : ' AND ';
-								}
-								$cur_query .= 'LOCATE(\','.mysqli_real_escape_string($this->link, $cur_value[0]).',\', e.`varlist`)';
-							}
-							break;
+						}
 					}
 				}
 				if ( $cur_query ) {
@@ -599,18 +607,26 @@ class MySQLDriver implements DriverInterface {
 				break;
 		}
 		if ($query_parts) {
-			if ($data_aliases) {
-				foreach ($data_aliases as &$cur_alias) {
-					$cur_alias = '`'.$this->prefix.'data'.$etype.'` '.$cur_alias;
-				}
-				unset($cur_alias);
-				$data_part = ', '.implode(', ', $data_aliases);
+			if ($subquery) {
+				$query = "((".implode(') AND (', $query_parts)."))";
 			} else {
-				$data_part = '';
+				if ($data_aliases) {
+					foreach ($data_aliases as &$cur_alias) {
+						$cur_alias = '`'.$this->prefix.'data'.$etype.'` '.$cur_alias;
+					}
+					unset($cur_alias);
+					$data_part = ', '.implode(', ', $data_aliases);
+				} else {
+					$data_part = '';
+				}
+				$query = "SELECT e.`guid`, e.`tags`, e.`cdate`, e.`mdate`, d.`name`, d.`value` FROM `{$this->prefix}entities{$etype}` e LEFT JOIN `{$this->prefix}data{$etype}` d ON e.`guid`=d.`guid`{$data_part} WHERE (".implode(') AND (', $query_parts).") ORDER BY ".(isset($options['reverse']) && $options['reverse'] ? $sort.' DESC' : $sort).";";
 			}
-			$query = "SELECT e.`guid`, e.`tags`, e.`cdate`, e.`mdate`, d.`name`, d.`value`, e.`varlist` FROM `{$this->prefix}entities{$etype}` e LEFT JOIN `{$this->prefix}data{$etype}` d ON e.`guid`=d.`guid`{$data_part} WHERE (".implode(') AND (', $query_parts).") ORDER BY ".(isset($options['reverse']) && $options['reverse'] ? $sort.' DESC' : $sort).";";
 		} else {
-			$query = "SELECT e.`guid`, e.`tags`, e.`cdate`, e.`mdate`, d.`name`, d.`value` FROM `{$this->prefix}entities{$etype}` e LEFT JOIN `{$this->prefix}data{$etype}` d ON e.`guid`=d.`guid` ORDER BY ".(isset($options['reverse']) && $options['reverse'] ? $sort.' DESC' : $sort).";";
+			if ($subquery) {
+				$query = '';
+			} else {
+				$query = "SELECT e.`guid`, e.`tags`, e.`cdate`, e.`mdate`, d.`name`, d.`value` FROM `{$this->prefix}entities{$etype}` e LEFT JOIN `{$this->prefix}data{$etype}` d ON e.`guid`=d.`guid` ORDER BY ".(isset($options['reverse']) && $options['reverse'] ? $sort.' DESC' : $sort).";";
+			}
 		}
 
 		return $query;
@@ -685,98 +701,7 @@ class MySQLDriver implements DriverInterface {
 				$row = mysqli_fetch_row($result);
 			}
 			// Check all conditions.
-			$pass_all = true;
-			foreach ($selectors as &$cur_selector) {
-				$pass = false;
-				foreach ($cur_selector as $key => &$value) {
-					if ($key === 0) {
-						$type = $value;
-						$type_is_not = ($type == '!&' || $type == '!|');
-						$type_is_or = ($type == '|' || $type == '!|');
-						$pass = !$type_is_or;
-						continue;
-					}
-					$clause_not = $key[0] === '!';
-					if ($key === 'ref' || $key === '!ref') {
-						// Handled by the query.
-						$pass = true;
-					} elseif ($key === 'guid' || $key === '!guid' || $key === 'tag' || $key === '!tag') {
-						// Handled by the query.
-						$pass = true;
-					} elseif ($key === 'isset' || $key === '!isset') {
-						// Handled by the query.
-						$pass = true;
-					} elseif ($key === 'strict' || $key === '!strict') {
-						// Handled by the query.
-						$pass = true;
-					} elseif ($key === 'like' || $key === '!like') {
-						// Handled by the query.
-						$pass = true;
-					} elseif ($key === 'pmatch' || $key === '!pmatch') {
-						// Handled by the query.
-						$pass = true;
-					} else {
-						// Check if it doesn't pass any for &, check if it
-						// passes any for |.
-						foreach ($value as $cur_value) {
-							if (($key === 'data' || $key === '!data') && ($cur_value[1] === true || $cur_value[1] === false || $cur_value[1] === 1 || $cur_value[1] === 0 || $cur_value[1] === -1 || $cur_value[1] === [])) {
-								// Handled by the query.
-								$pass = true;
-							} else {
-								// Unserialize the data for this variable.
-								if (isset($sdata[$cur_value[0]])) {
-									$data[$cur_value[0]] = unserialize($sdata[$cur_value[0]]);
-									unset($sdata[$cur_value[0]]);
-								}
-								switch ($key) {
-									case 'data':
-									case '!data':
-										// If we get here, it's not one of those simple data values above.
-										$pass = (($data[$cur_value[0]] == $cur_value[1]) xor ($type_is_not xor $clause_not));
-										break;
-									case 'array':
-									case '!array':
-										$pass = (((array) $data[$cur_value[0]] === $data[$cur_value[0]] && in_array($cur_value[1], $data[$cur_value[0]])) xor ($type_is_not xor $clause_not));
-										break;
-									case 'match':
-									case '!match':
-										$pass = ((isset($data[$cur_value[0]]) && preg_match($cur_value[1], $data[$cur_value[0]])) xor ($type_is_not xor $clause_not));
-										break;
-									case 'gt':
-									case '!gt':
-										$pass = (($data[$cur_value[0]] > $cur_value[1]) xor ($type_is_not xor $clause_not));
-										break;
-									case 'gte':
-									case '!gte':
-										$pass = (($data[$cur_value[0]] >= $cur_value[1]) xor ($type_is_not xor $clause_not));
-										break;
-									case 'lt':
-									case '!lt':
-										$pass = (($data[$cur_value[0]] < $cur_value[1]) xor ($type_is_not xor $clause_not));
-										break;
-									case 'lte':
-									case '!lte':
-										$pass = (($data[$cur_value[0]] <= $cur_value[1]) xor ($type_is_not xor $clause_not));
-										break;
-								}
-							}
-							if (!($type_is_or xor $pass)) {
-								break;
-							}
-						}
-					}
-					if (!($type_is_or xor $pass)) {
-						break;
-					}
-				}
-				unset($value);
-				if (!$pass) {
-					$pass_all = false;
-					break;
-				}
-			}
-			unset($cur_selector);
-			if ($pass_all) {
+			if ($this->checkData($data, $sdata, $selectors)) {
 				if (isset($options['offset']) && ($ocount < $options['offset'])) {
 					// We must be sure this entity is actually a match before
 					// incrementing the offset.
@@ -813,6 +738,106 @@ class MySQLDriver implements DriverInterface {
 		mysqli_free_result($result);
 
 		return $entities;
+	}
+
+	private function checkData(&$data, &$sdata, $selectors) {
+		foreach ($selectors as $cur_selector) {
+			$pass = false;
+			foreach ($cur_selector as $key => $value) {
+				if ($key === 0) {
+					$type = $value;
+					$type_is_not = ($type == '!&' || $type == '!|');
+					$type_is_or = ($type == '|' || $type == '!|');
+					$pass = !$type_is_or;
+					continue;
+				}
+				if (is_numeric($key)) {
+					$tmpArr = [$value];
+					$pass = $this->checkData($data, $sdata, $tmpArr);
+				} else {
+					$clause_not = $key[0] === '!';
+					if ($key === 'ref' || $key === '!ref') {
+						// Handled by the query.
+						$pass = true;
+					} elseif ($key === 'guid' || $key === '!guid' || $key === 'tag' || $key === '!tag') {
+						// Handled by the query.
+						$pass = true;
+					} elseif ($key === 'isset' || $key === '!isset') {
+						// Handled by the query.
+						$pass = true;
+					} elseif ($key === 'strict' || $key === '!strict') {
+						// Handled by the query.
+						$pass = true;
+					} elseif ($key === 'like' || $key === '!like') {
+						// Handled by the query.
+						$pass = true;
+					} elseif ($key === 'pmatch' || $key === '!pmatch') {
+						// Handled by the query.
+						$pass = true;
+					} else {
+						// Check if it doesn't pass any for &, check if it
+						// passes any for |.
+						foreach ($value as $cur_value) {
+							if (($key === 'data' || $key === '!data') && ($cur_value[1] === true || $cur_value[1] === false || $cur_value[1] === 1 || $cur_value[1] === 0 || $cur_value[1] === -1 || $cur_value[1] === [])) {
+								// Handled by the query.
+								$pass = true;
+							} else {
+								// Unserialize the data for this variable.
+								if (isset($sdata[$cur_value[0]])) {
+									$data[$cur_value[0]] = unserialize($sdata[$cur_value[0]]);
+									unset($sdata[$cur_value[0]]);
+								}
+								if (!key_exists($cur_value[0], $data)) {
+									$pass = false;
+								} else {
+									switch ($key) {
+										case 'data':
+										case '!data':
+											// If we get here, it's not one of those simple data values above.
+											$pass = (($data[$cur_value[0]] == $cur_value[1]) xor ($type_is_not xor $clause_not));
+											break;
+										case 'array':
+										case '!array':
+											$pass = (((array) $data[$cur_value[0]] === $data[$cur_value[0]] && in_array($cur_value[1], $data[$cur_value[0]])) xor ($type_is_not xor $clause_not));
+											break;
+										case 'match':
+										case '!match':
+											$pass = ((isset($data[$cur_value[0]]) && preg_match($cur_value[1], $data[$cur_value[0]])) xor ($type_is_not xor $clause_not));
+											break;
+										case 'gt':
+										case '!gt':
+											$pass = (($data[$cur_value[0]] > $cur_value[1]) xor ($type_is_not xor $clause_not));
+											break;
+										case 'gte':
+										case '!gte':
+											$pass = (($data[$cur_value[0]] >= $cur_value[1]) xor ($type_is_not xor $clause_not));
+											break;
+										case 'lt':
+										case '!lt':
+											$pass = (($data[$cur_value[0]] < $cur_value[1]) xor ($type_is_not xor $clause_not));
+											break;
+										case 'lte':
+										case '!lte':
+											$pass = (($data[$cur_value[0]] <= $cur_value[1]) xor ($type_is_not xor $clause_not));
+											break;
+									}
+								}
+							}
+							if (!($type_is_or xor $pass)) {
+								break;
+							}
+						}
+					}
+				}
+				if (!($type_is_or xor $pass)) {
+					break;
+				}
+			}
+			if (!$pass) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	public function getUID($name) {
