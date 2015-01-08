@@ -225,13 +225,10 @@ class REST {
 				$count = count($args);
 				if ($count > 1) {
 					for ($i = 1; $i < $count; $i++) {
-						if (!isset($args[$i]['type'])) {
+						$newArg = $this->translateSelector($args[$i]);
+						if ($newArg === false) {
 							return $this->httpError(400, "Bad Request");
 						}
-						// Translate JS {type: '&', ...} to PHP ['&', ...]
-						$newArg = [$args[$i]['type']];
-						unset($args[$i]['type']);
-						$newArg = array_merge($newArg, $args[$i]);
 						$args[$i] = $newArg;
 					}
 				}
@@ -254,6 +251,43 @@ class REST {
 			echo $result;
 			return true;
 		}
+	}
+
+	/**
+	 * Translate
+	 * - JS {"type": "&", "crit": "val", "1": {"type": "&", ...}, ...}
+	 * - JS ["&", {"crit": "val"}, ["&", ...], ...]
+	 * to PHP ["&", "crit" => "val", ["&", ...], ...]
+	 */
+	protected function translateSelector($selector) {
+		$newSel = [];
+		foreach ($selector as $key => $val) {
+			if ($key === "type" || $key === 0) {
+				$tmpArg = [$val];
+				$newSel = array_merge($tmpArg, $newSel);
+			} elseif (is_numeric($key)) {
+				if (isset($val['type']) || (isset($val[0]) && in_array($val[0], ['&', '!&', '|', '!|']))) {
+					$tmpSel = $this->translateSelector($val);
+					if ($tmpSel === false) {
+						return false;
+					}
+					$newSel[] = $tmpSel;
+				} else {
+					foreach ($val as $k2 => $v2) {
+						if (key_exists($k2, $newSel)) {
+							return false;
+						}
+						$newSel[$k2] = $v2;
+					}
+				}
+			} else {
+				$newSel[$key] = $val;
+			}
+		}
+		if (!isset($newSel[0]) || !in_array($newSel[0], ['&', '!&', '|', '!|'])) {
+			return false;
+		}
+		return $newSel;
 	}
 
 	protected function loadEntity($entityData) {

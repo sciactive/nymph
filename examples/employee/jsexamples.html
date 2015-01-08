@@ -251,6 +251,30 @@ if (!(entity.tags&lt;["test"]||entity.tags&gt;["test"])) {
 }, function(errObj){
 	$("#result").html(errObj.textStatus);
 });</pre>
+		<h4>Use deep selector 1</h4>
+		<pre>Nymph.getEntities({"class":"Employee","limit":4},{"type":"&amp;","tag":["employee"],"1":{"type":"|","like":["name","%Jane%"]}}).then(function(entities){
+	$("#result").html(JSON.stringify(entities));
+}, function(errObj){
+	$("#result").html(errObj.textStatus);
+});</pre>
+		<h4>Use deep selector 2</h4>
+		<pre>Nymph.getEntities({"class":"Employee","limit":4},["&amp;",{"tag":["employee"]},{"type":"|","like":["name","%Jane%"]}]).then(function(entities){
+	$("#result").html(JSON.stringify(entities));
+}, function(errObj){
+	$("#result").html(errObj.textStatus);
+});</pre>
+		<h4>Use deep selector 3</h4>
+		<pre>Nymph.getEntities({"class":"Employee","limit":4},["&amp;",{"tag":["employee"]},["|",{"like":["name","%Jane%"]}]]).then(function(entities){
+	$("#result").html(JSON.stringify(entities));
+}, function(errObj){
+	$("#result").html(errObj.textStatus);
+});</pre>
+		<h4>Use really deep selector</h4>
+		<pre>Nymph.getEntities({"class":"Employee","limit":4},{"type":"&amp;","tag":["employee"],"1":{"type":"|","1":{"type":"&amp;","like":["name","%Jane%"]}}}).then(function(entities){
+	$("#result").html(JSON.stringify(entities));
+}, function(errObj){
+	$("#result").html(errObj.textStatus);
+});</pre>
 		<h4>Delete an entity</h4>
 		<pre>Nymph.getEntity({"class":"Employee"}, {"type":"&amp;","strict":["name","Jane Doe"]}).then(function(jane){
 	$("#result").html(JSON.stringify(jane)+'&lt;br&gt;&lt;br&gt;');
