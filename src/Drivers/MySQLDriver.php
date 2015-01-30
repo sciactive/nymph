@@ -672,8 +672,6 @@ class MySQLDriver implements DriverInterface {
 			}
 		}
 
-//		echo $query;
-//		exit;
 		return $query;
 	}
 
