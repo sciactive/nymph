@@ -340,6 +340,11 @@ license LGPL
 				return this.ready();
 			}
 			var that = this;
+			if (this.guid === null) {
+				return new Promise(function(resolve){
+					resolve(that);
+				});
+			}
 			return new Promise(function(resolve, reject){
 				Nymph.getEntityData({"class":that.class},{"type":"&","guid":that.guid}).then(function(data){
 					resolve(that.init(data));

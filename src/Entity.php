@@ -8,7 +8,6 @@
  * @copyright SciActive.com
  * @link http://sciactive.com/
  */
-use SciActive\R as R;
 
 /**
  * Database abstraction object.

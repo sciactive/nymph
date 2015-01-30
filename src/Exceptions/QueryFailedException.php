@@ -12,6 +12,9 @@
 class QueryFailedException extends \Exception {
 	protected $query;
 	public function __construct($message, $code, $previous, $query = null) {
+		if ($query) {
+			$message .= "\nFull query: ".$query;
+		}
 		parent::__construct($message, $code, $previous);
 		$this->query = $query;
 	}

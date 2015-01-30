@@ -871,6 +871,13 @@ This one's zip code is 92064.";
 		// Retrieving entity by inclusive reference...
 		$resultEntity = Nymph::getEntities(
 				['class' => 'TestModel'],
+				['|', 'ref' => ['reference', [$arr['refGuid'], $arr['refGuid'] + 1]]]
+			);
+		$this->assertTrue($testEntity->inArray($resultEntity));
+
+		// Retrieving entity by inclusive reference... (slower query when written like this.)
+		$resultEntity = Nymph::getEntities(
+				['class' => 'TestModel'],
 				['|', 'ref' => [['reference', $arr['refGuid']], ['reference', $arr['refGuid'] + 1]]]
 			);
 		$this->assertTrue($testEntity->inArray($resultEntity));
@@ -883,6 +890,13 @@ This one's zip code is 92064.";
 		$testEntity = $arr['entity'];
 
 		// Testing wrong inclusive reference...
+		$resultEntity = Nymph::getEntities(
+				['class' => 'TestModel'],
+				['|', 'ref' => ['reference', [$arr['refGuid'] + 2, $arr['refGuid'] + 1]]]
+			);
+		$this->assertFalse($testEntity->inArray($resultEntity));
+
+		// Testing wrong inclusive reference... (slower query when written like this.)
 		$resultEntity = Nymph::getEntities(
 				['class' => 'TestModel'],
 				['|', 'ref' => [['reference', $arr['refGuid'] + 2], ['reference', $arr['refGuid'] + 1]]]

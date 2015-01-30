@@ -961,7 +961,7 @@ class PostgreSQLDriver implements DriverInterface {
 				continue;
 			}
 			$matches = [];
-			if (preg_match('/^\s*{(\d+)}<([\w-_]+)>\[([\w,]+)\]\s*$/S', $line, $matches)) {
+			if (preg_match('/^\s*{(\d+)}<([\w-_]+)>\[([\w,]*)\]\s*$/S', $line, $matches)) {
 				// Save the current entity.
 				if ($guid) {
 					$this->query("DELETE FROM \"{$this->prefix}guids\" WHERE \"guid\"={$guid}; INSERT INTO \"{$this->prefix}guids\" (\"guid\") VALUES ({$guid});");

@@ -71,6 +71,15 @@ return (object) [
 			'description' => 'The MySQL table name prefix.',
 			'value' => 'nymph_',
 		],
+		'engine' => [
+			'cname' => 'Table Engine',
+			'description' => 'The MySQL table engine. You can use InnoDB if you are using MySQL >= 5.6.',
+			'value' => 'MYISAM',
+			'options' => [
+				'MyISAM' => 'MYISAM',
+				'InnoDB' => 'InnoDB',
+			],
+		],
 	],
 	'PostgreSQL' => (object) [
 		'connection_type' => [
