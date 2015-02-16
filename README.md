@@ -14,7 +14,7 @@ composer require sciactive/nymph
 bower install nymph
 ```
 
-This repository will retrieve the correct files for server or client.
+This repository is set up to retrieve the correct files for [server](https://github.com/sciactive/nymph-server) or [client](https://github.com/sciactive/nymph-client).
 
 ## Nymph Query Language vs Just SQL
 
