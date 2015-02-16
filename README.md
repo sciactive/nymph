@@ -1,18 +1,20 @@
 # <img alt="logo" src="https://raw.githubusercontent.com/sciactive/2be-extras/master/logo/product-icon-40-bw.png" align="top" /> Nymph - a PHP and JS ORM
 
-[![Build Status](https://img.shields.io/travis/sciactive/nymph/master.svg?style=flat)](http://travis-ci.org/sciactive/nymph) [![Latest Stable Version](https://img.shields.io/packagist/v/sciactive/nymph.svg?style=flat)](https://packagist.org/packages/sciactive/nymph) [![License](https://img.shields.io/packagist/l/sciactive/nymph.svg?style=flat)](https://packagist.org/packages/sciactive/nymph) [![Open Issues](https://img.shields.io/github/issues/sciactive/nymph.svg?style=flat)](https://github.com/sciactive/nymph/issues)
+[![Build Status](https://img.shields.io/travis/sciactive/nymph-server/master.svg?style=flat)](http://travis-ci.org/sciactive/nymph-server) [![Latest Stable Version](https://img.shields.io/packagist/v/sciactive/nymph.svg?style=flat)](https://packagist.org/packages/sciactive/nymph) [![License](https://img.shields.io/packagist/l/sciactive/nymph.svg?style=flat)](https://packagist.org/packages/sciactive/nymph) [![Open Issues](https://img.shields.io/github/issues/sciactive/nymph.svg?style=flat)](https://github.com/sciactive/nymph/issues)
 
 Nymph is an ORM that is simple to use in both JavaScript and PHP.
 
 ## Installation
 
-You can install Nymph with Composer or Bower.
+You can install Nymph with Composer for the server side files, and Bower for the client side files.
 
 ```sh
 composer require sciactive/nymph
 
-bower install https://github.com/sciactive/nymph.git
+bower install nymph
 ```
+
+This repository will retrieve the correct files for server or client.
 
 ## Nymph Query Language vs Just SQL
 
@@ -105,7 +107,7 @@ composer require sciactive/nymph
 require 'vendor/autoload.php';
 use Nymph\Nymph as Nymph;
 \SciActive\R::_('NymphConfig', [], function(){
-	$config = include('vendor/sciactive/nymph/conf/defaults.php');
+	$config = include('vendor/sciactive/nymph-server/conf/defaults.php');
 	$config->MySQL->host['value'] = '127.0.0.1';
 	$config->MySQL->database['value'] = 'my_database';
 	$config->MySQL->user['value'] = 'my_user';
