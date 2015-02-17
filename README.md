@@ -70,7 +70,7 @@ $mysqli->close();
 
 ## Demos
 
-You can find working versions of the demos in the "examples" directory hosted on Heroku. Check out the [todo](http://nymph-demo.herokuapp.com/examples/todo/) ([source](https://github.com/sciactive/nymph/tree/master/examples/todo)) and [sudoku](http://nymph-demo.herokuapp.com/examples/sudoku/) ([source](https://github.com/sciactive/nymph/tree/master/examples/sudoku)) apps.
+You can find working versions of the demos in the "examples" directory hosted on Heroku. Check out the [todo](http://nymph-demo.herokuapp.com/examples/todo/) ([source](https://github.com/sciactive/nymph-examples/tree/master/examples/todo)) and [sudoku](http://nymph-demo.herokuapp.com/examples/sudoku/) ([source](https://github.com/sciactive/nymph-examples/tree/master/examples/sudoku)) apps.
 
 ## Why Nymph
 
