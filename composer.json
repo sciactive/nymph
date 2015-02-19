@@ -1,7 +1,7 @@
 {
 	"name": "sciactive/nymph",
 	"description": "An object relational mapper with PHP and JavaScript interfaces.",
-	"version": "1.4.0-beta.1",
+	"version": "1.4.0-beta.2",
 	"time": "2015-02-16",
 	"homepage": "http://nymph.io/",
 	"type": "library",
@@ -35,6 +35,9 @@
 		]
 	},
 	"require": {
-		"sciactive/nymph-server": "1.4.0-beta.1"
-	}
+		"sciactive/nymph-server": "1.4.0-beta.2",
+		"sciactive/nymph-pubsub": "1.4.0-beta.2"
+	},
+	"minimum-stability": "dev",
+    "prefer-stable": true
 }
