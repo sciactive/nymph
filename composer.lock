@@ -4,7 +4,7 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "6fc8150b86b25bcb535974cd793c37d5",
+    "hash": "6f1cea029b522c992f351eac5428e00b",
     "packages": [
         {
             "name": "devristo/phpws",
@@ -389,16 +389,16 @@
         },
         {
             "name": "sciactive/hookphp",
-            "version": "1.0.0",
+            "version": "1.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sciactive/hookphp.git",
-                "reference": "823ddb654379eb95e361dd909f70b9fed36686ba"
+                "reference": "6899180d5199af855f530e3a5140c9ef88897127"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sciactive/hookphp/zipball/823ddb654379eb95e361dd909f70b9fed36686ba",
-                "reference": "823ddb654379eb95e361dd909f70b9fed36686ba",
+                "url": "https://api.github.com/repos/sciactive/hookphp/zipball/6899180d5199af855f530e3a5140c9ef88897127",
+                "reference": "6899180d5199af855f530e3a5140c9ef88897127",
                 "shasum": ""
             },
             "type": "library",
@@ -429,26 +429,27 @@
                 "interception",
                 "method hooking"
             ],
-            "time": "2014-12-15 00:00:00"
+            "time": "2015-02-19 00:00:00"
         },
         {
             "name": "sciactive/nymph-pubsub",
-            "version": "1.4.0-beta.2",
+            "version": "1.4.0-beta.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sciactive/nymph-pubsub.git",
-                "reference": "f7d59e55b6ed4cfc20ea09b3bcc07a681dcf96b9"
+                "reference": "c93f7fe25fcf033366751d4117f375f545187263"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sciactive/nymph-pubsub/zipball/f7d59e55b6ed4cfc20ea09b3bcc07a681dcf96b9",
-                "reference": "f7d59e55b6ed4cfc20ea09b3bcc07a681dcf96b9",
+                "url": "https://api.github.com/repos/sciactive/nymph-pubsub/zipball/c93f7fe25fcf033366751d4117f375f545187263",
+                "reference": "c93f7fe25fcf033366751d4117f375f545187263",
                 "shasum": ""
             },
             "require": {
                 "devristo/phpws": "dev-master",
-                "sciactive/hookphp": "~1.0",
-                "sciactive/nymph-server": "1.4.0-beta.2",
+                "sciactive/hookphp": "~1.1",
+                "sciactive/nymph-server": "1.4.0-beta.3",
+                "sciactive/requirephp": "~1.3",
                 "videlalvaro/php-amqplib": "2.2.*"
             },
             "type": "library",
@@ -481,20 +482,20 @@
         },
         {
             "name": "sciactive/nymph-server",
-            "version": "1.4.0-beta.2",
+            "version": "1.4.0-beta.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sciactive/nymph-server.git",
-                "reference": "eb5e1e5449e99f44391a3fa1e168a3e5d21d6477"
+                "reference": "6f9929aa89acebaf8f5cffd825429e1816f7e8c4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sciactive/nymph-server/zipball/eb5e1e5449e99f44391a3fa1e168a3e5d21d6477",
-                "reference": "eb5e1e5449e99f44391a3fa1e168a3e5d21d6477",
+                "url": "https://api.github.com/repos/sciactive/nymph-server/zipball/6f9929aa89acebaf8f5cffd825429e1816f7e8c4",
+                "reference": "6f9929aa89acebaf8f5cffd825429e1816f7e8c4",
                 "shasum": ""
             },
             "require": {
-                "sciactive/requirephp": "~1.2"
+                "sciactive/requirephp": "~1.3"
             },
             "require-dev": {
                 "codeclimate/php-test-reporter": "dev-master"
@@ -535,16 +536,16 @@
         },
         {
             "name": "sciactive/requirephp",
-            "version": "1.2.0",
+            "version": "1.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sciactive/requirephp.git",
-                "reference": "bb5cfc994918a47ebe96aab93d969cb16a4e49e0"
+                "reference": "3147a999d1f9a1d880223603a9d0a848334ee587"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sciactive/requirephp/zipball/bb5cfc994918a47ebe96aab93d969cb16a4e49e0",
-                "reference": "bb5cfc994918a47ebe96aab93d969cb16a4e49e0",
+                "url": "https://api.github.com/repos/sciactive/requirephp/zipball/3147a999d1f9a1d880223603a9d0a848334ee587",
+                "reference": "3147a999d1f9a1d880223603a9d0a848334ee587",
                 "shasum": ""
             },
             "type": "library",
@@ -577,7 +578,7 @@
                 "service location",
                 "service locator"
             ],
-            "time": "2014-11-04 00:00:00"
+            "time": "2015-02-19 00:00:00"
         },
         {
             "name": "videlalvaro/php-amqplib",

@@ -1,0 +1,12 @@
+[submodule "server"]
+	path = server
+	url = git@github.com:sciactive/nymph-server.git
+[submodule "examples"]
+	path = examples
+	url = git@github.com:sciactive/nymph-examples.git
+[submodule "client"]
+	path = client
+	url = git@github.com:sciactive/nymph-client.git
+[submodule "pubsub"]
+	path = pubsub
+	url = git@github.com:sciactive/nymph-pubsub.git
