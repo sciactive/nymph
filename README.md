@@ -1,8 +1,8 @@
-# <img alt="logo" src="https://raw.githubusercontent.com/sciactive/2be-extras/master/logo/product-icon-40-bw.png" align="top" /> Nymph - a PHP and JS ORM
+# <img alt="logo" src="https://raw.githubusercontent.com/sciactive/2be-extras/master/logo/product-icon-40-bw.png" align="top" /> Nymph - ORM for collaborative web apps
 
 [![Build Status](https://img.shields.io/travis/sciactive/nymph-server/master.svg?style=flat)](http://travis-ci.org/sciactive/nymph-server) [![Latest Stable Version](https://img.shields.io/packagist/v/sciactive/nymph.svg?style=flat)](https://packagist.org/packages/sciactive/nymph) [![License](https://img.shields.io/packagist/l/sciactive/nymph.svg?style=flat)](https://packagist.org/packages/sciactive/nymph) [![Open Issues](https://img.shields.io/github/issues/sciactive/nymph.svg?style=flat)](https://github.com/sciactive/nymph/issues)
 
-Nymph is an ORM that is simple to use in both JavaScript and PHP.
+Nymph is a real time, pubsub ORM that is easy to use in JavaScript and PHP.
 
 ## Installation
 
@@ -15,6 +15,14 @@ bower install nymph
 ```
 
 This repository is set up to retrieve the correct files for [server](https://github.com/sciactive/nymph-server) or [client](https://github.com/sciactive/nymph-client).
+
+## Demos
+
+Try opening the same one in two windows, and see one window react to changes in the other.
+
+- [Todo](http://nymph-demo.herokuapp.com/examples/todo/) ([source](https://github.com/sciactive/nymph-examples/tree/master/examples/todo))
+- [Sudoku](http://nymph-demo.herokuapp.com/examples/sudoku/) ([source](https://github.com/sciactive/nymph-examples/tree/master/examples/sudoku))
+- [Simple Clicker](http://nymph-demo.herokuapp.com/examples/clicker/) ([source](https://github.com/sciactive/nymph-examples/tree/master/examples/clicker))
 
 ## Nymph Query Language vs Just SQL
 
@@ -67,10 +75,6 @@ echo json_encode($entities);
 $mysqli->close();
 ```
 *Without Nymph, every time you want a new type of query available on the frontend, you're going to need to either modify this endpoint or create a new one.*
-
-## Demos
-
-You can find working versions of the demos in the "examples" directory hosted on Heroku. Check out the [todo](http://nymph-demo.herokuapp.com/examples/todo/) ([source](https://github.com/sciactive/nymph-examples/tree/master/examples/todo)) and [sudoku](http://nymph-demo.herokuapp.com/examples/sudoku/) ([source](https://github.com/sciactive/nymph-examples/tree/master/examples/sudoku)) apps.
 
 ## Why Nymph
 
