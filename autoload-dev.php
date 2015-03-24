@@ -1,53 +1,11 @@
 <?php
 
-spl_autoload_register(function($class){
-    $prefix = 'Nymph\\PubSub\\';
-    $base_dir = __DIR__ . '/pubsub/src/';
-
-    // does the class use the namespace prefix?
-    $len = strlen($prefix);
-    if (strncmp($prefix, $class, $len) !== 0) {
-        // no, move to the next registered autoloader
-        return;
-    }
-
-    // get the relative class name
-    $relative_class = substr($class, $len);
-
-    // replace the namespace prefix with the base directory, replace namespace
-    // separators with directory separators in the relative class name, append
-    // with .php
-    $file = $base_dir . str_replace('\\', '/', $relative_class) . '.php';
-
-    // if the file exists, require it
-    if (file_exists($file)) {
-        require $file;
-    }
-});
-
-spl_autoload_register(function($class){
-    $prefix = 'Nymph\\';
-    $base_dir = __DIR__ . '/server/src/';
-
-    // does the class use the namespace prefix?
-    $len = strlen($prefix);
-    if (strncmp($prefix, $class, $len) !== 0) {
-        // no, move to the next registered autoloader
-        return;
-    }
-
-    // get the relative class name
-    $relative_class = substr($class, $len);
-
-    // replace the namespace prefix with the base directory, replace namespace
-    // separators with directory separators in the relative class name, append
-    // with .php
-    $file = $base_dir . str_replace('\\', '/', $relative_class) . '.php';
-
-    // if the file exists, require it
-    if (file_exists($file)) {
-        require $file;
-    }
-});
+file_put_contents(__DIR__.'/vendor/composer/autoload_psr4.php', str_replace([
+	'array($vendorDir . \'/sciactive/nymph-pubsub/src\')',
+	'array($vendorDir . \'/sciactive/nymph-server/src\')',
+], [
+	'array(\''.__DIR__.'/pubsub/src\')',
+	'array(\''.__DIR__.'/server/src\')',
+], file_get_contents(__DIR__.'/vendor/composer/autoload_psr4.php')));
 
 require __DIR__.'/vendor/autoload.php';
