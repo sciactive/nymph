@@ -1,8 +1,8 @@
 {
 	"name": "sciactive/nymph",
-	"description": "An object relational mapper with PHP and JavaScript interfaces.",
-	"version": "1.4.0-beta.4",
-	"time": "2015-02-16",
+	"description": "Powerful object data storage and querying for collaborative web apps.",
+	"version": "1.4.0",
+	"time": "2015-03-27",
 	"homepage": "http://nymph.io/",
 	"type": "library",
 	"authors": [
@@ -19,6 +19,7 @@
 		"postgres",
 		"postgresql",
 		"object database",
+		"object data store",
 		"object relational mapper",
 		"object relational mapping"
 	],
@@ -35,8 +36,8 @@
 		]
 	},
 	"require": {
-		"sciactive/nymph-server": "1.4.0-beta.4",
-		"sciactive/nymph-pubsub": "1.4.0-beta.4"
+		"sciactive/nymph-server": "1.4.0",
+		"sciactive/nymph-pubsub": "1.4.0"
 	},
 	"require-dev": {
 		"sciactive/requirephp": "~1.3"
