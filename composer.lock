@@ -4,7 +4,7 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "55330342d198e9404a831f06422494d1",
+    "hash": "83ebd9c3651cebcb0ffb4e2d7222187e",
     "packages": [
         {
             "name": "devristo/phpws",
@@ -433,22 +433,22 @@
         },
         {
             "name": "sciactive/nymph-pubsub",
-            "version": "1.4.1",
+            "version": "1.4.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sciactive/nymph-pubsub.git",
-                "reference": "88374bb64cb60ae61ae1d84cc4ffb6455fe41082"
+                "reference": "365cba16f6b3d8893759ca3c8ff582a231672d7d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sciactive/nymph-pubsub/zipball/88374bb64cb60ae61ae1d84cc4ffb6455fe41082",
-                "reference": "88374bb64cb60ae61ae1d84cc4ffb6455fe41082",
+                "url": "https://api.github.com/repos/sciactive/nymph-pubsub/zipball/365cba16f6b3d8893759ca3c8ff582a231672d7d",
+                "reference": "365cba16f6b3d8893759ca3c8ff582a231672d7d",
                 "shasum": ""
             },
             "require": {
                 "devristo/phpws": "dev-master",
                 "sciactive/hookphp": "~1.1",
-                "sciactive/nymph-server": "~1.4.1",
+                "sciactive/nymph-server": "~1.4.2",
                 "sciactive/requirephp": "~1.3",
                 "videlalvaro/php-amqplib": "2.2.*"
             },
@@ -482,20 +482,20 @@
                 "pubsub",
                 "subscribe"
             ],
-            "time": "2015-04-16 00:00:00"
+            "time": "2015-04-17 00:00:00"
         },
         {
             "name": "sciactive/nymph-server",
-            "version": "1.4.1",
+            "version": "1.4.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sciactive/nymph-server.git",
-                "reference": "9aa7a554497adeb722c51a9320ad12250931aab7"
+                "reference": "505a3bf67a110a7f5479eabe4e4e2fb2e533c129"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sciactive/nymph-server/zipball/9aa7a554497adeb722c51a9320ad12250931aab7",
-                "reference": "9aa7a554497adeb722c51a9320ad12250931aab7",
+                "url": "https://api.github.com/repos/sciactive/nymph-server/zipball/505a3bf67a110a7f5479eabe4e4e2fb2e533c129",
+                "reference": "505a3bf67a110a7f5479eabe4e4e2fb2e533c129",
                 "shasum": ""
             },
             "require": {
@@ -537,7 +537,7 @@
                 "postgres",
                 "postgresql"
             ],
-            "time": "2015-04-16 00:00:00"
+            "time": "2015-04-17 00:00:00"
         },
         {
             "name": "sciactive/requirephp",
