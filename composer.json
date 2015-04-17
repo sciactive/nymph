@@ -1,8 +1,8 @@
 {
 	"name": "sciactive/nymph",
 	"description": "Powerful object data storage and querying for collaborative web apps.",
-	"version": "1.4.0",
-	"time": "2015-03-27",
+	"version": "1.4.1",
+	"time": "2015-04-16",
 	"homepage": "http://nymph.io/",
 	"type": "library",
 	"authors": [
@@ -36,8 +36,8 @@
 		]
 	},
 	"require": {
-		"sciactive/nymph-server": "1.4.0",
-		"sciactive/nymph-pubsub": "1.4.0"
+		"sciactive/nymph-server": "1.4.1",
+		"sciactive/nymph-pubsub": "1.4.1"
 	},
 	"require-dev": {
 		"sciactive/requirephp": "~1.3"

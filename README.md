@@ -14,7 +14,7 @@ composer require sciactive/nymph
 bower install nymph
 ```
 
-This repository is set up to retrieve the correct files for [server](https://github.com/sciactive/nymph-server) or [client](https://github.com/sciactive/nymph-client).
+This repository is a container for the [server](https://github.com/sciactive/nymph-server), [pubsub](https://github.com/sciactive/nymph-pubsub), and [client](https://github.com/sciactive/nymph-client) files.
 
 ## Demos
 
@@ -110,14 +110,14 @@ composer require sciactive/nymph
 ```php
 require 'vendor/autoload.php';
 use Nymph\Nymph as Nymph;
-\SciActive\RequirePHP::_('NymphConfig', [], function(){
-	$config = include('vendor/sciactive/nymph-server/conf/defaults.php');
-	$config->MySQL->host['value'] = 'your_db_host';
-	$config->MySQL->database['value'] = 'your_database';
-	$config->MySQL->user['value'] = 'your_user';
-	$config->MySQL->password['value'] = 'your_password';
-	return $config;
-});
+Nymph::configure([
+	'MySQL' => [
+		'host' => 'your_db_host',
+		'database' => 'your_database',
+		'user' => 'your_user',
+		'password' => 'your_password'
+	]
+]);
 
 // You are set up. Now make a class like `MyEntity` and use it.
 
