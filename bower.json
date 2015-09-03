@@ -1,7 +1,7 @@
 {
 	"name": "nymph",
 	"description": "Powerful object data storage and querying for collaborative web apps.",
-	"version": "1.4.2",
+	"version": "1.4.3",
 	"homepage": "http://nymph.io/",
 	"authors": [
 		"Hunter Perrin <hunter@sciactive.com>"
@@ -26,6 +26,6 @@
 		"composer.lock"
 	],
 	"dependencies": {
-		"nymph-client": "1.4.2"
+		"nymph-client": "1.4.3"
 	}
 }
