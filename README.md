@@ -109,7 +109,7 @@ composer require sciactive/nymph
 ```
 ```php
 require 'vendor/autoload.php';
-use Nymph\Nymph as Nymph;
+use Nymph\Nymph;
 Nymph::configure([
 	'MySQL' => [
 		'host' => 'your_db_host',
