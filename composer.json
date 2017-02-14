@@ -36,8 +36,8 @@
 		]
 	},
 	"require": {
-		"sciactive/nymph-server": "1.4.3",
-		"sciactive/nymph-pubsub": "1.4.3"
+		"sciactive/nymph-server": "dev-cleanup",
+		"sciactive/nymph-pubsub": "dev-cleanup"
 	},
 	"require-dev": {
 		"sciactive/requirephp": "~1.3"
