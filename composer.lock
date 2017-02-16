@@ -707,12 +707,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/sciactive/nymph-server.git",
-                "reference": "eb4cce2a9dc8d95cc7a1b7f6405f3ca959e49667"
+                "reference": "dc4a47afe4601049c68e5677ca808a5f74c5e1a5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sciactive/nymph-server/zipball/eb4cce2a9dc8d95cc7a1b7f6405f3ca959e49667",
-                "reference": "eb4cce2a9dc8d95cc7a1b7f6405f3ca959e49667",
+                "url": "https://api.github.com/repos/sciactive/nymph-server/zipball/dc4a47afe4601049c68e5677ca808a5f74c5e1a5",
+                "reference": "dc4a47afe4601049c68e5677ca808a5f74c5e1a5",
                 "shasum": ""
             },
             "require": {
@@ -754,7 +754,7 @@
                 "postgres",
                 "postgresql"
             ],
-            "time": "2017-02-14 23:13:51"
+            "time": "2017-02-16 17:38:10"
         },
         {
             "name": "sciactive/requirephp",
@@ -1160,16 +1160,16 @@
         },
         {
             "name": "zendframework/zend-servicemanager",
-            "version": "3.2.0",
+            "version": "3.2.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/zendframework/zend-servicemanager.git",
-                "reference": "596a2cde85a92c3366514ae0f55ea32ef59536ac"
+                "reference": "fe608d85457449889750fc6bf8d0859af59f56ec"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/zendframework/zend-servicemanager/zipball/596a2cde85a92c3366514ae0f55ea32ef59536ac",
-                "reference": "596a2cde85a92c3366514ae0f55ea32ef59536ac",
+                "url": "https://api.github.com/repos/zendframework/zend-servicemanager/zipball/fe608d85457449889750fc6bf8d0859af59f56ec",
+                "reference": "fe608d85457449889750fc6bf8d0859af59f56ec",
                 "shasum": ""
             },
             "require": {
@@ -1184,7 +1184,7 @@
                 "mikey179/vfsstream": "^1.6",
                 "ocramius/proxy-manager": "^1.0 || ^2.0",
                 "phpbench/phpbench": "^0.10.0",
-                "phpunit/phpunit": "^4.6 || ^5.2.10",
+                "phpunit/phpunit": "^5.7 || ^6.0.6",
                 "zendframework/zend-coding-standard": "~1.0.0"
             },
             "suggest": {
@@ -1217,7 +1217,7 @@
                 "servicemanager",
                 "zf"
             ],
-            "time": "2016-12-19 20:04:51"
+            "time": "2017-02-15 15:29:48"
         },
         {
             "name": "zendframework/zend-stdlib",
