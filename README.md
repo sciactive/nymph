@@ -104,6 +104,7 @@ Nymph in JavaScript handles any database interaction by using a NymphREST endpoi
 ## Setting up a Nymph Application
 
 <div dir="rtl">Quick Setup with Composer</div>
+
 ```sh
 composer require sciactive/nymph
 ```
