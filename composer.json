@@ -1,8 +1,8 @@
 {
 	"name": "sciactive/nymph",
 	"description": "Powerful object data storage and querying for collaborative web apps.",
-	"version": "1.4.3",
-	"time": "2015-09-02",
+	"version": "1.5.0",
+	"time": "2017-06-16",
 	"homepage": "http://nymph.io/",
 	"type": "library",
 	"authors": [
@@ -23,7 +23,7 @@
 		"object relational mapper",
 		"object relational mapping"
 	],
-	"license": "LGPL",
+	"license": "Apache-2.0",
 	"support": {
 		"issues": "https://github.com/sciactive/nymph/issues",
 		"wiki": "https://github.com/sciactive/nymph/wiki",
@@ -36,8 +36,8 @@
 		]
 	},
 	"require": {
-		"sciactive/nymph-server": "dev-cleanup",
-		"sciactive/nymph-pubsub": "dev-cleanup"
+		"sciactive/nymph-server": "1.5.0",
+		"sciactive/nymph-pubsub": "1.5.0"
 	},
 	"require-dev": {
 		"sciactive/requirephp": "~1.3"
