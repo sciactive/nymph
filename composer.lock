@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "0bffa0bc05e28edfcde0a3b5cdbf5eee",
-    "content-hash": "a80f9618b1e998156d22f83ca5f09813",
+    "hash": "822184a1df6727417fa9f85259ac7219",
+    "content-hash": "c1a987a8d38cbdb77558ac97324e695d",
     "packages": [
         {
             "name": "cboden/ratchet",
@@ -606,17 +606,23 @@
         },
         {
             "name": "sciactive/hookphp",
-            "version": "1.2.2",
+            "version": "2.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sciactive/hookphp.git",
-                "reference": "ef78d5af0943c1fd0b627426ec9905aeb6ac1c6c"
+                "reference": "f0605a702ee42eeb1d58220c1ad900e47a0b37cb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sciactive/hookphp/zipball/ef78d5af0943c1fd0b627426ec9905aeb6ac1c6c",
-                "reference": "ef78d5af0943c1fd0b627426ec9905aeb6ac1c6c",
+                "url": "https://api.github.com/repos/sciactive/hookphp/zipball/f0605a702ee42eeb1d58220c1ad900e47a0b37cb",
+                "reference": "f0605a702ee42eeb1d58220c1ad900e47a0b37cb",
                 "shasum": ""
+            },
+            "require": {
+                "php": "~7.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^6.1"
             },
             "type": "library",
             "autoload": {
@@ -629,7 +635,7 @@
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
-                "LGPL"
+                "Apache-2.0"
             ],
             "authors": [
                 {
@@ -646,26 +652,26 @@
                 "interception",
                 "method hooking"
             ],
-            "time": "2015-04-10 00:00:00"
+            "time": "2017-06-17 00:00:00"
         },
         {
             "name": "sciactive/nymph-pubsub",
-            "version": "1.5.1",
+            "version": "1.5.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sciactive/nymph-pubsub.git",
-                "reference": "62e9832ed53c80baa88ac26c085dd5db1c182e9f"
+                "reference": "da5ddaa77ae7eaeab1c949f63905ebc990b88d11"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sciactive/nymph-pubsub/zipball/62e9832ed53c80baa88ac26c085dd5db1c182e9f",
-                "reference": "62e9832ed53c80baa88ac26c085dd5db1c182e9f",
+                "url": "https://api.github.com/repos/sciactive/nymph-pubsub/zipball/da5ddaa77ae7eaeab1c949f63905ebc990b88d11",
+                "reference": "da5ddaa77ae7eaeab1c949f63905ebc990b88d11",
                 "shasum": ""
             },
             "require": {
                 "cboden/ratchet": "0.3.*",
-                "sciactive/hookphp": "~1.1",
-                "sciactive/nymph-server": "~1.5.1",
+                "sciactive/hookphp": "~2.0",
+                "sciactive/nymph-server": "~1.5.2",
                 "sciactive/requirephp": "~1.3",
                 "textalk/websocket": "1.0.*",
                 "zendframework/zend-log": "2.*"
@@ -704,16 +710,16 @@
         },
         {
             "name": "sciactive/nymph-server",
-            "version": "1.5.1",
+            "version": "1.5.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sciactive/nymph-server.git",
-                "reference": "5c9e5374a11363a26e11880a952570bef9dba276"
+                "reference": "b8ce457a37fcd1e681f6c2573563425c425c4910"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sciactive/nymph-server/zipball/5c9e5374a11363a26e11880a952570bef9dba276",
-                "reference": "5c9e5374a11363a26e11880a952570bef9dba276",
+                "url": "https://api.github.com/repos/sciactive/nymph-server/zipball/b8ce457a37fcd1e681f6c2573563425c425c4910",
+                "reference": "b8ce457a37fcd1e681f6c2573563425c425c4910",
                 "shasum": ""
             },
             "require": {
@@ -721,7 +727,7 @@
             },
             "require-dev": {
                 "phpunit/phpunit": "^6.1",
-                "sciactive/hookphp": "~1.2"
+                "sciactive/hookphp": "~2.0"
             },
             "type": "library",
             "autoload": {
