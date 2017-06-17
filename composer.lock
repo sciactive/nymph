@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "0490d785ad9a3b99e4cafc3c23389692",
-    "content-hash": "4e32502f62ceff84122f74d36f71c578",
+    "hash": "0bffa0bc05e28edfcde0a3b5cdbf5eee",
+    "content-hash": "a80f9618b1e998156d22f83ca5f09813",
     "packages": [
         {
             "name": "cboden/ratchet",
@@ -650,22 +650,22 @@
         },
         {
             "name": "sciactive/nymph-pubsub",
-            "version": "1.5.0",
+            "version": "1.5.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sciactive/nymph-pubsub.git",
-                "reference": "71c94bc588e8bc76908ae48009a5b8461f422151"
+                "reference": "62e9832ed53c80baa88ac26c085dd5db1c182e9f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sciactive/nymph-pubsub/zipball/71c94bc588e8bc76908ae48009a5b8461f422151",
-                "reference": "71c94bc588e8bc76908ae48009a5b8461f422151",
+                "url": "https://api.github.com/repos/sciactive/nymph-pubsub/zipball/62e9832ed53c80baa88ac26c085dd5db1c182e9f",
+                "reference": "62e9832ed53c80baa88ac26c085dd5db1c182e9f",
                 "shasum": ""
             },
             "require": {
                 "cboden/ratchet": "0.3.*",
                 "sciactive/hookphp": "~1.1",
-                "sciactive/nymph-server": "~1.5.0",
+                "sciactive/nymph-server": "~1.5.1",
                 "sciactive/requirephp": "~1.3",
                 "textalk/websocket": "1.0.*",
                 "zendframework/zend-log": "2.*"
@@ -681,7 +681,7 @@
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
-                "LGPL"
+                "Apache-2.0"
             ],
             "authors": [
                 {
@@ -704,16 +704,16 @@
         },
         {
             "name": "sciactive/nymph-server",
-            "version": "1.5.0",
+            "version": "1.5.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sciactive/nymph-server.git",
-                "reference": "81b0117d2c3d840d985b41db0a8851eb08b4fa51"
+                "reference": "5c9e5374a11363a26e11880a952570bef9dba276"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sciactive/nymph-server/zipball/81b0117d2c3d840d985b41db0a8851eb08b4fa51",
-                "reference": "81b0117d2c3d840d985b41db0a8851eb08b4fa51",
+                "url": "https://api.github.com/repos/sciactive/nymph-server/zipball/5c9e5374a11363a26e11880a952570bef9dba276",
+                "reference": "5c9e5374a11363a26e11880a952570bef9dba276",
                 "shasum": ""
             },
             "require": {
@@ -734,7 +734,7 @@
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
-                "LGPL"
+                "Apache-2.0"
             ],
             "authors": [
                 {
