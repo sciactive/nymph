@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "822184a1df6727417fa9f85259ac7219",
-    "content-hash": "c1a987a8d38cbdb77558ac97324e695d",
+    "hash": "568a87187fbd8ff9379c11d89ee1faed",
+    "content-hash": "663684c868d5d68d94f2830ea401ef99",
     "packages": [
         {
             "name": "cboden/ratchet",
@@ -710,16 +710,16 @@
         },
         {
             "name": "sciactive/nymph-server",
-            "version": "1.5.2",
+            "version": "1.5.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sciactive/nymph-server.git",
-                "reference": "b8ce457a37fcd1e681f6c2573563425c425c4910"
+                "reference": "14b95ed8cd86dea72bf2e5e34879df1d479a37a6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sciactive/nymph-server/zipball/b8ce457a37fcd1e681f6c2573563425c425c4910",
-                "reference": "b8ce457a37fcd1e681f6c2573563425c425c4910",
+                "url": "https://api.github.com/repos/sciactive/nymph-server/zipball/14b95ed8cd86dea72bf2e5e34879df1d479a37a6",
+                "reference": "14b95ed8cd86dea72bf2e5e34879df1d479a37a6",
                 "shasum": ""
             },
             "require": {
@@ -762,7 +762,7 @@
                 "postgres",
                 "postgresql"
             ],
-            "time": "2017-06-16 00:00:00"
+            "time": "2017-06-18 00:00:00"
         },
         {
             "name": "sciactive/requirephp",
