@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "568a87187fbd8ff9379c11d89ee1faed",
-    "content-hash": "663684c868d5d68d94f2830ea401ef99",
+    "hash": "182b05166c342db1c1c536bd23ae7b55",
+    "content-hash": "8107798f1dec6154e29fd40f745b2de9",
     "packages": [
         {
             "name": "cboden/ratchet",
@@ -656,22 +656,22 @@
         },
         {
             "name": "sciactive/nymph-pubsub",
-            "version": "1.5.2",
+            "version": "1.5.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sciactive/nymph-pubsub.git",
-                "reference": "da5ddaa77ae7eaeab1c949f63905ebc990b88d11"
+                "reference": "3133d4d9e1b7a445bac521b5fbb9d838be8ef46c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sciactive/nymph-pubsub/zipball/da5ddaa77ae7eaeab1c949f63905ebc990b88d11",
-                "reference": "da5ddaa77ae7eaeab1c949f63905ebc990b88d11",
+                "url": "https://api.github.com/repos/sciactive/nymph-pubsub/zipball/3133d4d9e1b7a445bac521b5fbb9d838be8ef46c",
+                "reference": "3133d4d9e1b7a445bac521b5fbb9d838be8ef46c",
                 "shasum": ""
             },
             "require": {
                 "cboden/ratchet": "0.3.*",
                 "sciactive/hookphp": "~2.0",
-                "sciactive/nymph-server": "~1.5.2",
+                "sciactive/nymph-server": "~1.5.4",
                 "sciactive/requirephp": "~1.3",
                 "textalk/websocket": "1.0.*",
                 "zendframework/zend-log": "2.*"
@@ -706,7 +706,7 @@
                 "pubsub",
                 "subscribe"
             ],
-            "time": "2017-06-16 00:00:00"
+            "time": "2017-06-18 00:00:00"
         },
         {
             "name": "sciactive/nymph-server",
