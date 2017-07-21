@@ -26,6 +26,6 @@
 		"composer.lock"
 	],
 	"dependencies": {
-		"nymph-client": "1.5.4"
+		"nymph-client": "1.6.0"
 	}
 }
