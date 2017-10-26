@@ -81,10 +81,10 @@ $mysqli->close();
 Nymph takes the objects that hold your data and translates them to relational data to be stored in a SQL database. Nymph has two parts, in both JavaScript and PHP:
 
 <dl>
-	<dt>Nymph Object</dt>
-	<dd>The Nymph object is where you communicate with the database and make queries. It also has sorting methods to help you sort arrays of entities.</dd>
-	<dt>Entity Class</dt>
-	<dd>The Entity class is what you will extend to make data objects.</dd>
+  <dt>Nymph Object</dt>
+  <dd>The Nymph object is where you communicate with the database and make queries. It also has sorting methods to help you sort arrays of entities.</dd>
+  <dt>Entity Class</dt>
+  <dd>The Entity class is what you will extend to make data objects.</dd>
 </dl>
 
 Both of these exist in PHP and JavaScript, and interacting with them in either environment is very similar. In JavaScript, since data can't be retrieved immediately, Nymph will return promises instead of actual data.
@@ -102,17 +102,15 @@ composer require sciactive/nymph
 require 'vendor/autoload.php';
 use Nymph\Nymph;
 Nymph::configure([
-	'MySQL' => [
-		'host' => 'your_db_host',
-		'database' => 'your_database',
-		'user' => 'your_user',
-		'password' => 'your_password'
-	]
+  'MySQL' => [
+    'host' => 'your_db_host',
+    'database' => 'your_database',
+    'user' => 'your_user',
+    'password' => 'your_password'
+  ]
 ]);
 
 // You are set up. Now make a class like `MyEntity` and use it.
-
-require 'my_autoloader.php';
 
 $myEntity = new MyEntity();
 $myEntity->myVar = "myValue";
