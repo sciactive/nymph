@@ -1,8 +1,8 @@
 {
 	"name": "sciactive/nymph",
-	"description": "Powerful object data storage and querying for collaborative web apps.",
-	"version": "1.6.0",
-	"time": "2017-07-21",
+	"description": "Don't use sciactive/nymph anymore. You should use sciactive/nymph-server and sciactive/nymph-pubsub.",
+	"version": "1.6.2",
+	"time": "2017-10-26",
 	"homepage": "http://nymph.io/",
 	"type": "library",
 	"authors": [
@@ -36,7 +36,7 @@
 		]
 	},
 	"require": {
-		"sciactive/nymph-server": "1.6.0",
+		"sciactive/nymph-server": "1.6.2",
 		"sciactive/nymph-pubsub": "1.6.0"
 	},
 	"require-dev": {
