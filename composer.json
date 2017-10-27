@@ -1,47 +1,6 @@
 {
-	"name": "sciactive/nymph",
-	"description": "Powerful object data storage and querying for collaborative web apps.",
-	"version": "2.2.0",
-	"time": "2017-10-25",
-	"homepage": "http://nymph.io/",
-	"type": "library",
-	"authors": [
-		{
-			"name": "Hunter Perrin",
-			"email": "hunter@sciactive.com",
-			"homepage": "https://github.com/hperrin",
-			"role": "Developer"
-		}
-	],
-	"keywords": [
-		"orm",
-		"mysql",
-		"postgres",
-		"postgresql",
-		"object database",
-		"object data store",
-		"object relational mapper",
-		"object relational mapping"
-	],
-	"license": "Apache-2.0",
-	"support": {
-		"issues": "https://github.com/sciactive/nymph/issues",
-		"wiki": "https://github.com/sciactive/nymph/wiki",
-		"source": "https://github.com/sciactive/nymph"
-	},
-	"archive": {
-		"exclude": [
-			"**/.*",
-			"bower.json"
-		]
-	},
-	"require": {
-		"sciactive/nymph-server": "2.2.0",
-		"sciactive/nymph-pubsub": "2.2.0"
-	},
-	"require-dev": {
-		"sciactive/requirephp": "~1.3"
-	},
-	"minimum-stability": "dev",
-  "prefer-stable": true
+    "require": {
+        "sciactive/nymph-server": "^2.2",
+        "sciactive/nymph-pubsub": "^2.2"
+    }
 }
