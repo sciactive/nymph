@@ -1,20 +1,38 @@
 # Nymph - collaborative app data
 
-[![Build Status](https://img.shields.io/travis/sciactive/nymph-server/master.svg?style=flat)](http://travis-ci.org/sciactive/nymph-server) [![Latest Stable Version](https://img.shields.io/packagist/v/sciactive/nymph.svg?style=flat)](https://packagist.org/packages/sciactive/nymph) [![License](https://img.shields.io/packagist/l/sciactive/nymph.svg?style=flat)](https://packagist.org/packages/sciactive/nymph) [![Open Issues](https://img.shields.io/github/issues/sciactive/nymph.svg?style=flat)](https://github.com/sciactive/nymph/issues)
+[![Build Status](https://img.shields.io/travis/sciactive/nymph-server/master.svg?style=flat)](http://travis-ci.org/sciactive/nymph-server) [![Demo App Uptime](https://img.shields.io/uptimerobot/ratio/m776732368-bd4ca09edc681d477a3ddf94.svg?style=flat)](http://nymph-demo.herokuapp.com/examples/sudoku/) [![Last Commit](https://img.shields.io/github/last-commit/sciactive/nymph.svg)](https://github.com/sciactive/nymph/commits/master) [![License](https://img.shields.io/packagist/l/sciactive/nymph.svg?style=flat)](https://packagist.org/packages/sciactive/nymph)
 
 Nymph is an object data store that is easy to use in JavaScript and PHP.
 
 ## Installation
 
-You can install Nymph with Composer for the server side files, and NPM for the client side files.
+For more detailed installation instructions, see the individual repositories. The best place to start is cloning the example repo.
+
+[![REST Server](https://img.shields.io/badge/repo-rest%20server-blue.svg?style=flat)](https://github.com/sciactive/nymph-server) [![PubSub Server](https://img.shields.io/badge/repo-pubsub%20server-blue.svg?style=flat)](https://github.com/sciactive/nymph-pubsub) [![Browser Client](https://img.shields.io/badge/repo-browser%20client-brightgreen.svg?style=flat)](https://github.com/sciactive/nymph-client) [![Node.js Client](https://img.shields.io/badge/repo-node%20client-brightgreen.svg?style=flat)](https://github.com/sciactive/nymph-client-node) [![App Examples](https://img.shields.io/badge/repo-examples-orange.svg?style=flat)](https://github.com/sciactive/nymph-examples)
+
+### Server Installation
 
 ```sh
-composer require sciactive/nymph
-
-npm install --save nymph-client
+composer install sciactive/nymph-server
+composer install sciactive/nymph-pubsub
 ```
 
-This repository is a container for the [server](https://github.com/sciactive/nymph-server), [pubsub](https://github.com/sciactive/nymph-pubsub), and [client](https://github.com/sciactive/nymph-client) files.
+### Client Installation
+
+```sh
+npm install --save nymph-client
+npm install --save nymph-client-node
+```
+
+### Example Apps Installation
+
+```sh
+# setup MySQL db nymph_example with user nymph_example and password "omgomg"
+git clone https://github.com/sciactive/nymph-examples.git
+cd nymph-examples
+composer install
+php examples/pubsub.php
+```
 
 ## Demos
 
@@ -24,102 +42,27 @@ Try opening the same one in two windows, and see one window react to changes in 
 - [Sudoku](http://nymph-demo.herokuapp.com/examples/sudoku/) ([source](https://github.com/sciactive/nymph-examples/tree/master/examples/sudoku))
 - [Simple Clicker](http://nymph-demo.herokuapp.com/examples/clicker/) ([source](https://github.com/sciactive/nymph-examples/tree/master/examples/clicker))
 
-## Nymph Query Language vs Just SQL
+## Nymph Query Language
 
-#### Nymph Query from Frontend
-
-```js
-Nymph.getEntities({"class":"BlogPost"}, {"type":"&", "like":["title","%easy%"], "data":["archived",false]}).then(function(entities){
-  console.log(entities);
-}, function(){
-  alert("Error");
-});
-```
-*No need for a specific endpoint here. Nymph uses the same endpoint for all client side queries.*
-
-#### Equivalent SQL Query from Frontend
+Nymph uses an object based query language. It is similar to Polish notation, as `"operator":["operand","operand"]`.
 
 ```js
-$.ajax({
-  "url": "titlesearch.php",
-  "data": {"title":"%not as easy%","archived":"false"},
-  "dataType": "JSON",
-  "success": function(entities){
-    console.log(entities);
+const easyBlogPosts = await Nymph.getEntities(
+  {
+    "class": BlogPost.class
   },
-  "error": function(){
-    alert("Error");
+  {"type": "&",
+    "like": ["title", "%easy%"],
+    "data": ["archived", false]
   }
-});
+);
 ```
-```php
-<?php
-// This file is the endpoint for searching for a BlogPost by title.
-$mysqli = new mysqli();
-
-$title = $_GET['title'];
-$archived = ($_GET['archived'] == "true" ? 'TRUE' : 'FALSE');
-$entities = array();
-if ($stmt = $mysqli->prepare("SELECT * FROM BlogPosts WHERE title LIKE '?' AND archived=?")) {
-  $stmt->bind_param("ss", $title, $archived);
-  $stmt->execute();
-  $result = $stmt->get_result();
-  while ($row = $result->fetch_assoc()) {
-    $entities[] = $row;
-  }
-  $stmt->close();
-}
-
-header("Content-Type: application/json");
-echo json_encode($entities);
-$mysqli->close();
-```
-*Without Nymph, every time you want a new type of query available on the frontend, you're going to need to either modify this endpoint or create a new one.*
 
 ## What is Nymph?
 
-Nymph takes the objects that hold your data and translates them to relational data to be stored in a SQL database. Nymph has two parts, in both JavaScript and PHP:
+Nymph is an Object Relational Mapper. It takes the objects that hold your data and translates them to relational data to be stored in a SQL database. Nymph allows rapid prototyping and a powerful query language.
 
-<dl>
-  <dt>Nymph Object</dt>
-  <dd>The Nymph object is where you communicate with the database and make queries. It also has sorting methods to help you sort arrays of entities.</dd>
-  <dt>Entity Class</dt>
-  <dd>The Entity class is what you will extend to make data objects.</dd>
-</dl>
-
-Both of these exist in PHP and JavaScript, and interacting with them in either environment is very similar. In JavaScript, since data can't be retrieved immediately, Nymph will return promises instead of actual data.
-
-Nymph in JavaScript handles any database interaction by using a NymphREST endpoint. You can build an endpoint by following the instructions in the [Setup Guide](https://github.com/sciactive/nymph/wiki/Setup-Guide).
-
-## Setting up a Nymph Application
-
-<div dir="rtl">Quick Setup with Composer</div>
-
-```sh
-composer require sciactive/nymph
-```
-```php
-require 'vendor/autoload.php';
-use Nymph\Nymph;
-Nymph::configure([
-  'MySQL' => [
-    'host' => 'your_db_host',
-    'database' => 'your_database',
-    'user' => 'your_user',
-    'password' => 'your_password'
-  ]
-]);
-
-// You are set up. Now make a class like `MyEntity` and use it.
-
-$myEntity = new MyEntity();
-$myEntity->myVar = "myValue";
-$myEntity->save();
-
-$allMyEntities = Nymph::getEntities(['class' => 'MyEntity']);
-```
-
-For a thorough step by step guide to setting up Nymph on your own server, visit the [Setup Guide](https://github.com/sciactive/nymph/wiki/Setup-Guide).
+Nymph provides a client library which handles database interactions by using a REST endpoint. You can set up an endpoint by following the instructions in the [Setup Guide](https://github.com/sciactive/nymph/wiki/Setup-Guide).
 
 ## Documentation
 
@@ -127,4 +70,4 @@ Check out the documentation in the wiki, [Technical Documentation Index](https:/
 
 ## What's Next
 
-Up next is an ACL system for Nymph. It will allow you to restrict what entities a user, or group of users, has access to. It will include a user and group entity class. It will soon be available at [tilmeld.org](http://tilmeld.org/).
+Up next is an user management system for Nymph. It will let you set up a registration and login process using Nymph entities. It will soon be available at [tilmeld.org](http://tilmeld.org/).

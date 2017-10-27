@@ -1,48 +1,8 @@
 <?php
 
-// Did I really try to do this instead of just setting my own autoloader??
-
-// $files = [
-//   __DIR__.'/vendor/composer/autoload_classmap.php',
-//   __DIR__.'/vendor/composer/autoload_psr4.php',
-//   __DIR__.'/vendor/composer/autoload_namespaces.php',
-//   __DIR__.'/vendor/composer/autoload_static.php',
-// ];
-//
-// foreach ($files as $file) {
-//   $contents = file_get_contents($file);
-//
-//   if (strpos($contents, '$vendorDir . \'/sciactive/nymph-server/src')
-//       !== false) {
-//     $contents = str_replace(
-//         [
-//           '$vendorDir . \'/sciactive/nymph-pubsub/src',
-//           '$vendorDir . \'/sciactive/nymph-server/src',
-//         ],
-//         [
-//           '\''.__DIR__.'/pubsub/src',
-//           '\''.__DIR__.'/server/src',
-//         ],
-//         $contents
-//     );
-//     file_put_contents($file, $contents);
-//   }
-//   if (strpos($contents, '__DIR__ . \'/..\' . \'/sciactive/nymph-server/src\'')
-//       !== false) {
-//     $contents = str_replace(
-//         [
-//           '__DIR__ . \'/..\' . \'/sciactive/nymph-pubsub/src\'',
-//           '__DIR__ . \'/..\' . \'/sciactive/nymph-server/src\'',
-//         ],
-//         [
-//           '\''.__DIR__.'/pubsub/src\'',
-//           '\''.__DIR__.'/server/src\'',
-//         ],
-//         $contents
-//     );
-//     file_put_contents($file, $contents);
-//   }
-// }
+// Override Composer packages with the files from the repository. This is very
+// helpful in development, so you can test without having to publish a bunch of
+// package versions.
 
 require __DIR__.'/vendor/autoload.php';
 
