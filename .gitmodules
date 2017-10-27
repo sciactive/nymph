@@ -5,11 +5,11 @@
 [submodule "examples"]
 	path = examples
 	url = git@github.com:sciactive/nymph-examples.git
-	branch = node-support
+	branch = master
 [submodule "client"]
 	path = client
 	url = git@github.com:sciactive/nymph-client.git
-	branch = node-support
+	branch = master
 [submodule "pubsub"]
 	path = pubsub
 	url = git@github.com:sciactive/nymph-pubsub.git
