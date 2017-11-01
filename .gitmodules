@@ -18,3 +18,7 @@
 	path = client-node
 	url = git@github.com:sciactive/nymph-client-node.git
 	branch = master
+[submodule "query-editor"]
+	path = query-editor
+	url = git@github.com:sciactive/nymph-query-editor.git
+	branch = master
