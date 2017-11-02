@@ -4,43 +4,32 @@
 
 Nymph is an object data store that is easy to use in JavaScript and PHP.
 
-## Installation
-
-For more detailed installation instructions, see the individual repositories. The best place to start is cloning the example repo.
-
-[![REST Server](https://img.shields.io/badge/repo-rest%20server-blue.svg?style=flat)](https://github.com/sciactive/nymph-server) [![PubSub Server](https://img.shields.io/badge/repo-pubsub%20server-blue.svg?style=flat)](https://github.com/sciactive/nymph-pubsub) [![Browser Client](https://img.shields.io/badge/repo-browser%20client-brightgreen.svg?style=flat)](https://github.com/sciactive/nymph-client) [![Node.js Client](https://img.shields.io/badge/repo-node%20client-brightgreen.svg?style=flat)](https://github.com/sciactive/nymph-client-node) [![App Examples](https://img.shields.io/badge/repo-examples-orange.svg?style=flat)](https://github.com/sciactive/nymph-examples)
-
-### Server Installation
-
-```sh
-composer install sciactive/nymph-server
-composer install sciactive/nymph-pubsub
-```
-
-### Client Installation
-
-```sh
-npm install --save nymph-client
-npm install --save nymph-client-node
-```
-
-### Example Apps Installation
-
-```sh
-# setup MySQL db nymph_example with user nymph_example and password "omgomg"
-git clone https://github.com/sciactive/nymph-examples.git
-cd nymph-examples
-composer install
-php examples/pubsub.php
-```
-
-## Demos
+## Live Demos
 
 Try opening the same one in two windows, and see one window react to changes in the other.
 
 - [Todo](https://nymph-demo.herokuapp.com/examples/todo/svelte/) ([source](https://github.com/sciactive/nymph-examples/tree/master/examples/todo/))
 - [Sudoku](https://nymph-demo.herokuapp.com/examples/sudoku/) ([source](https://github.com/sciactive/nymph-examples/tree/master/examples/sudoku))
 - [Simple Clicker](https://nymph-demo.herokuapp.com/examples/clicker/) ([source](https://github.com/sciactive/nymph-examples/tree/master/examples/clicker))
+
+## Installation
+
+This repo is for developing Nymph itself, and will run the example apps with latest Nymph code. If you want to develop an app with Nymph, you can follow the installation instructions in the server and client repos.
+
+[![REST Server](https://img.shields.io/badge/repo-rest%20server-blue.svg?style=flat)](https://github.com/sciactive/nymph-server) [![PubSub Server](https://img.shields.io/badge/repo-pubsub%20server-blue.svg?style=flat)](https://github.com/sciactive/nymph-pubsub) [![Browser Client](https://img.shields.io/badge/repo-browser%20client-brightgreen.svg?style=flat)](https://github.com/sciactive/nymph-client) [![Node.js Client](https://img.shields.io/badge/repo-node%20client-brightgreen.svg?style=flat)](https://github.com/sciactive/nymph-client-node) [![App Examples](https://img.shields.io/badge/repo-examples-orange.svg?style=flat)](https://github.com/sciactive/nymph-examples)
+
+### Dev Environment Installation
+
+1. [Get Docker](https://www.docker.com/community-edition).
+2. Clone the repo: `git clone --recursive https://github.com/sciactive/nymph.git && cd nymph`
+3. Run the app: `./run.sh`
+
+Now you can see the example apps on your local machine:
+
+* [Todo App with Svelte](http://localhost:8080/examples/examples/todo/svelte/)
+* [Todo App with Angular 1](http://localhost:8080/examples/examples/todo/angular1/)
+* [Sudoku App](http://localhost:8080/examples/examples/sudoku/)
+* [Simple Clicker App](http://localhost:8080/examples/examples/clicker/)
 
 ## Nymph Query Language
 

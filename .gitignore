@@ -1,2 +1,5 @@
+node_modules
 vendor
-.idea
+/db_data
+/db_password.txt
+/db_root_password.txt

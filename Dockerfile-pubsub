@@ -1,0 +1,5 @@
+FROM php:7.1-cli
+
+RUN docker-php-ext-install mysqli
+RUN curl https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh -o wait-for-it.sh
+RUN chmod 755 wait-for-it.sh
