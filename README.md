@@ -20,7 +20,8 @@ This repo is for developing Nymph itself, and will run the example apps with lat
 
 ### Dev Environment Installation
 
-1. [Get Docker](https://www.docker.com/community-edition).
+1. [Get Docker](https://www.docker.com/community-edition). On Ubuntu: `sudo apt-get install docker docker-compose`.
+  * If you're on Ubuntu, you need to also run `sudo usermod -a -G docker $USER`, then log out and log back in.
 2. Clone the repo: `git clone --recursive https://github.com/sciactive/nymph.git && cd nymph`
 3. Run the app: `./run.sh`
 
