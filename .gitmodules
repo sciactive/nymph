@@ -1,24 +1,24 @@
 [submodule "server"]
 	path = server
-	url = git@github.com:sciactive/nymph-server.git
+	url = https://github.com/sciactive/nymph-server.git
 	branch = master
 [submodule "examples"]
 	path = examples
-	url = git@github.com:sciactive/nymph-examples.git
+	url = https://github.com/sciactive/nymph-examples.git
 	branch = master
 [submodule "client"]
 	path = client
-	url = git@github.com:sciactive/nymph-client.git
+	url = https://github.com/sciactive/nymph-client.git
 	branch = master
 [submodule "pubsub"]
 	path = pubsub
-	url = git@github.com:sciactive/nymph-pubsub.git
+	url = https://github.com/sciactive/nymph-pubsub.git
 	branch = master
 [submodule "client-node"]
 	path = client-node
-	url = git@github.com:sciactive/nymph-client-node.git
+	url = https://github.com/sciactive/nymph-client-node.git
 	branch = master
 [submodule "query-editor"]
 	path = query-editor
-	url = git@github.com:sciactive/nymph-query-editor.git
+	url = https://github.com/sciactive/nymph-query-editor.git
 	branch = master
