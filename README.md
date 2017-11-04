@@ -56,11 +56,9 @@ const easyBlogPosts = await Nymph.getEntities(
 
 Nymph is an Object Relational Mapper. It takes the objects that hold your data and translates them to relational data to be stored in a SQL database. Nymph allows rapid prototyping and a powerful query language.
 
-Nymph provides a client library which handles database interactions by using a REST endpoint. You can set up an endpoint by following the instructions in the [Setup Guide](https://github.com/sciactive/nymph/wiki/Setup-Guide).
+## API Docs
 
-## Documentation
-
-Check out the documentation in the wiki, [Technical Documentation Index](https://github.com/sciactive/nymph/wiki/Technical-Documentation).
+Check out the [API Docs in the wiki](https://github.com/sciactive/nymph/wiki/API-Docs).
 
 ## What's Next
 
