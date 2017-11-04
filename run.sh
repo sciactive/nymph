@@ -6,7 +6,10 @@ if [ ! -d "vendor" ]; then
     composer install
   else
     # No composer on the host, so install with Docker image.
-    if ! docker run -it --rm -v $PWD:/app composer install; then
+    if docker run -it --rm -v $PWD:/app composer install; then
+      # Make sure the files are owned by the user.
+      docker run -it --rm -v $PWD:/app ubuntu chown -R $(id -u):$(id -g) /app/vendor
+    else
       echo "Failed to install PHP libraries."
       exit 1
     fi
