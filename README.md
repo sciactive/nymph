@@ -14,7 +14,11 @@ Try opening the same one in two windows, and see one window react to changes in 
 
 ## Installation
 
-This repo is for developing Nymph itself, and will run the example apps with latest Nymph code. If you want to develop an app with Nymph, you can follow the installation instructions in the server and client repos.
+This repo is for developing Nymph itself, and will run the example apps with latest Nymph code. If you want to develop an app with Nymph, you can use the app template repo:
+
+[Nymph App Template](https://github.com/hperrin/nymph-template)
+
+You can also install Nymph manually on your server by following the installation instructions in the server and client repos.
 
 [![REST Server](https://img.shields.io/badge/repo-rest%20server-blue.svg?style=flat)](https://github.com/sciactive/nymph-server) [![PubSub Server](https://img.shields.io/badge/repo-pubsub%20server-blue.svg?style=flat)](https://github.com/sciactive/nymph-pubsub) [![Browser Client](https://img.shields.io/badge/repo-browser%20client-brightgreen.svg?style=flat)](https://github.com/sciactive/nymph-client) [![Node.js Client](https://img.shields.io/badge/repo-node%20client-brightgreen.svg?style=flat)](https://github.com/sciactive/nymph-client-node) [![App Examples](https://img.shields.io/badge/repo-examples-orange.svg?style=flat)](https://github.com/sciactive/nymph-examples)
 
