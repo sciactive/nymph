@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "f7b8f5626cc34de09fc86ab63b0d5040",
+    "content-hash": "e1f34cdc4873809da9224196a2f8db6c",
     "packages": [
         {
             "name": "cboden/ratchet",
@@ -197,6 +197,54 @@
                 "url"
             ],
             "time": "2017-03-20T17:10:46+00:00"
+        },
+        {
+            "name": "paragonie/random_compat",
+            "version": "v2.0.11",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/paragonie/random_compat.git",
+                "reference": "5da4d3c796c275c55f057af5a643ae297d96b4d8"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/paragonie/random_compat/zipball/5da4d3c796c275c55f057af5a643ae297d96b4d8",
+                "reference": "5da4d3c796c275c55f057af5a643ae297d96b4d8",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.2.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "4.*|5.*"
+            },
+            "suggest": {
+                "ext-libsodium": "Provides a modern crypto API that can be used to generate random bytes."
+            },
+            "type": "library",
+            "autoload": {
+                "files": [
+                    "lib/random.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Paragon Initiative Enterprises",
+                    "email": "security@paragonie.com",
+                    "homepage": "https://paragonie.com"
+                }
+            ],
+            "description": "PHP 5.x polyfill for random_bytes() and random_int() from PHP 7",
+            "keywords": [
+                "csprng",
+                "pseudorandom",
+                "random"
+            ],
+            "time": "2017-09-27T21:40:39+00:00"
         },
         {
             "name": "psr/container",
@@ -917,30 +965,125 @@
             "time": "2015-02-19T00:00:00+00:00"
         },
         {
-            "name": "symfony/http-foundation",
-            "version": "v3.3.10",
+            "name": "sciactive/tilmeld",
+            "version": "1.0.0-beta.1",
             "source": {
                 "type": "git",
-                "url": "https://github.com/symfony/http-foundation.git",
-                "reference": "22cf9c2b1d9f67cc8e75ae7f4eaa60e4c1eff1f8"
+                "url": "https://github.com/sciactive/tilmeld.git",
+                "reference": "03cf28922586332a7ab985db5fca940f439af975"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/http-foundation/zipball/22cf9c2b1d9f67cc8e75ae7f4eaa60e4c1eff1f8",
-                "reference": "22cf9c2b1d9f67cc8e75ae7f4eaa60e4c1eff1f8",
+                "url": "https://api.github.com/repos/sciactive/tilmeld/zipball/03cf28922586332a7ab985db5fca940f439af975",
+                "reference": "03cf28922586332a7ab985db5fca940f439af975",
+                "shasum": ""
+            },
+            "require": {
+                "sciactive/hookphp": "~2.0",
+                "sciactive/nymph-pubsub": "~2.2",
+                "sciactive/nymph-server": "~2.2",
+                "sciactive/umailphp": "~2.1"
+            },
+            "type": "library",
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "Hunter Perrin",
+                    "email": "hperrin@gmail.com",
+                    "homepage": "https://github.com/hperrin",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Nymph user and group management with access controls.",
+            "homepage": "http://tilmeld.org/",
+            "keywords": [
+                "User management",
+                "Users",
+                "acl",
+                "group management",
+                "group manager",
+                "groups",
+                "nymph",
+                "user manager"
+            ],
+            "time": "2017-11-13T00:00:00+00:00"
+        },
+        {
+            "name": "sciactive/umailphp",
+            "version": "2.1.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/sciactive/umailphp.git",
+                "reference": "c50dc7ef04702ee8144448f06df3959d3f29e7cb"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/sciactive/umailphp/zipball/c50dc7ef04702ee8144448f06df3959d3f29e7cb",
+                "reference": "c50dc7ef04702ee8144448f06df3959d3f29e7cb",
+                "shasum": ""
+            },
+            "require": {
+                "sciactive/nymph-server": "~2.2.0",
+                "sciactive/requirephp": "~1.3"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "uMailPHP\\": "src/"
+                },
+                "psr-4": {
+                    "uMailPHP\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "Hunter Perrin",
+                    "email": "hunter@sciactive.com",
+                    "homepage": "https://github.com/hperrin",
+                    "role": "Developer"
+                }
+            ],
+            "description": "A PHP email templating system.",
+            "homepage": "http://umailphp.org/",
+            "keywords": [
+                "email",
+                "templating"
+            ],
+            "time": "2017-11-13T00:00:00+00:00"
+        },
+        {
+            "name": "symfony/http-foundation",
+            "version": "v3.4.0-BETA4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/http-foundation.git",
+                "reference": "ce3c40e528a2786453fa4154c85480ee6e9b8500"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/http-foundation/zipball/ce3c40e528a2786453fa4154c85480ee6e9b8500",
+                "reference": "ce3c40e528a2786453fa4154c85480ee6e9b8500",
                 "shasum": ""
             },
             "require": {
                 "php": "^5.5.9|>=7.0.8",
-                "symfony/polyfill-mbstring": "~1.1"
+                "symfony/polyfill-mbstring": "~1.1",
+                "symfony/polyfill-php70": "~1.6"
             },
             "require-dev": {
-                "symfony/expression-language": "~2.8|~3.0"
+                "symfony/expression-language": "~2.8|~3.0|~4.0"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "3.3-dev"
+                    "dev-master": "3.4-dev"
                 }
             },
             "autoload": {
@@ -967,7 +1110,7 @@
             ],
             "description": "Symfony HttpFoundation Component",
             "homepage": "https://symfony.com",
-            "time": "2017-10-05T23:10:23+00:00"
+            "time": "2017-11-10T07:36:19+00:00"
         },
         {
             "name": "symfony/polyfill-mbstring",
@@ -1029,17 +1172,76 @@
             "time": "2017-10-11T12:05:26+00:00"
         },
         {
-            "name": "symfony/routing",
-            "version": "v3.3.10",
+            "name": "symfony/polyfill-php70",
+            "version": "v1.6.0",
             "source": {
                 "type": "git",
-                "url": "https://github.com/symfony/routing.git",
-                "reference": "2e26fa63da029dab49bf9377b3b4f60a8fecb009"
+                "url": "https://github.com/symfony/polyfill-php70.git",
+                "reference": "0442b9c0596610bd24ae7b5f0a6cdbbc16d9fcff"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/routing/zipball/2e26fa63da029dab49bf9377b3b4f60a8fecb009",
-                "reference": "2e26fa63da029dab49bf9377b3b4f60a8fecb009",
+                "url": "https://api.github.com/repos/symfony/polyfill-php70/zipball/0442b9c0596610bd24ae7b5f0a6cdbbc16d9fcff",
+                "reference": "0442b9c0596610bd24ae7b5f0a6cdbbc16d9fcff",
+                "shasum": ""
+            },
+            "require": {
+                "paragonie/random_compat": "~1.0|~2.0",
+                "php": ">=5.3.3"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.6-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Symfony\\Polyfill\\Php70\\": ""
+                },
+                "files": [
+                    "bootstrap.php"
+                ],
+                "classmap": [
+                    "Resources/stubs"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Nicolas Grekas",
+                    "email": "p@tchwork.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                }
+            ],
+            "description": "Symfony polyfill backporting some PHP 7.0+ features to lower PHP versions",
+            "homepage": "https://symfony.com",
+            "keywords": [
+                "compatibility",
+                "polyfill",
+                "portable",
+                "shim"
+            ],
+            "time": "2017-10-11T12:05:26+00:00"
+        },
+        {
+            "name": "symfony/routing",
+            "version": "v3.4.0-BETA4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/routing.git",
+                "reference": "78e46a29ea0a76f8a63b5aecde17270c36542d7b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/routing/zipball/78e46a29ea0a76f8a63b5aecde17270c36542d7b",
+                "reference": "78e46a29ea0a76f8a63b5aecde17270c36542d7b",
                 "shasum": ""
             },
             "require": {
@@ -1048,17 +1250,17 @@
             "conflict": {
                 "symfony/config": "<2.8",
                 "symfony/dependency-injection": "<3.3",
-                "symfony/yaml": "<3.3"
+                "symfony/yaml": "<3.4"
             },
             "require-dev": {
                 "doctrine/annotations": "~1.0",
                 "doctrine/common": "~2.2",
                 "psr/log": "~1.0",
-                "symfony/config": "~2.8|~3.0",
-                "symfony/dependency-injection": "~3.3",
-                "symfony/expression-language": "~2.8|~3.0",
-                "symfony/http-foundation": "~2.8|~3.0",
-                "symfony/yaml": "~3.3"
+                "symfony/config": "~2.8|~3.0|~4.0",
+                "symfony/dependency-injection": "~3.3|~4.0",
+                "symfony/expression-language": "~2.8|~3.0|~4.0",
+                "symfony/http-foundation": "~2.8|~3.0|~4.0",
+                "symfony/yaml": "~3.4|~4.0"
             },
             "suggest": {
                 "doctrine/annotations": "For using the annotation loader",
@@ -1071,7 +1273,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "3.3-dev"
+                    "dev-master": "3.4-dev"
                 }
             },
             "autoload": {
@@ -1104,7 +1306,7 @@
                 "uri",
                 "url"
             ],
-            "time": "2017-10-02T07:25:00+00:00"
+            "time": "2017-11-07T14:20:24+00:00"
         },
         {
             "name": "textalk/websocket",
@@ -1327,8 +1529,10 @@
     ],
     "packages-dev": [],
     "aliases": [],
-    "minimum-stability": "stable",
-    "stability-flags": [],
+    "minimum-stability": "beta",
+    "stability-flags": {
+        "sciactive/tilmeld": 10
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": [],

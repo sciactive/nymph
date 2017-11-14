@@ -22,3 +22,7 @@
 	path = query-editor
 	url = https://github.com/sciactive/nymph-query-editor.git
 	branch = master
+[submodule "tilmeld"]
+	path = tilmeld
+	url = https://github.com/sciactive/tilmeld.git
+	branch = master
