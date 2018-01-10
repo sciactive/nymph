@@ -30,3 +30,11 @@
 	path = tilmeld-client
 	url = https://github.com/sciactive/tilmeld-client.git
 	branch = master
+[submodule "tilmeld.org"]
+	path = tilmeld.org
+	url = https://github.com/sciactive/tilmeld.org.git
+	branch = master
+[submodule "nymph.io"]
+	path = nymph.io
+	url = https://github.com/sciactive/nymph.io.git
+	branch = master
