@@ -2,7 +2,7 @@
   "require": {
     "sciactive/nymph-server": "^3.0@beta",
     "sciactive/nymph-pubsub": "^3.0@beta",
-    "sciactive/tilmeld": "^1.0@beta"
+    "sciactive/tilmeld-server": "^1.0@beta"
   },
   "minimum-stability": "beta"
 }
