@@ -62,4 +62,4 @@ Check out the [API Docs in the wiki](https://github.com/sciactive/nymph/wiki/API
 
 ## What's Next
 
-Up next is an user management system for Nymph. It will let you set up a registration and login process using Nymph entities. It will soon be available at [tilmeld.org](http://tilmeld.org/).
+Up next is a user management system for Nymph. Currently in beta, it will let you set up a registration and login process using Nymph entities. It's available at [tilmeld.org](http://tilmeld.org/).
