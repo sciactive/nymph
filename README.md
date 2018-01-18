@@ -1,6 +1,6 @@
 # Nymph - collaborative app data
 
-[![Build Status](https://img.shields.io/travis/sciactive/nymph-server/master.svg?style=flat)](http://travis-ci.org/sciactive/nymph-server) [![Demo App Uptime](https://img.shields.io/uptimerobot/ratio/m776732368-bd4ca09edc681d477a3ddf94.svg?style=flat)](http://nymph-demo.herokuapp.com/examples/sudoku/) [![Last Commit](https://img.shields.io/github/last-commit/sciactive/nymph.svg)](https://github.com/sciactive/nymph/commits/master) [![license](https://img.shields.io/github/license/sciactive/nymph.svg)]()
+[![Build Status](https://img.shields.io/travis/sciactive/nymph-server/master.svg)](http://travis-ci.org/sciactive/nymph-server) [![Demo App Uptime](https://img.shields.io/uptimerobot/ratio/m776732368-bd4ca09edc681d477a3ddf94.svg)](http://nymph-demo.herokuapp.com/examples/sudoku/) [![Last Commit](https://img.shields.io/github/last-commit/sciactive/nymph.svg)](https://github.com/sciactive/nymph/commits/master) [![license](https://img.shields.io/github/license/sciactive/nymph.svg)]()
 
 Nymph is an object data store that is easy to use in JavaScript and PHP.
 
@@ -20,7 +20,7 @@ This repo is for developing Nymph itself, and will run the example apps with lat
 
 You can also install Nymph manually on your server by following the installation instructions in the server and client repos.
 
-[![REST Server](https://img.shields.io/badge/repo-rest%20server-blue.svg?style=flat)](https://github.com/sciactive/nymph-server) [![PubSub Server](https://img.shields.io/badge/repo-pubsub%20server-blue.svg?style=flat)](https://github.com/sciactive/nymph-pubsub) [![Browser Client](https://img.shields.io/badge/repo-browser%20client-brightgreen.svg?style=flat)](https://github.com/sciactive/nymph-client) [![Node.js Client](https://img.shields.io/badge/repo-node%20client-brightgreen.svg?style=flat)](https://github.com/sciactive/nymph-client-node) [![App Examples](https://img.shields.io/badge/repo-examples-orange.svg?style=flat)](https://github.com/sciactive/nymph-examples)
+[![REST Server](https://img.shields.io/badge/repo-rest%20server-blue.svg)](https://github.com/sciactive/nymph-server) [![PubSub Server](https://img.shields.io/badge/repo-pubsub%20server-blue.svg)](https://github.com/sciactive/nymph-pubsub) [![Browser Client](https://img.shields.io/badge/repo-browser%20client-brightgreen.svg)](https://github.com/sciactive/nymph-client) [![Node.js Client](https://img.shields.io/badge/repo-node%20client-brightgreen.svg)](https://github.com/sciactive/nymph-client-node) [![App Examples](https://img.shields.io/badge/repo-examples-orange.svg)](https://github.com/sciactive/nymph-examples)
 
 ### Dev Environment Installation
 
