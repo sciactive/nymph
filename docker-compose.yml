@@ -11,6 +11,14 @@ services:
       MYSQL_USER: nymph_example
       MYSQL_PASSWORD: omgomg
 
+  # db:
+  #   image: postgres:latest
+  #   volumes:
+  #     - ./db_data:/var/lib/postgresql/data
+  #   environment:
+  #     POSTGRES_USER: nymph_example
+  #     POSTGRES_PASSWORD: omgomg
+
   pubsub:
     depends_on:
       - db
@@ -19,7 +27,14 @@ services:
       dockerfile: Dockerfile-pubsub
     volumes:
       - .:/nymph
-    command: ["/nymph/wait-for-it.sh", "db:3306", "--", "php", "/nymph/examples/examples/pubsub.php"]
+    command: [
+      "/nymph/wait-for-it.sh",
+      "db:3306",
+      # "db:5432",
+      "--",
+      "php",
+      "/nymph/examples/examples/pubsub.php"
+    ]
     ports:
       - "8081:8081"
     environment:
@@ -27,6 +42,11 @@ services:
       MYSQL_DATABASE: nymph_example
       MYSQL_USER: nymph_example
       MYSQL_PASSWORD: omgomg
+      # PGSQL_HOST: db
+      # PGSQL_PORT: 5432
+      # PGSQL_DATABASE: nymph_example
+      # PGSQL_USER: nymph_example
+      # PGSQL_PASSWORD: omgomg
 
   web:
     depends_on:
@@ -44,4 +64,9 @@ services:
       MYSQL_DATABASE: nymph_example
       MYSQL_USER: nymph_example
       MYSQL_PASSWORD: omgomg
+      # PGSQL_HOST: db
+      # PGSQL_PORT: 5432
+      # PGSQL_DATABASE: nymph_example
+      # PGSQL_USER: nymph_example
+      # PGSQL_PASSWORD: omgomg
       PUBSUB_HOST: pubsub:8081
