@@ -2,7 +2,9 @@ version: '3.0'
 
 services:
   db:
-    image: mysql:latest
+    build:
+      context: .
+      dockerfile: Dockerfile-mysql
     volumes:
       - ./db_data:/var/lib/mysql
     environment:
@@ -27,14 +29,13 @@ services:
       dockerfile: Dockerfile-pubsub
     volumes:
       - .:/nymph
-    command: [
-      "/nymph/wait-for-it.sh",
-      "db:3306",
-      # "db:5432",
-      "--",
-      "php",
-      "/nymph/examples/examples/pubsub.php"
-    ]
+    command:
+      - "/nymph/wait-for-it.sh"
+      - "db:3306"
+      # - "db:5432"
+      - "--"
+      - "php"
+      - "/nymph/examples/examples/pubsub.php"
     ports:
       - "8081:8081"
     environment:
