@@ -1,4 +1,4 @@
-version: '3.0'
+version: '3.1'
 
 services:
   db:
@@ -48,6 +48,9 @@ services:
       # PGSQL_DATABASE: nymph_example
       # PGSQL_USER: nymph_example
       # PGSQL_PASSWORD: omgomg
+      TILMELD_SECRET_FILE: /run/secrets/tilmeld_secret
+    secrets:
+      - tilmeld_secret
 
   web:
     depends_on:
@@ -71,3 +74,11 @@ services:
       # PGSQL_USER: nymph_example
       # PGSQL_PASSWORD: omgomg
       PUBSUB_HOST: pubsub:8081
+      TILMELD_SECRET_FILE: /run/secrets/tilmeld_secret
+    secrets:
+      - tilmeld_secret
+
+
+secrets:
+  tilmeld_secret:
+    file: tilmeld_secret.txt
