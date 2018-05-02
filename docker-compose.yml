@@ -35,7 +35,7 @@ services:
       # - "db:5432"
       - "--"
       - "php"
-      - "/nymph/examples/examples/pubsub.php"
+      - "/nymph/examples/examples/pubsub-tilmeld.php"
     ports:
       - "8081:8081"
     environment:
