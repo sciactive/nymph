@@ -1,7 +1,7 @@
-<h1 style="border: 0;">
-  <img alt="Nymph" src="assets/nymph-logo-125.png" />
+<h1>
+  <img alt="Nymph" src="assets/nymph-logo-125.png" /><br />
+  <small>collaborative app data</small>
 </h1>
-<h2><small>collaborative app data</small></h2>
 
 [![Build Status](https://img.shields.io/travis/sciactive/nymph-server/master.svg)](http://travis-ci.org/sciactive/nymph-server) [![Demo App Uptime](https://img.shields.io/uptimerobot/ratio/m776732368-bd4ca09edc681d477a3ddf94.svg)](http://nymph-demo.herokuapp.com/examples/sudoku/) [![Last Commit](https://img.shields.io/github/last-commit/sciactive/nymph.svg)](https://github.com/sciactive/nymph/commits/master) [![license](https://img.shields.io/github/license/sciactive/nymph.svg)]()
 
