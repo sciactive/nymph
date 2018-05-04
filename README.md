@@ -1,4 +1,4 @@
-<h1 style="text-align: center;">
+<h1 align="center">
   <img alt="Nymph" src="assets/nymph-header-125.png" /><br />
   <small>collaborative app data</small>
 </h1>
