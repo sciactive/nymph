@@ -1,5 +1,5 @@
-<h1>
-  <img alt="Nymph" src="assets/nymph-logo-125.png" /><br />
+<h1 style="text-align: center;">
+  <img alt="Nymph" src="assets/nymph-header-125.png" /><br />
   <small>collaborative app data</small>
 </h1>
 
