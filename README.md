@@ -22,13 +22,13 @@ Nymph sends the data from objects (called entities) up to the server to save in 
 // Creating entities is super easy.
 async function createBlogPost(title, body, archived) {
   // BlogPost extends Entity.
-  const blogPost = new BlogPost();
-  blogPost.set({title, body, archived});
-  if (!await blogPost.save()) {
+  const post = new BlogPost();
+  post.set({title, body, archived});
+  if (!await post.save()) {
     return null;
   }
   // The post is now saved in the database.
-  return blogPost;
+  return post;
 }
 
 // Creating relationships is also easy.
@@ -101,13 +101,13 @@ async function getMyLatestCommentsForPosts(posts) {
 Live page updating is easy in Nymph with the PubSub server.
 
 ```js
-function watchBlogPostComments(blogPost, component) {
+function watchBlogPostComments(post, component) {
   const comments = component.state.comments || [];
   const subscription = Nymph.getEntities({
     'class': BlogPostComment.class
   }, {
     'type': '&',
-    'ref': ['post', blogPost]
+    'ref': ['post', post]
   }).subscribe((newComments) => {
     // The PubSub server keeps us up to date on this query.
     PubSub.updateArray(comments, newComments);
