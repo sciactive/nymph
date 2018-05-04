@@ -4,11 +4,13 @@
 
 [![Build Status](https://img.shields.io/travis/sciactive/nymph-server/master.svg)](http://travis-ci.org/sciactive/nymph-server) [![Demo App Uptime](https://img.shields.io/uptimerobot/ratio/m776732368-bd4ca09edc681d477a3ddf94.svg)](http://nymph-demo.herokuapp.com/examples/sudoku/) [![Last Commit](https://img.shields.io/github/last-commit/sciactive/nymph.svg)](https://github.com/sciactive/nymph/commits/master) [![license](https://img.shields.io/github/license/sciactive/nymph.svg)]()
 
-Nymph is an Object Relational Mapper (ORM) with a powerful query language, modern client library, REST and Pub/Sub servers, and user/group management.
+Nymph stores data from objects and lets you query it easily.
+
+It's an ORM with a powerful query language, modern client library, REST and Pub/Sub servers, and user/group management.
 
 ## Live Demos
 
-Try opening the same one in two windows, and see one window react to changes in the other.
+Try opening the same one in two windows, and see one window update with changes from the other.
 
 - [Todo](https://nymph-demo.herokuapp.com/examples/todo/svelte/) ([source](https://github.com/sciactive/nymph-examples/tree/master/examples/todo/))
 - [Sudoku](https://nymph-demo.herokuapp.com/examples/sudoku/) ([source](https://github.com/sciactive/nymph-examples/tree/master/examples/sudoku))
@@ -16,7 +18,7 @@ Try opening the same one in two windows, and see one window react to changes in 
 
 ## Nymph Entities
 
-Nymph sends the data from objects (called entities) up to the server to save in the database.
+Nymph sends data from objects (called entities) to the server and saves to the database.
 
 ```js
 // Creating entities is super easy.
@@ -49,10 +51,10 @@ async function createBlogPostComment(post, body) {
 
 ## Nymph Query Language
 
-Nymph uses an object based query language. It is similar to Polish notation, as `"operator":["operand","operand"]`.
+Nymph uses an object based query language. It's similar to Polish notation, as `'operator':['operand','operand']`.
 
 ```js
-// The object based language makes querying from the frontend very easy.
+// Object based queries are easy from the frontend.
 async function searchBlogPosts(userQuery, page = 0) {
   // The server will only return entities the user has access to.
   return await Nymph.getEntities({
@@ -91,14 +93,14 @@ async function getMyLatestCommentsForPosts(posts) {
     // ...and the comment is for any...
     'type': '|',
     // ...of the given posts.
-    'ref': posts.map((post) => ['post', post])
+    'ref': posts.map(post => ['post', post])
   });
 }
 ```
 
 ## Nymph PubSub
 
-Live page updating is easy in Nymph with the PubSub server.
+Live page updating is easy with the PubSub server.
 
 ```js
 function watchBlogPostComments(post, component) {
@@ -108,10 +110,10 @@ function watchBlogPostComments(post, component) {
   }, {
     'type': '&',
     'ref': ['post', post]
-  }).subscribe((newComments) => {
+  }).subscribe(update => {
     // The PubSub server keeps us up to date on this query.
-    PubSub.updateArray(comments, newComments);
-    component.setState({...component.state, comments});
+    PubSub.updateArray(comments, update);
+    component.setState({comments});
   });
 
   return {
@@ -124,13 +126,13 @@ function watchBlogPostComments(post, component) {
 
 ## Installation
 
-This repo is for developing Nymph itself, and will run the example apps with latest Nymph code. If you want to develop an app with Nymph, you can use the app template repo:
+This repo is for working on Nymph itself. If you want to build an app with Nymph, you can use the app template:
 
 [Nymph App Template](https://github.com/hperrin/nymph-template)
 
-You can also install Nymph manually on your server by following the installation instructions in the server and client repos.
+You can also install Nymph in an existing app by following the instructions in the server and client repos.
 
-[![REST Server](https://img.shields.io/badge/repo-rest%20server-blue.svg)](https://github.com/sciactive/nymph-server) [![PubSub Server](https://img.shields.io/badge/repo-pubsub%20server-blue.svg)](https://github.com/sciactive/nymph-pubsub) [![Browser Client](https://img.shields.io/badge/repo-browser%20client-brightgreen.svg)](https://github.com/sciactive/nymph-client) [![Node.js Client](https://img.shields.io/badge/repo-node%20client-brightgreen.svg)](https://github.com/sciactive/nymph-client-node) [![Tilmeld Server](https://img.shields.io/badge/repo-tilmeld%20server-blue.svg)](https://github.com/sciactive/tilmeld-server) [![Tilmeld Client](https://img.shields.io/badge/repo-tilmeld%20client-brightgreen.svg)](https://github.com/sciactive/tilmeld-client) [![App Examples](https://img.shields.io/badge/repo-examples-orange.svg)](https://github.com/sciactive/nymph-examples)
+[![Nymph Server](https://img.shields.io/badge/repo-nymph%20server-blue.svg)](https://github.com/sciactive/nymph-server) [![PubSub Server](https://img.shields.io/badge/repo-pubsub%20server-blue.svg)](https://github.com/sciactive/nymph-pubsub) [![Tilmeld Server](https://img.shields.io/badge/repo-tilmeld%20server-blue.svg)](https://github.com/sciactive/tilmeld-server) [![Browser Client](https://img.shields.io/badge/repo-browser%20client-brightgreen.svg)](https://github.com/sciactive/nymph-client) [![Node.js Client](https://img.shields.io/badge/repo-node%20client-brightgreen.svg)](https://github.com/sciactive/nymph-client-node) [![Tilmeld Client](https://img.shields.io/badge/repo-tilmeld%20client-brightgreen.svg)](https://github.com/sciactive/tilmeld-client) [![App Examples](https://img.shields.io/badge/repo-examples-orange.svg)](https://github.com/sciactive/nymph-examples)
 
 ### Dev Environment Installation
 
@@ -143,7 +145,8 @@ You can also install Nymph manually on your server by following the installation
 Now you can see the example apps on your local machine:
 
 * [Todo App with Svelte](http://localhost:8080/examples/examples/todo/svelte/)
-* [Todo App with Angular 1](http://localhost:8080/examples/examples/todo/angular1/)
+* [Todo App with React](http://localhost:8080/examples/examples/todo/react/)
+* [Todo App with AngularJS](http://localhost:8080/examples/examples/todo/angular1/)
 * [Sudoku App](http://localhost:8080/examples/examples/sudoku/)
 * [Simple Clicker App](http://localhost:8080/examples/examples/clicker/)
 
@@ -153,4 +156,4 @@ Check out the [API Docs in the wiki](https://github.com/sciactive/nymph/wiki/API
 
 ## What's Next
 
-Up next is a user management system for Nymph. Currently in beta, it will let you set up a registration and login process using Nymph entities. It's available at [tilmeld.org](http://tilmeld.org/).
+Tilmeld is a user management system for Nymph. Currently in beta, it provides registration and login with Nymph entities. It's available at [tilmeld.org](http://tilmeld.org/).
