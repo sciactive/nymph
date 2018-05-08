@@ -16,6 +16,10 @@ Try opening the same one in two windows, and see one window update with changes 
 - [Sudoku](https://nymph-demo.herokuapp.com/examples/sudoku/) ([source](https://github.com/sciactive/nymph-examples/tree/master/examples/sudoku))
 - [Simple Clicker](https://nymph-demo.herokuapp.com/examples/clicker/) ([source](https://github.com/sciactive/nymph-examples/tree/master/examples/clicker))
 
+## App Template
+
+To start building an app with Nymph, you can use the [Nymph App Template](https://github.com/hperrin/nymph-template).
+
 ## Nymph Entities
 
 Nymph sends data from objects (called entities) to the server and saves to the database.
@@ -126,15 +130,15 @@ function watchBlogPostComments(post, component) {
 
 ## Installation
 
-This repo is for working on Nymph itself. If you want to build an app with Nymph, you can use the app template:
+If you want to build an app with Nymph, you can use the [app template](https://github.com/hperrin/nymph-template).
 
-[Nymph App Template](https://github.com/hperrin/nymph-template)
-
-You can also install Nymph in an existing app by following the instructions in the server and client repos.
+You can also install Nymph in an existing app by following the instructions in the server and client repos, or in the wiki [for Nymph](https://github.com/sciactive/nymph/wiki/Setup-Guide) and [PubSub](https://github.com/sciactive/nymph/wiki/PubSub-Server-Setup).
 
 [![Nymph Server](https://img.shields.io/badge/repo-nymph%20server-blue.svg)](https://github.com/sciactive/nymph-server) [![PubSub Server](https://img.shields.io/badge/repo-pubsub%20server-blue.svg)](https://github.com/sciactive/nymph-pubsub) [![Tilmeld Server](https://img.shields.io/badge/repo-tilmeld%20server-blue.svg)](https://github.com/sciactive/tilmeld-server) [![Browser Client](https://img.shields.io/badge/repo-browser%20client-brightgreen.svg)](https://github.com/sciactive/nymph-client) [![Node.js Client](https://img.shields.io/badge/repo-node%20client-brightgreen.svg)](https://github.com/sciactive/nymph-client-node) [![Tilmeld Client](https://img.shields.io/badge/repo-tilmeld%20client-brightgreen.svg)](https://github.com/sciactive/tilmeld-client) [![App Examples](https://img.shields.io/badge/repo-examples-orange.svg)](https://github.com/sciactive/nymph-examples)
 
 ### Dev Environment Installation
+
+If you are interested in working on Nymph itself:
 
 1. [Get Docker](https://www.docker.com/community-edition). On Ubuntu: `sudo apt-get install docker.io docker-compose`.
   * If you're on Ubuntu, you need to also run `sudo usermod -a -G docker $USER`, then log out and log back in.
