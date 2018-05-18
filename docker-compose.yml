@@ -33,6 +33,8 @@ services:
       - "/nymph/wait-for-it.sh"
       - "db:3306"
       # - "db:5432"
+      - "-t"
+      - "120"
       - "--"
       - "php"
       - "/nymph/examples/examples/pubsub-tilmeld.php"
