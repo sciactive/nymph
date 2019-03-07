@@ -148,11 +148,16 @@ If you are interested in working on Nymph itself:
 
 Now you can see the example apps on your local machine:
 
-* [Todo App with Svelte](http://localhost:8080/examples/examples/todo/svelte/)
-* [Todo App with React](http://localhost:8080/examples/examples/todo/react/)
-* [Todo App with AngularJS](http://localhost:8080/examples/examples/todo/angular1/)
-* [Sudoku App](http://localhost:8080/examples/examples/sudoku/)
-* [Simple Clicker App](http://localhost:8080/examples/examples/clicker/)
+* Todo App with Svelte
+  * http://localhost:8080/examples/examples/todo/svelte/
+* Todo App with React
+  * http://localhost:8080/examples/examples/todo/react/
+* Todo App with AngularJS
+  * http://localhost:8080/examples/examples/todo/angular1/
+* Sudoku App
+  * http://localhost:8080/examples/examples/sudoku/
+* Simple Clicker App
+  * http://localhost:8080/examples/examples/clicker/
 
 ## API Docs
 
@@ -160,4 +165,4 @@ Check out the [API Docs in the wiki](https://github.com/sciactive/nymph/wiki/API
 
 ## What's Next
 
-Tilmeld is a user management system for Nymph. Currently in beta, it provides registration and login with Nymph entities. It's available at [tilmeld.org](http://tilmeld.org/).
+Tilmeld is a user management system for Nymph. Currently in beta, it provides registration and login with Nymph entities. Check it out at [tilmeld.org](http://tilmeld.org/).
