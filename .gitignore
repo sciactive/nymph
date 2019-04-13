@@ -1,7 +1,5 @@
 node_modules
 vendor
-/db_data
-/db_password.txt
-/db_root_password.txt
+/db_*
 /tilmeld_secret.txt
 /wait-for-it.sh
