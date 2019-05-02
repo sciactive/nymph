@@ -38,3 +38,6 @@
 	path = nymph.io
 	url = https://github.com/sciactive/nymph.io.git
 	branch = master
+[submodule "tilmeld-components"]
+	path = tilmeld-components
+	url = https://github.com/sciactive/tilmeld-components.git
