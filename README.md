@@ -4,7 +4,7 @@
 
 [![Build Status](https://img.shields.io/travis/sciactive/nymph-server/master.svg)](http://travis-ci.org/sciactive/nymph-server) [![Demo App Uptime](https://img.shields.io/uptimerobot/ratio/m776732368-bd4ca09edc681d477a3ddf94.svg)](http://nymph-demo.herokuapp.com/examples/sudoku/) [![Last Commit](https://img.shields.io/github/last-commit/sciactive/nymph.svg)](https://github.com/sciactive/nymph/commits/master) [![license](https://img.shields.io/github/license/sciactive/nymph.svg)]()
 
-Nymph stores data from objects and lets you query it easily.
+Nymph stores data from objects and lets you query easily.
 
 It's an ORM with a powerful query language, modern client library, REST and Pub/Sub servers, and user/group management.
 
@@ -22,17 +22,15 @@ To start building an app with Nymph, you can use the [Nymph App Template](https:
 
 ## Nymph Entities
 
-Nymph sends data from objects (called entities) to the server and saves to the database.
+Nymph stores data in objects called Entities. It handles relationships between entities by simply saving one entity in another one's property.
 
 ```js
 // Creating entities is super easy.
 async function createBlogPost(title, body, archived) {
   // BlogPost extends Entity.
   const post = new BlogPost();
-  post.set({title, body, archived});
-  if (!await post.save()) {
-    return null;
-  }
+  post.set({ title, body, archived });
+  await post.save();
   // The post is now saved in the database.
   return post;
 }
@@ -40,17 +38,17 @@ async function createBlogPost(title, body, archived) {
 // Creating relationships is also easy.
 async function createBlogPostComment(post, body) {
   if (!(post instanceof BlogPost)) {
-    alert('post should be a BlogPost object!');
-    return null;
+    throw new Error('post should be a BlogPost object!');
   }
 
-  const comment = new BlogPostComment();
-  comment.set({post, body});
-  if (!await comment.save()) {
-    return null;
-  }
+  const comment = new Comment();
+  comment.set({ post, body });
+  await comment.save();
   return comment;
 }
+
+const post = await createBlogPost('My First Post', 'This is a great blog post!', false);
+await createBlogPostComment(post, 'It sure is! Wow!');
 ```
 
 ## Nymph Query Language
@@ -82,7 +80,7 @@ async function getBlogPostComments(post) {
   });
 }
 
-// Even complicated queries are easy.
+// Complicated queries are easy.
 async function getMyLatestCommentsForPosts(posts) {
   return await Nymph.getEntities({
     // Get all comments...
@@ -94,7 +92,7 @@ async function getMyLatestCommentsForPosts(posts) {
     // ...where the current user is the author...
     'ref': ['user', await User.current()]
   }, {
-    // ...and the comment is for any...
+    // ...and the comment is on any...
     'type': '|',
     // ...of the given posts.
     'ref': posts.map(post => ['post', post])
@@ -104,11 +102,12 @@ async function getMyLatestCommentsForPosts(posts) {
 
 ## Nymph PubSub
 
-Live page updating is easy with the PubSub server.
+Making collaborative apps is easy with the PubSub server.
 
 ```js
 function watchBlogPostComments(post, component) {
   const comments = component.state.comments || [];
+
   const subscription = Nymph.getEntities({
     'class': BlogPostComment.class
   }, {
@@ -117,7 +116,7 @@ function watchBlogPostComments(post, component) {
   }).subscribe(update => {
     // The PubSub server keeps us up to date on this query.
     PubSub.updateArray(comments, update);
-    component.setState({comments});
+    component.setState({ comments });
   });
 
   return {
@@ -127,6 +126,10 @@ function watchBlogPostComments(post, component) {
   };
 }
 ```
+
+## User/Group Management
+
+Tilmeld is a user management system for Nymph. Check it out at [tilmeld.org](http://tilmeld.org/).
 
 ## Installation
 
@@ -162,7 +165,3 @@ Now you can see the example apps on your local machine:
 ## API Docs
 
 Check out the [API Docs in the wiki](https://github.com/sciactive/nymph/wiki/API-Docs).
-
-## What's Next
-
-Tilmeld is a user management system for Nymph. Currently in beta, it provides registration and login with Nymph entities. Check it out at [tilmeld.org](http://tilmeld.org/).
