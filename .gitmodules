@@ -41,3 +41,4 @@
 [submodule "tilmeld-components"]
 	path = tilmeld-components
 	url = https://github.com/sciactive/tilmeld-components.git
+	branch = master
