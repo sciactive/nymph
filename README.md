@@ -22,7 +22,7 @@ To start building an app with Nymph, you can use the [Nymph App Template](https:
 
 ## Nymph Entities
 
-Nymph stores data in objects called Entities. It handles relationships between entities by simply saving one entity in another one's property.
+Nymph stores data in objects called Entities. Relationships between entities are done by saving one entity in another one's property.
 
 ```js
 // Creating entities is super easy.
