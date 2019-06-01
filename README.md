@@ -4,9 +4,9 @@
 
 [![Build Status](https://img.shields.io/travis/sciactive/nymph-server/master.svg)](http://travis-ci.org/sciactive/nymph-server) [![Demo App Uptime](https://img.shields.io/uptimerobot/ratio/m776732368-bd4ca09edc681d477a3ddf94.svg)](http://nymph-demo.herokuapp.com/examples/sudoku/) [![Last Commit](https://img.shields.io/github/last-commit/sciactive/nymph.svg)](https://github.com/sciactive/nymph/commits/master) [![license](https://img.shields.io/github/license/sciactive/nymph.svg)]()
 
-Nymph stores data from objects and lets you query easily.
+Powerful object data storage and querying for collaborative web apps.
 
-It's an ORM with a powerful query language, modern client library, REST and Pub/Sub servers, and user/group management.
+Nymph is an ORM with a powerful query language, modern client library, REST and Pub/Sub servers, and user/group management.
 
 ## Live Demos
 
