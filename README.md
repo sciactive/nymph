@@ -146,7 +146,7 @@ You can also install Nymph in an existing app by following the instructions in t
 
 If you are interested in working on Nymph itself:
 
-1. [Get Docker](https://www.docker.com/community-edition). On Ubuntu: `sudo apt-get install docker.io docker-compose`.
+1. [Get Docker](https://www.docker.com/products/docker-desktop). On Ubuntu: `sudo apt-get install docker.io docker-compose`.
   * If you're on Ubuntu, you need to also run `sudo usermod -a -G docker $USER`, then log out and log back in.
 2. Clone the repo: `git clone --recursive https://github.com/sciactive/nymph.git && cd nymph`
 3. Make sure you're on master: `git submodule foreach git checkout master`
