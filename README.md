@@ -29,8 +29,10 @@ Nymph stores data in objects called Entities. Relationships between entities are
 async function createBlogPost(title, body, archived) {
   // BlogPost extends Entity.
   const post = new BlogPost();
-  post.set({ title, body, archived });
-  await post.save();
+  post.title = title;
+  post.body = body;
+  post.archived = archived;
+  await post.$save();
   // The post is now saved in the database.
   return post;
 }
@@ -42,8 +44,9 @@ async function createBlogPostComment(post, body) {
   }
 
   const comment = new Comment();
-  comment.set({ post, body });
-  await comment.save();
+  comment.post = post;
+  comment.body = body;
+  await comment.$save();
   return comment;
 }
 
@@ -53,7 +56,7 @@ await createBlogPostComment(post, 'It sure is! Wow!');
 
 ## Nymph Query Language
 
-Nymph uses an object based query language. It's similar to Polish notation, as `'operator':['operand','operand']`.
+Nymph uses an object based query language. It's similar to Polish notation, as `'operator' : ['operand', 'operand']`.
 
 ```js
 // Object based queries are easy from the frontend.
@@ -155,8 +158,6 @@ Now you can see the example apps on your local machine:
   * http://localhost:8080/examples/examples/todo/svelte/
 * Todo App with React
   * http://localhost:8080/examples/examples/todo/react/
-* Todo App with AngularJS
-  * http://localhost:8080/examples/examples/todo/angular1/
 * Sudoku App
   * http://localhost:8080/examples/examples/sudoku/
 * Simple Clicker App
