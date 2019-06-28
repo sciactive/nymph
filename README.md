@@ -6,7 +6,7 @@
 
 Powerful object data storage and querying for collaborative web apps.
 
-Nymph is an ORM with a powerful query language, modern client library, REST and Pub/Sub servers, and user/group management.
+Nymph is an ORM with a powerful query language, modern client library, REST and Publish/Subscribe servers, and user/group management.
 
 ## Live Demos
 
@@ -68,7 +68,9 @@ async function searchBlogPosts(userQuery, page = 0) {
     'offset': page * 10
   }, {
     'type': '&',
+    // You can do things like pattern matching.
     'like': ['title', '%' + userQuery + '%'],
+    // Or strict comparison, etc.
     'strict': ['archived', false]
   });
 }
@@ -122,17 +124,15 @@ function watchBlogPostComments(post, component) {
     component.setState({ comments });
   });
 
-  return {
-    destroy() {
-      subscription.unsubscribe();
-    }
-  };
+  component.onDestroy(() => {
+    subscription.unsubscribe();
+  });
 }
 ```
 
 ## User/Group Management
 
-Tilmeld is a user management system for Nymph. Check it out at [tilmeld.org](http://tilmeld.org/).
+Tilmeld is a user management system for Nymph. Check it out at [tilmeld.org](https://tilmeld.org/).
 
 ## Installation
 
