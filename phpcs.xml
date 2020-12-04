@@ -1,0 +1,179 @@
+<?xml version="1.0"?>
+<ruleset name="SciActive">
+  <description>The SciActive PHP code style.</description>
+
+  <arg name="tab-width" value="2"/>
+
+  <!-- Include the whole PSR-2 standard -->
+  <rule ref="PSR2">
+    <!-- Braces on same line. -->
+    <exclude name="PSR2.Classes.ClassDeclaration.OpenBraceNewLine" />
+    <exclude name="Squiz.Classes.ClassDeclaration.OpenBraceNewLine" />
+    <exclude name="PEAR.Functions.FunctionDeclaration.BraceOnSameLine" />
+    <exclude name="Squiz.Functions.MultiLineFunctionDeclaration.BraceOnSameLine" />
+    <!-- Multiline condition complex indentation. -->
+    <exclude name="PEAR.ControlStructures.MultiLineCondition.StartWithBoolean" />
+    <exclude name="PEAR.ControlStructures.MultiLineCondition.Alignment" />
+    <!-- Conflicts with PEAR.Functions.FunctionDeclaration. -->
+    <exclude name="Squiz.Functions.MultiLineFunctionDeclaration.Indent" />
+  </rule>
+
+
+  <!-- And change some of the rules to SciActive Code Style. -->
+
+  <!-- Braces on same line. -->
+  <rule ref="Generic.Functions.OpeningFunctionBraceKernighanRitchie">
+    <properties>
+      <property name="checkFunctions" value="true" />
+      <property name="checkClosures" value="true" />
+    </properties>
+  </rule>
+
+  <!-- Change soft limit on line length to 80 characters. -->
+  <rule ref="Generic.Files.LineLength">
+    <properties>
+      <property name="lineLimit" value="80"/>
+      <property name="absoluteLineLimit" value="0"/>
+      <property name="ignoreComments" value="true" />
+    </properties>
+  </rule>
+
+  <!-- Indent of 2 spaces. -->
+  <rule ref="Generic.Arrays.ArrayIndent">
+    <properties>
+      <property name="indent" value="2" />
+    </properties>
+  </rule>
+  <rule ref="Generic.WhiteSpace.ScopeIndent">
+    <properties>
+      <property name="indent" value="2"/>
+      <property name="exact" value="true"/>
+      <property name="ignoreIndentationTokens" type="array" value="T_COMMENT,T_DOC_COMMENT_OPEN_TAG,T_OBJECT_OPERATOR"/>
+    </properties>
+  </rule>
+  <rule ref="PSR2.Classes.ClassDeclaration">
+    <properties>
+      <property name="indent" value="2" />
+    </properties>
+  </rule>
+  <rule ref="PSR2.ControlStructures.SwitchDeclaration">
+    <properties>
+      <property name="indent" value="2"/>
+    </properties>
+  </rule>
+  <rule ref="PSR2.Methods.FunctionCallSignature">
+    <properties>
+      <property name="indent" value="2" />
+      <property name="allowMultipleArguments" value="false" />
+    </properties>
+  </rule>
+  <rule ref="PEAR.ControlStructures.MultiLineCondition">
+    <properties>
+      <property name="indent" value="2" />
+    </properties>
+  </rule>
+  <rule ref="PEAR.Formatting.MultiLineAssignment">
+    <properties>
+      <property name="indent" value="2" />
+    </properties>
+  </rule>
+  <rule ref="PEAR.Functions.FunctionCallSignature">
+    <properties>
+      <property name="indent" value="2" />
+      <property name="allowMultipleArguments" value="false" />
+    </properties>
+  </rule>
+  <rule ref="PEAR.Functions.FunctionDeclaration">
+    <properties>
+      <property name="indent" value="2" />
+    </properties>
+  </rule>
+  <rule ref="PEAR.WhiteSpace.ObjectOperatorIndent">
+    <properties>
+      <property name="indent" value="2" />
+    </properties>
+  </rule>
+  <rule ref="PEAR.WhiteSpace.ScopeClosingBrace">
+    <properties>
+      <property name="indent" value="2" />
+    </properties>
+  </rule>
+  <rule ref="Squiz.Classes.ClassDeclaration">
+    <properties>
+      <property name="indent" value="2" />
+    </properties>
+  </rule>
+
+
+  <!-- Now SciActive special blend of rules. -->
+
+  <rule ref="Squiz.Commenting.FunctionComment.MissingParamTag">
+    <message>@param annotation for parameter "%s" missing</message>
+	</rule>
+  <rule ref="Generic.Files.LineEndings" />
+  <rule ref="Generic.Classes.DuplicateClassName"/>
+  <rule ref="Generic.CodeAnalysis.EmptyStatement"/>
+  <rule ref="Generic.CodeAnalysis.ForLoopShouldBeWhileLoop"/>
+  <rule ref="Generic.CodeAnalysis.UnconditionalIfStatement"/>
+  <rule ref="Generic.CodeAnalysis.UnnecessaryFinalModifier"/>
+  <rule ref="Generic.CodeAnalysis.UselessOverridingMethod"/>
+  <rule ref="Generic.ControlStructures.InlineControlStructure">
+    <properties>
+      <property name="error" value="false"/>
+    </properties>
+  </rule>
+  <rule ref="Generic.Formatting.SpaceAfterCast"/>
+  <rule ref="Generic.Formatting.SpaceAfterNot">
+    <properties>
+      <property name="spacing" value="0" />
+    </properties>
+  </rule>
+  <rule ref="Generic.Functions.OpeningFunctionBraceKernighanRitchie"/>
+  <rule ref="Generic.NamingConventions.ConstructorName"/>
+  <rule ref="Generic.PHP.DisallowShortOpenTag"/>
+  <rule ref="Generic.PHP.ForbiddenFunctions"/>
+  <rule ref="Generic.PHP.NoSilencedErrors"/>
+  <rule ref="Generic.WhiteSpace.ArbitraryParenthesesSpacing">
+    <properties>
+      <property name="ignoreNewlines" value="true" />
+    </properties>
+  </rule>
+  <rule ref="PEAR.Commenting.InlineComment"/>
+  <rule ref="Squiz.PHP.LowercasePHPFunctions"/>
+  <rule ref="Squiz.PHP.NonExecutableCode"/>
+  <rule ref="Squiz.Scope.StaticThisUsage"/>
+  <rule ref="Squiz.ControlStructures.ControlSignature">
+    <properties>
+      <property name="requiredSpacesBeforeColon" value="0" />
+    </properties>
+  </rule>
+  <rule ref="Squiz.ControlStructures.ForEachLoopDeclaration"/>
+  <rule ref="Squiz.ControlStructures.ForLoopDeclaration"/>
+  <rule ref="Squiz.Functions.FunctionDeclaration"/>
+  <rule ref="Squiz.Functions.FunctionDeclarationArgumentSpacing">
+    <properties>
+      <property name="equalsSpacing" value="1" />
+    </properties>
+  </rule>
+  <rule ref="Squiz.Strings.ConcatenationSpacing">
+    <properties>
+      <property name="ignoreNewlines" value="true" />
+    </properties>
+  </rule>
+  <rule ref="Squiz.WhiteSpace.ObjectOperatorSpacing">
+    <properties>
+      <property name="ignoreNewlines" value="true" />
+    </properties>
+  </rule>
+  <rule ref="Squiz.WhiteSpace.OperatorSpacing">
+    <properties>
+      <property name="ignoreNewlines" value="true" />
+    </properties>
+  </rule>
+  <rule ref="Squiz.WhiteSpace.LanguageConstructSpacing"/>
+  <rule ref="Squiz.WhiteSpace.LogicalOperatorSpacing"/>
+  <rule ref="Squiz.WhiteSpace.ScopeKeywordSpacing"/>
+  <rule ref="Squiz.WhiteSpace.SemicolonSpacing"/>
+
+  <rule ref="Squiz.WhiteSpace.ControlStructureSpacing" />
+</ruleset>
