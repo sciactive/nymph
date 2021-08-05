@@ -8,6 +8,12 @@ Powerful object data storage and querying for collaborative web apps.
 
 Nymph is an ORM with a powerful query language, modern client library, REST and Publish/Subscribe servers, and user/group management.
 
+## Node.js Migration
+
+Nymph is being migrated to Node.js! Nymph has been a PHP project for many years, but it's time to move to bigger and better things, and that comes in the form of TypeScript! TypeScript, unlike PHP, is strictly typed. Node.js, unlike PHP, isn't specifically designed to handle strictly HTTP traffic. It also has a much larger list of available libraries to help rapidly develop server software. As such, the next version of Nymph will be written for Node.js in TypeScript. Check it out here:
+
+https://github.com/sciactive/nymphjs
+
 ## Live Demos
 
 Try opening the same one in two windows, and see one window update with changes from the other.
