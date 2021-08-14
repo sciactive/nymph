@@ -8,11 +8,9 @@ Powerful object data storage and querying for collaborative web apps.
 
 Nymph is an ORM with a powerful query language, modern client library, REST and Publish/Subscribe servers, and user/group management.
 
-## Node.js Migration
+## Deprecation Notice
 
-Nymph is being migrated to Node.js! Nymph has been a PHP project for many years, but it's time to move to bigger and better things, and that comes in the form of TypeScript! TypeScript, unlike PHP, is strictly typed. Node.js, unlike PHP, isn't specifically designed to handle strictly HTTP traffic. It also has a much larger list of available libraries to help rapidly develop server software. As such, the next version of Nymph will be written for Node.js in TypeScript. Check it out here:
-
-https://github.com/sciactive/nymphjs
+The PHP implementation of Nymph/Tilmeld has been deprecated. It will no longer have any new features added. Instead, a new version of Nymph running on Node.js, written entirely in TypeScript will replace the PHP implementation. You can find it over at the [Nymph.js repo](https://github.com/sciactive/nymphjs).
 
 ## Live Demos
 
@@ -46,7 +44,7 @@ async function createBlogPost(title, body, archived) {
 // Creating relationships is also easy.
 async function createBlogPostComment(post, body) {
   if (!(post instanceof BlogPost)) {
-    throw new Error('post should be a BlogPost object!');
+    throw new Error("post should be a BlogPost object!");
   }
 
   const comment = new Comment();
@@ -56,8 +54,12 @@ async function createBlogPostComment(post, body) {
   return comment;
 }
 
-const post = await createBlogPost('My First Post', 'This is a great blog post!', false);
-await createBlogPostComment(post, 'It sure is! Wow!');
+const post = await createBlogPost(
+  "My First Post",
+  "This is a great blog post!",
+  false
+);
+await createBlogPostComment(post, "It sure is! Wow!");
 ```
 
 ## Nymph Query Language
@@ -68,46 +70,56 @@ Nymph uses an object based query language. It's similar to Polish notation, as `
 // Object based queries are easy from the frontend.
 async function searchBlogPosts(userQuery, page = 0) {
   // The server will only return entities the user has access to.
-  return await Nymph.getEntities({
-    'class': BlogPost.class,
-    'limit': 10,
-    'offset': page * 10
-  }, {
-    'type': '&',
-    // You can do things like pattern matching.
-    'like': ['title', '%' + userQuery + '%'],
-    // Or strict comparison, etc.
-    'strict': ['archived', false]
-  });
+  return await Nymph.getEntities(
+    {
+      class: BlogPost.class,
+      limit: 10,
+      offset: page * 10,
+    },
+    {
+      type: "&",
+      // You can do things like pattern matching.
+      like: ["title", "%" + userQuery + "%"],
+      // Or strict comparison, etc.
+      strict: ["archived", false],
+    }
+  );
 }
 
 // Querying relationships is also easy.
 async function getBlogPostComments(post) {
-  return await Nymph.getEntities({
-    'class': BlogPostComment.class
-  }, {
-    'type': '&',
-    'ref': ['post', post]
-  });
+  return await Nymph.getEntities(
+    {
+      class: BlogPostComment.class,
+    },
+    {
+      type: "&",
+      ref: ["post", post],
+    }
+  );
 }
 
 // Complicated queries are easy.
 async function getMyLatestCommentsForPosts(posts) {
-  return await Nymph.getEntities({
-    // Get all comments...
-    'class': BlogPostComment.class
-  }, {
-    'type': '&',
-    // ...made in the last day...
-    'gte': ['cdate', null, '-1 day'],
-    // ...where the current user is the author...
-    'ref': ['user', await User.current()]
-  }, {
-    // ...and the comment is on any...
-    'type': '|',
-    // ...of the given posts.
-    'ref': posts.map(post => ['post', post])
-  });
+  return await Nymph.getEntities(
+    {
+      // Get all comments...
+      class: BlogPostComment.class,
+    },
+    {
+      type: "&",
+      // ...made in the last day...
+      gte: ["cdate", null, "-1 day"],
+      // ...where the current user is the author...
+      ref: ["user", await User.current()],
+    },
+    {
+      // ...and the comment is on any...
+      type: "|",
+      // ...of the given posts.
+      ref: posts.map((post) => ["post", post]),
+    }
+  );
 }
 ```
 
@@ -119,12 +131,15 @@ Making collaborative apps is easy with the PubSub server.
 function watchBlogPostComments(post, component) {
   const comments = component.state.comments || [];
 
-  const subscription = Nymph.getEntities({
-    'class': BlogPostComment.class
-  }, {
-    'type': '&',
-    'ref': ['post', post]
-  }).subscribe(update => {
+  const subscription = Nymph.getEntities(
+    {
+      class: BlogPostComment.class,
+    },
+    {
+      type: "&",
+      ref: ["post", post],
+    }
+  ).subscribe((update) => {
     // The PubSub server keeps us up to date on this query.
     PubSub.updateArray(comments, update);
     component.setState({ comments });
@@ -153,19 +168,19 @@ You can also install Nymph in an existing app by following the instructions in t
 If you are interested in working on Nymph itself:
 
 1. [Get Docker](https://docs.docker.com/install/#supported-platforms)
-   * You can run the Docker install script on Linux with:
+   - You can run the Docker install script on Linux with:
      ```shell
      curl -fsSL https://get.docker.com -o get-docker.sh
      sh get-docker.sh
      ```
-   * Or, from the repos on Ubuntu:
+   - Or, from the repos on Ubuntu:
      ```shell
      sudo apt-get install docker.io
      sudo usermod -a -G docker $USER
      ```
      Then log out and log back in.
 2. [Get Docker Compose](https://docs.docker.com/compose/install/)
-   * From the repos on Ubuntu:
+   - From the repos on Ubuntu:
      ```shell
      sudo apt-get install docker-compose
      ```
@@ -185,14 +200,14 @@ If you are interested in working on Nymph itself:
 
 Now you can see the example apps on your local machine:
 
-* Todo App with Svelte
-  * http://localhost:8080/examples/examples/todo/svelte/
-* Todo App with React
-  * http://localhost:8080/examples/examples/todo/react/
-* Sudoku App
-  * http://localhost:8080/examples/examples/sudoku/
-* Simple Clicker App
-  * http://localhost:8080/examples/examples/clicker/
+- Todo App with Svelte
+  - http://localhost:8080/examples/examples/todo/svelte/
+- Todo App with React
+  - http://localhost:8080/examples/examples/todo/react/
+- Sudoku App
+  - http://localhost:8080/examples/examples/sudoku/
+- Simple Clicker App
+  - http://localhost:8080/examples/examples/clicker/
 
 ## API Docs
 
